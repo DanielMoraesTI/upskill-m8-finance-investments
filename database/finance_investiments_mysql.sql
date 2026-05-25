@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS investimentos_acoes;
 DROP TABLE IF EXISTS investimentos_renda_fixa;
 
 CREATE TABLE investimentos_renda_fixa (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   nome_renda_fixa VARCHAR(150) NOT NULL,
   data_inicial DATE NOT NULL,
   valor_investido DECIMAL(14, 2) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE investimentos_renda_fixa (
 );
 
 CREATE TABLE investimentos_acoes (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   sigla VARCHAR(10) NOT NULL,
   nome_acao VARCHAR(150) NOT NULL,
   quantidade INT UNSIGNED NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE investimentos_acoes (
 );
 
 CREATE TABLE investimentos_fundos_imobiliarios (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   sigla VARCHAR(10) NOT NULL,
   categoria ENUM('Fundos de Tijolo', 'Fundos de Papel', 'Fundos Híbridos') NOT NULL,
   quantidade INT UNSIGNED NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE investimentos_fundos_imobiliarios (
 );
 
 CREATE TABLE investimentos_historico (
-  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id INT AUTO_INCREMENT PRIMARY KEY,
   investment_type ENUM('renda_fixa', 'acoes', 'fundos_imobiliarios') NOT NULL,
   investment_id INT UNSIGNED NOT NULL,
   action_type ENUM('CRIACAO', 'ATUALIZACAO', 'REMOCAO') NOT NULL,
