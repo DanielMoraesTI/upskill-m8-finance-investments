@@ -1,3 +1,3 @@
 export default function AcoesPage() {
-	return <main>Ações</main>;
+  return <main>Ações</main>;
 }

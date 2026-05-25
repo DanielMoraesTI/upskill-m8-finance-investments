@@ -1,3 +1,3 @@
 export default function HistoricoPage() {
-	return <main>Historico</main>;
+  return <main>Historico</main>;
 }

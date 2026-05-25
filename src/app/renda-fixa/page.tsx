@@ -1,3 +1,3 @@
 export default function RendaFixaPage() {
-	return <main>Renda fixa</main>;
+  return <main>Renda fixa</main>;
 }
