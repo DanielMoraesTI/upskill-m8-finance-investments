@@ -6,6 +6,9 @@ import Link from "next/link";
 import Image from "next/image";
 import NavItem, { NavItemInterface } from "../NavItem";
 import "./index.css";
+import { FaBars, FaXmark } from "react-icons/fa6";
+import { useState } from "react";
+
 
 export default function Navbar() {
   const items: NavItemInterface[] = [
@@ -33,6 +36,8 @@ export default function Navbar() {
 
   const pathname = usePathname();
 
+  const [openMenu, setOpenMenu] = useState<boolean>(false);
+
   return (
     <header>
       <nav className="navbar">
@@ -47,7 +52,7 @@ export default function Navbar() {
             priority
           />
         </Link>
-        <ul className="navbar-itens">
+        <ul className={`navbar-itens ${openMenu ? "open" : ""}`}>
           {items.map((item, index) => (
             <NavItem
 				key={index}
@@ -57,6 +62,10 @@ export default function Navbar() {
 			/>
           ))}
         </ul>
+
+		<button className="btn-mobile-menu" onClick={() => setOpenMenu(!openMenu)}>
+			{openMenu ? <FaXmark /> : <FaBars />}
+		</button>
 
         <button className="btn-contact">Contatar</button>
       </nav>

@@ -21,6 +21,16 @@ header {
             gap: 32px;
             align-items: center;
             list-style: none;
+
+            &.open {
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: #13131d;
+                padding: 20px;
+            }
         }
 
         .btn-contact {
@@ -36,6 +46,33 @@ header {
             
             &:hover {
                 background-color: #5a3dc8;
+            }
+        }
+
+        .btn-mobile-menu {
+            display: none;
+            background-color: transparent;
+            font-size: 20px;
+            color: #f7f5ff;
+            border: none;
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 768px) {
+            .btn-mobile-menu {
+                display: block;
+            }
+
+            .navbar-itens {
+                display: none;
+
+                &.open {
+                    display: flex;
+                }
+            }
+
+            .btn-contact {
+                display: none;
             }
         }
     }
