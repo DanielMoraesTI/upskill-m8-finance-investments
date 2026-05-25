@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./styles.css";
+import Navbar from "../components/Navbar";
 
 
 const poppins = Poppins({
@@ -27,6 +28,7 @@ export default function RootLayout({
       lang="pt-BR"
     >
       <body className={poppins.className}>
+        <Navbar />
         {children}
       </body>
     </html>
