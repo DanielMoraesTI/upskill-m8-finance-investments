@@ -10,6 +10,8 @@ import { FaBars, FaXmark } from "react-icons/fa6";
 import { useState } from "react";
 
 
+
+
 export default function Navbar() {
   const items: NavItemInterface[] = [
     {
@@ -38,6 +40,13 @@ export default function Navbar() {
 
   const [openMenu, setOpenMenu] = useState<boolean>(false);
 
+  const imageStyles = {
+  width: "auto",
+  height: "auto",
+  display: "block",
+  objectFit: "contain" as const,
+  };
+
   return (
     <header>
       <nav className="navbar">
@@ -50,6 +59,7 @@ export default function Navbar() {
             height={768}
             sizes="(max-width: 768px) 112px, 160px"
             priority
+            style={imageStyles}
           />
         </Link>
         <ul className={`navbar-itens ${openMenu ? "open" : ""}`}>
