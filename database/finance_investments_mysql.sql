@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS finance_investiments;
-CREATE DATABASE IF NOT EXISTS finance_investiments;
+DROP DATABASE IF EXISTS finance_investments;
+CREATE DATABASE IF NOT EXISTS finance_investments;
 
-USE finance_investiments;
+USE finance_investments;
 
 DROP TABLE IF EXISTS investimentos_historico;
 DROP TABLE IF EXISTS investimentos_fundos_imobiliarios;
