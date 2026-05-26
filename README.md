@@ -1,40 +1,3 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
 ### Configurar variáveis de ambiente
 Crie um arquivo `.env` na raiz do projeto segunido o modelo abaixo:
 
@@ -47,3 +10,68 @@ MYSQL_USER=root
 MYSQL_PASSWORD=
 MYSQL_DATABASE=finance_investments
 ```
+
+# Plano de Execução: Dashboard de Inteligência Financeira
+
+Este documento define a ordem de desenvolvimento da plataforma, focando em uma progressão lógica de aprendizado e construção de interface.
+
+---
+
+## 🚩 Milestone 1: Definição de Escopo e Valor de Negócio (CONCLUÍDO)
+- **Status:** Concluído.
+- **Resultado:** User Stories organizadas por pastas em `/docs`.
+
+## 🚩 Milestone 2: Modelagem de Dados Unificada (O Alicerce)
+- **Objetivo:** Criar a estrutura única de banco de dados e popular com dados iniciais.
+- **Entregáveis:**
+    - Geração do `schema.prisma` com uma tabela central de transações.
+    - Script de **Seed** para gerar dados mockados (permitindo visualizar o sistema sem precisar cadastrar nada primeiro).
+- **Tecnologia:** Prisma ORM + MySQL.
+
+## 🚩 Milestone 3: Layout e Rotas (Navegação)
+- **Objetivo:** Criar a "casca" da aplicação e a lógica de navegação.
+- **Entregáveis:**
+    - Header global com navegação entre páginas.
+    - Controlador de Tema (Dark/Light mode) persistido.
+    - Estrutura de rotas no Next.js App Router.
+- **Aprendizado:** Context API e LocalStorage.
+
+## 🚩 Milestone 4: Sistema de Login/Signup
+- **Objetivo:** O utilizador pode criar uma conta e acessar recursos protegidos da aplicação.
+- **Entregáveis:**
+    - Controlador de Acesso.
+    - Sistema de Signup.
+    - Sistema de Login.
+- **Aprendizado:** Firebase / NextAuth, JWT, Segurançam Autorização, Autenticação.
+
+## 🚩 Milestone 5: Tabela de Movimentações (Visualização)
+- **Objetivo:** Exibir os dados que foram gerados no Seed em uma tabela rica.
+- **Entregáveis:**
+    - Listagem de todas as transações.
+    - Controladores de dados: Filtros (Classe, Tipo, Data) e Ordenação.
+- **Aprendizado:** React Query (Fetching) e manipulação de arrays.
+
+## 🚩 Milestone 6: CRUD - Modal de Compra e Venda (Entrada)
+- **Objetivo:** Permitir que o usuário adicione novas transações através de uma interface amigável.
+- **Entregáveis:**
+    - Modal contendo o formulário único de transação.
+    - Lógica de salvar no banco e atualizar a tabela.
+- **Aprendizado:** Redux (Gerenciamento de estado global do modal/form).
+
+## 🚩 Milestone 7: Dashboard (Área de Gráficos)
+- **Objetivo:** Transformar os dados da tabela em visões visuais e gráficas.
+- **Entregáveis:**
+    - Gráfico de Alocação de Ativos.
+    - Cards com resumo do patrimônio total.
+    - Termômetro de risco.
+
+## 🚩 Milestone 8: Chatbot de Insights (Inteligência)
+- **Objetivo:** Interface de conversação para análise da carteira.
+- **Entregáveis:**
+    - Interface de chat lateral ou dedicada.
+    - Integração com LLM para responder perguntas sobre o histórico.
+
+## 🚩 Milestone 9: Copilot (Extração por Texto)
+- **Objetivo:** Facilitar a entrada de dados via processamento de linguagem natural.
+- **Entregáveis:**
+    - Campo de texto no modal que preenche o formulário automaticamente ao identificar os dados em um parágrafo colado.

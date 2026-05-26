@@ -1,10 +1,7 @@
-import Image from "next/image";
-
 export default function Home() {
-	return (
-		<div>
-			início
-		</div>
-		
-	);
+  return (
+    <main>
+      <h1>Testes para NavBar depois de Autenticar</h1>
+    </main>
+  );
 }
