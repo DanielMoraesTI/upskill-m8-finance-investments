@@ -105,6 +105,7 @@ export function Navbar() {
               <PanelBottom className="h-5 w-5" />
               <span className="sr-only">Abrir / Fechar Menu</span>
             </SheetTrigger>
+            
             <SheetContent side="left" className="sm:max-w-x">
               <nav className="flex h-full flex-col gap-2 text-base font-medium">
                 <Link
