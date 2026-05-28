@@ -1,7 +1,15 @@
 "use client";
-
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroupContent,
+} from "@/components/ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -9,21 +17,13 @@ import {
   Building2,
   HandCoins,
   History,
-  PanelBottom,
   Wallet,
+  LogIn,
+  Moon,
   type LucideIcon,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-
-//Componente principal de navegação que combina a barra de navegação desktop e mobile, garantindo que apenas uma seja exibida com base no tamanho da tela
-export default function Navbar() {
-  return (
-    <>
-      <DesktopNavBar />
-      <MobileNavBar />
-    </>
-  );
-}
 
 interface NavItemProps {
   href: string;
@@ -31,7 +31,7 @@ interface NavItemProps {
   icon: LucideIcon;
 }
 
-const navItems: NavItemProps[] = [
+const navItemOptions: NavItemProps[] = [
   {
     href: "/portal",
     label: "Dashboard",
@@ -59,115 +59,67 @@ const navItems: NavItemProps[] = [
   },
 ] as const;
 
-//Componente Logo reutilizável para evitar repetição entre desktop e mobile da navegação
-const LogoComponent = () => (
-  <Link
-    href="/portal"
-    className="flex min-h-12 items-center justify-center rounded-xl px-3"
-  >
-    <Image
-      src="/assets/logo.png"
-      alt="Logo do Sistema de Investimentos"
-      width={1224}
-      height={768}
-      sizes="(max-width: 768px) 112px, 160px"
-      priority
-      style={{ width: "auto", height: "auto" }}
-    />
-    <span className="sr-only">Logo da Empresa</span>
-  </Link>
-);
-
-// Componente de item de navegação reutilizável para evitar repetição entre desktop e mobile da navegação
-const NavItemComponent = ({
-  item,
-  pathname,
-  isMobile = false,
-}: {
-  item: NavItemProps;
-  pathname: string;
-  isMobile?: boolean;
-}) => {
-  const isActive = pathname === item.href;
-  const Icon = item.icon;
-
-  const baseStyles =
-    "flex items-center gap-3 rounded-xl px-3 transition-all py-2.5 md:min-h-12 md:w-full";
-
-  const activeStyles =
-    "bg-cyan-100 text-cyan-950 shadow-sm ring ring-cyan-200 shadow-cyan-200";
-
-  return (
-    <Link
-      href={item.href}
-      className={`${baseStyles} ${isActive ? activeStyles : ""}`}
-    >
-      <span
-        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
-          isActive
-            ? "bg-cyan-600 text-white"
-            : "bg-muted/60 text-muted-foreground"
-        }`}
-      >
-        <Icon className="h-4.5 w-4.5" />
-      </span>
-      <span>{item.label}</span>
-    </Link>
-  );
-};
-
-//Componente de lista de navegação reutilizável para evitar repetição entre desktop e mobile da navegação
-const NavList = ({ isMobile = false }: { isMobile?: boolean }) => {
+export default function Navbar() {
   const pathname = usePathname();
 
+  function RenderedIcon({ icon }: { icon: LucideIcon }) {
+    const Icon = icon;
+    return <Icon className="w-5 h-5" />;
+  }
+
   return (
-    <nav className="flex w-full flex-col gap-4 text-base font-medium md:px-3 md:py-4">
-      {navItems.map((item) => (
-        <NavItemComponent
-          key={item.href}
-          item={item}
-          pathname={pathname}
-          isMobile={isMobile}
-        />
-      ))}
-    </nav>
+    <Sidebar>
+      <SidebarHeader>
+        <Link
+          href="/portal"
+          className="relative flex h-50 w-full items-center justify-center overflow-hidden bg-background rounded-lg"
+        >
+          <Image
+            src="/assets/logo.png"
+            alt="Logo do Sistema de Investimentos"
+            fill
+            priority
+            className="object-cover object-center border-2 border-gray-300 rounded-full"
+          />
+        </Link>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItemOptions.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton isActive={pathname === item.href}>
+                    <Link
+                      href={item.href}
+                      className="flex flex-row gap-2 items-center justify-start"
+                    >
+                      <RenderedIcon icon={item.icon} />
+                      {item.label}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="">
+        <Button variant="outline" size="sm">
+          <LogIn className="w-4 h-4" />
+          Sair
+        </Button>
+        <Button 
+          variant="outline"
+          size="sm"
+          className="ml-2"
+        >
+          <Moon className="w-4 h-4" />
+            Dark Mode
+        </Button>
+      </SidebarFooter>
+    </Sidebar>
   );
-};
-
-//Barra de navegação desktop (sidebar) visível apenas em telas maiores que sm
-const DesktopNavBar = () => (
-  <aside className="hidden w-60 shrink-0 border-r border-border bg-background md:sticky md:top-0 md:flex md:h-screen md:flex-col">
-    <LogoComponent />
-    <NavList />
-  </aside>
-);
-
-//Barra de navegação mobile (com drawer) visível apenas em telas menores que md
-const MobileNavBar = () => (
-  <header className="sticky top-0 z-30 flex h-14 items-center justify-start gap-3 border-b bg-background px-3 md:hidden">
-    <Sheet>
-      <SheetTrigger
-        render={(triggerProps) => (
-          <Button
-            {...triggerProps}
-            size="icon"
-            variant="outline"
-            className="shrink-0"
-          >
-            <PanelBottom className="h-5 w-5" />
-            <span className="sr-only">Abrir / Fechar Menu</span>
-          </Button>
-        )}
-      />
-
-      <SheetContent side="left" className="w-full md:max-w-xs">
-        <div className="flex h-full flex-col">
-          <LogoComponent />
-          <NavList isMobile />
-        </div>
-      </SheetContent>
-    </Sheet>
-
-    <h2 className="text-base font-medium leading-none">Menu</h2>
-  </header>
-);
+}

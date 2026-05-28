@@ -1,4 +1,6 @@
 "use client";
+import AuthPage from "@/components/Auth";
+import Image from "next/image";
 import { useState } from "react";
 
 export default function Authentication() {
@@ -12,53 +14,13 @@ export default function Authentication() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-foreground">
-      {/** imagem de fundo */}
-
-      {/** FORM */}
-      <div
-        className="flex flex-col bg-background w-[65%] h-fit rounded-lg gap-5"
-        style={{ padding: "20px" }}
-      >
-        <h1>{criandoConta ? "Criar conta" : "Login"}</h1>
-
-        {/** BODY */}
-        <div className="flex flex-col gap-5">
-          <label htmlFor="email">EMAIL</label>
-          <input
-            name="email"
-            type="email"
-            placeholder="Digite seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="off"
-          />
-
-          <label htmlFor="password">SENHA</label>
-          <input
-            name="password"
-            type="password"
-            placeholder="Digite sua senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="off"
-          />
-        </div>
-
-        {/** ACTION */}
-        <button onClick={onSubmit}>
-          {criandoConta ? "Registrar" : "Login"}
-        </button>
+    <div
+      className="flex min-h-screen items-center justify-center bg-gray-100 p-4 bg-cover bg-center"
+      style={{ backgroundImage: "url('/assets/logo.png')" }}
+    >
+      <div className="w-full max-w-md">
+        <AuthPage />
       </div>
-
-      <button
-        className="text-white mt-4"
-        onClick={() => setCriandoConta(!criandoConta)}
-      >
-        {criandoConta
-          ? "Já tem uma conta? Fazer login"
-          : "Não tem uma conta? Criar Conta"}
-      </button>
     </div>
   );
 }

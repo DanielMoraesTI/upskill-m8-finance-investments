@@ -1,7 +1,5 @@
-// import Navbar from "@/components/Navbar";
-// import Navbares from "@/components/Navbares";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import Shadbar from "@/components/Shadbar";
+import Navbar from "@/components/Navbar";
 
 export default function PortalLayout({
   children,
@@ -10,7 +8,7 @@ export default function PortalLayout({
 }>) {
   return (
     <SidebarProvider>
-      <Shadbar />
+      <Navbar />
       <main>
         <SidebarTrigger className="flex flex-row gap-2 items-center justify-start" />
         {children}
@@ -18,13 +16,3 @@ export default function PortalLayout({
     </SidebarProvider>
   );
 }
-
-// return (
-//   <div className="min-h-screen md:flex">
-//     <Navbares />
-
-//     <div className="min-h-screen w-full min-w-0 bg-green-500 md:flex-1">
-//       {children}
-//     </div>
-//   </div>
-// );
