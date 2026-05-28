@@ -15,6 +15,16 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
+//Componente principal de navegação que combina a barra de navegação desktop e mobile, garantindo que apenas uma seja exibida com base no tamanho da tela
+export default function Navbar() {
+  return (
+    <>
+      <DesktopNavBar />
+      <MobileNavBar />
+    </>
+  );
+}
+
 interface NavItemProps {
   href: string;
   label: string;
@@ -81,16 +91,17 @@ const NavItemComponent = ({
   const isActive = pathname === item.href;
   const Icon = item.icon;
 
-  const baseStyles = `flex items-center gap-3 rounded-xl px-3 transition-all ${
-    isMobile ? "py-2.5" : "min-h-12 w-full"
-  }`;
+  const baseStyles =
+    "flex items-center gap-3 rounded-xl px-3 transition-all py-2.5 md:min-h-12 md:w-full";
 
-  const activeStyles = isActive
-    ? "bg-cyan-50 text-cyan-950 shadow-sm ring-1 ring-cyan-200"
-    : "text-foreground/80 hover:bg-accent/70 hover:text-foreground";
+  const activeStyles =
+    "bg-cyan-100 text-cyan-950 shadow-sm ring ring-cyan-200 shadow-cyan-200";
 
   return (
-    <Link href={item.href} className={`${baseStyles} ${activeStyles}`}>
+    <Link
+      href={item.href}
+      className={`${baseStyles} ${isActive ? activeStyles : ""}`}
+    >
       <span
         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
           isActive
@@ -110,11 +121,7 @@ const NavList = ({ isMobile = false }: { isMobile?: boolean }) => {
   const pathname = usePathname();
 
   return (
-    <nav
-      className={`flex w-full flex-col gap-2 ${
-        isMobile ? "text-base font-medium" : "px-3 py-4"
-      }`}
-    >
+    <nav className="flex w-full flex-col gap-4 text-base font-medium md:px-3 md:py-4">
       {navItems.map((item) => (
         <NavItemComponent
           key={item.href}
@@ -164,13 +171,3 @@ const MobileNavBar = () => (
     <h2 className="text-base font-medium leading-none">Menu</h2>
   </header>
 );
-
-//Componente principal de navegação que combina a barra de navegação desktop e mobile, garantindo que apenas uma seja exibida com base no tamanho da tela
-export function Navbar() {
-  return (
-    <>
-      <DesktopNavBar />
-      <MobileNavBar />
-    </>
-  );
-}
