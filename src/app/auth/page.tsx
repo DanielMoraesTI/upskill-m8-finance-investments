@@ -47,7 +47,7 @@ export default function Authentication() {
   return (
     <div
       className="flex min-h-screen items-center justify-center bg-gray-100 p-4 bg-cover bg-center"
-      style={{ backgroundImage: "url('/assets/logo.png')" }}
+      style={{ backgroundImage: "url('/assets/logo-b.png')" }}
     >
       <div className="w-full max-w-md">
         <Card>

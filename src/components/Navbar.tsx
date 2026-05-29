@@ -53,6 +53,11 @@ const navItemOptions: NavItemProps[] = [
     icon: HandCoins,
   },
   {
+    href: "/portal/comprar-vender",
+    label: "Comprar/Vender",
+    icon: HandCoins,
+  },
+  {
     href: "/portal/historico",
     label: "Histórico",
     icon: History,
@@ -75,7 +80,7 @@ export default function Navbar() {
           className="relative flex h-50 w-full items-center justify-center overflow-hidden bg-background rounded-lg"
         >
           <Image
-            src="/assets/logo.png"
+            src="/assets/logo-b.png"
             alt="Logo do Sistema de Investimentos"
             fill
             priority

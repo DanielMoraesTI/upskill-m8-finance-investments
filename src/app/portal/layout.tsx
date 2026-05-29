@@ -9,7 +9,7 @@ export default function PortalLayout({
   return (
     <SidebarProvider>
       <Navbar />
-      <main>
+      <main className="flex min-h-screen flex-1 flex-col">
         <SidebarTrigger className="flex flex-row gap-2 items-center justify-start" />
         {children}
       </main>
