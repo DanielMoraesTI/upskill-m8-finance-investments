@@ -13,9 +13,7 @@ CREATE TABLE investimentos_renda_fixa (
   nome_renda_fixa VARCHAR(150) NOT NULL,
   data_inicial DATE NOT NULL,
   valor_investido DECIMAL(14, 2) NOT NULL,
-  valor_bruto_atual DECIMAL(14, 2) NOT NULL,
-  imposto_renda DECIMAL(14, 2) NOT NULL DEFAULT 0,
-  valor_liquido_atual DECIMAL(14, 2) GENERATED ALWAYS AS (valor_bruto_atual - imposto_renda) STORED,
+  valor_ atual DECIMAL(14, 2) NOT NULL,
   data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY idx_rf_data_atualizacao (data_atualizacao)

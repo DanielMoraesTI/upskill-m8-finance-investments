@@ -106,7 +106,7 @@ export default function Navbar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="">
+      <SidebarFooter className="mb-4">
         <Button variant="outline" size="sm">
           <LogIn className="w-4 h-4" />
           Sair
