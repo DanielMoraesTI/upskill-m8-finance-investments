@@ -66,9 +66,6 @@ export function SignupForm({
             <FieldGroup>
               <Field>
                 <Button type="submit">Criar conta</Button>
-                <Button variant="outline" type="button">
-                  Entrar com o Google
-                </Button>
                 <FieldDescription className="px-6 text-center">
                   Já possui uma conta?{" "}
                   <button

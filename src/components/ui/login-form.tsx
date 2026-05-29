@@ -53,9 +53,6 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit">Entrar</Button>
-                <Button variant="outline" type="button">
-                  Entrar com o Google
-                </Button>
                 <FieldDescription className="text-center">
                   Não tem uma conta?{" "}
                   <button
