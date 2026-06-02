@@ -1,11 +1,9 @@
 "use client";
 
-import ChartPieLegend from "@/components/ui/CircleInvestments";
-import { ChartBarMultiple } from "@/components/ui/ChartBarMultiple";
-import { CardAcoes } from "@/components/ui/cardAcoes";
-import { CardFiis } from "@/components/ui/cardFiis";
-import { CardRendaFixa } from "@/components/ui/cardRendaFixa";
-import { CardTotal } from "@/components/ui/cardTotal";
+import { ChartBarMultiple } from "@/components/multipleBar/MultipleBar";
+import { CardValues } from "@/components/cardsValues/CardValues";
+import { InvestorProfileSlider } from "@/components/investorSlider/InvestorProfileSlider";
+import PieLegends from "@/components/pieLegends/PieLegends";
 
 export const description = "A multiple bar chart";
 
@@ -18,15 +16,40 @@ export default function Dashboard() {
           Acompanhe o desempenho dos seus investimentos em um só lugar
         </p>
         <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <CardTotal />
-          <CardAcoes />
-          <CardFiis />
-          <CardRendaFixa />
+          <CardValues title="Valor Total Investido" value="R$ 50.000,00" />
+          <CardValues title="Ações" value="R$ 10.000,00" />
+          <CardValues title="Fundos Imobiliários" value="R$ 20.000,00" />
+          <CardValues title="Renda Fixa" value="R$ 20.000,00" />
         </div>
       </section>
       <div className="mt-6 grid w-full grid-rows-1 gap-4 md:grid-cols-2">
-        <ChartPieLegend />
+        <PieLegends
+          title="Distribuição da Carteira"
+          description="Ações, FIIs e Renda Fixa"
+          legendColumnsClass="*:basis-1/4"
+          data={[
+            {
+              key: "acoes",
+              label: "Ações",
+              value: 10000,
+              color: "var(--chart-1)",
+            },
+            {
+              key: "fiis",
+              label: "FIIs",
+              value: 20000,
+              color: "var(--chart-2)",
+            },
+            {
+              key: "rendaFixa",
+              label: "Renda Fixa",
+              value: 20000,
+              color: "var(--chart-3)",
+            },
+          ]}
+        />
         <ChartBarMultiple />
+        <InvestorProfileSlider />
       </div>
     </div>
   );

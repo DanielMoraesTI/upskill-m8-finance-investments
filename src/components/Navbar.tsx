@@ -23,6 +23,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggleButton } from "@/components/mode/theme-toggle-button";
 import { usePathname } from "next/navigation";
 
 interface NavItemProps {
@@ -77,14 +78,14 @@ export default function Navbar() {
       <SidebarHeader>
         <Link
           href="/portal"
-          className="relative flex h-50 w-full items-center justify-center overflow-hidden bg-background rounded-lg"
+          className="relative flex h-50 w-full items-center justify-center overflow-hidden bg-background"
         >
           <Image
             src="/assets/logo-b.png"
             alt="Logo do Sistema de Investimentos"
             fill
             priority
-            className="object-cover object-center border-2 border-gray-300 rounded-full"
+            className="object-cover object-center border-2 border-gray-300"
           />
         </Link>
       </SidebarHeader>
@@ -116,14 +117,7 @@ export default function Navbar() {
           <LogIn className="w-4 h-4" />
           Sair
         </Button>
-        <Button 
-          variant="outline"
-          size="sm"
-          className="ml-2"
-        >
-          <Moon className="w-4 h-4" />
-            Dark Mode
-        </Button>
+        <ThemeToggleButton />
       </SidebarFooter>
     </Sidebar>
   );
