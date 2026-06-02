@@ -1,6 +1,4 @@
 import mysql from "mysql2/promise";
-import dotenv from "dotenv";
-dotenv.config();
 
 const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -8,6 +6,7 @@ const db = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   connectionLimit: 10,
+  rowsAsArray: true,
   typeCast: function (field, next) {
     if (field.type === "TINY" && field.length === 1) {
       return field.string() === "1";
