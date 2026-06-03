@@ -4,6 +4,7 @@ import "./styles.css";
 import { cn } from "@/lib/utils";
 import AppProvider from "@/context/AppProvider";
 import AuthProvider from "@/context/AuthProvider";
+import { ThemeProvider } from "@/components/mode/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>      
       <body
         className={cn(
           "min-w-screen min-h-screen bg-background font-sans antialiased",
@@ -26,8 +27,16 @@ export default function RootLayout({
         )}
       >
         <AppProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+        >
+          <AuthProvider>
+          {children}
+          </AuthProvider>
         </AppProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
