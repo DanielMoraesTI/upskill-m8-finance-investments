@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>      
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={cn(
           "min-w-screen min-h-screen bg-background font-sans antialiased",
@@ -28,15 +28,13 @@ export default function RootLayout({
       >
         <AppProvider>
           <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-        >
-          <AuthProvider>
-          {children}
-          </AuthProvider>
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+          >
+            <AuthProvider>{children}</AuthProvider>
+          </ThemeProvider>
         </AppProvider>
-        </ThemeProvider>
       </body>
     </html>
   );

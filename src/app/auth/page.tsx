@@ -22,29 +22,12 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Loading from "@/components/Loading";
 import { useRouter } from "next/navigation";
+import { useApp } from "@/context/AppProvider";
 
 export default function Authentication() {
   const [isLogin, setIsLogin] = useState<boolean>(true);
-  const [resultMessage, setResultMessage] = useState<string>("");
-  const [result, setResult] = useState<"success" | "error" | null>(null);
   const router = useRouter();
-
-  // Reset automático do estado de resultado após 5 segundos para limpar mensagens de feedback
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  useEffect(() => {
-    if (result) {
-      timeoutRef.current = setTimeout(() => {
-        setResult(null);
-        setResultMessage("");
-      }, 5000);
-    }
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [result, resultMessage]);
+  const { resultMessage, setResultMessage, result, setResult } = useApp();
 
   const onSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     try {
@@ -89,9 +72,9 @@ export default function Authentication() {
     <div className="flex min-h-screen">
       <div className="flex w-full md:w-[30%] items-center justify-center bg-gray-100 p-8">
         {/** Efeito Overlay enquanto orquestra o redirecionamento */}
-      {result === "success" && <Loading />}
+        {result === "success" && <Loading />}
 
-      <div className="w-full max-w-md">
+        <div className="w-full max-w-md">
           <Card>
             <CardHeader>
               <CardTitle>{isLogin ? "Entrar" : "Crie sua conta"}</CardTitle>
@@ -131,11 +114,11 @@ export default function Authentication() {
                   <Field>
                     <FieldLabel htmlFor="password">Senha</FieldLabel>
                     <Input
-                    id="password"
-                    type="password"
-                    name="password"
-                    required
-                  />
+                      id="password"
+                      type="password"
+                      name="password"
+                      required
+                    />
                     <FieldDescription>
                       Deve ter pelo menos 8 caracteres.
                     </FieldDescription>
@@ -146,26 +129,26 @@ export default function Authentication() {
                         Confirmar Senha
                       </FieldLabel>
                       <Input
-                      id="confirm-password"
-                      type="password"
-                      name="confirm-password"
-                      required
-                    />
+                        id="confirm-password"
+                        type="password"
+                        name="confirm-password"
+                        required
+                      />
                       <FieldDescription>
                         Por favor, confirme sua senha
                       </FieldDescription>
                     </Field>
                   )}
                   {resultMessage && (
-                  <Field>
-                    <FieldDescription
-                      className={`w-full text-center font-medium ${result === "error" ? "text-red-500" : "text-green-500"}`}
-                    >
-                      {resultMessage}
-                    </FieldDescription>
-                  </Field>
-                )}
-                <FieldGroup>
+                    <Field>
+                      <FieldDescription
+                        className={`w-full text-center font-medium ${result === "error" ? "text-red-500" : "text-green-500"}`}
+                      >
+                        {resultMessage}
+                      </FieldDescription>
+                    </Field>
+                  )}
+                  <FieldGroup>
                     <Field>
                       <Button type="submit">
                         {isLogin ? "Entrar" : "Criar conta"}
