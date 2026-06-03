@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./styles.css";
 import { cn } from "@/lib/utils";
+import AppProvider from "@/context/AppProvider";
 import AuthProvider from "@/context/AuthProvider";
 import { ThemeProvider } from "@/components/mode/theme-provider";
 
@@ -25,7 +26,8 @@ export default function RootLayout({
           inter.className,
         )}
       >
-        <ThemeProvider
+        <AppProvider>
+          <ThemeProvider
           attribute="class"
           defaultTheme="light"
           enableSystem={false}
@@ -33,6 +35,7 @@ export default function RootLayout({
           <AuthProvider>
           {children}
           </AuthProvider>
+        </AppProvider>
         </ThemeProvider>
       </body>
     </html>
