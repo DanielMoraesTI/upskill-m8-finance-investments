@@ -120,7 +120,7 @@ export default function Authentication() {
                       required
                     />
                     <FieldDescription>
-                      Deve ter pelo menos 8 caracteres.
+                      Deve ter pelo menos 6 caracteres.
                     </FieldDescription>
                   </Field>
                   {!isLogin && (

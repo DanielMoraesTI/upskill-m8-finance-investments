@@ -3,6 +3,7 @@
 import { CardValues } from "@/components/cardsValues/CardValues";
 import PieLegends from "@/components/pieLegends/PieLegends";
 import { ItemCard, fakeItems } from "./investmentsList/FiisList";
+import { FiisCategory } from "@/components/fiisCategory/FiisCategory";
 
 export default function Fiis() {
   return (
@@ -33,6 +34,17 @@ export default function Fiis() {
             },
           ]}
         />
+        // Com dados de exemplo (default)
+        <FiisCategory />
+
+        // Com dados personalizados
+        <FiisCategory
+          data={[
+            { categoria: "Fundos de Papel", valorTotal: 20075.33 },
+            { categoria: "Fundos de Tijolo", valorTotal: 32080.14 },
+          ]}
+          titulo="Minha Carteira de FIIs"
+        />
         <ul className="flex w-full flex-col gap-3">
           {fakeItems.map((item) => (
             <li key={item.id}>
@@ -43,3 +55,4 @@ export default function Fiis() {
     </div>
   );
 }
+
