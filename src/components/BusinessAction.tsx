@@ -44,12 +44,20 @@ function TabsIcons() {
 
 function NativeSelectDemo() {
   return (
-    <NativeSelect className="w-full">
-      <NativeSelectOption value="">Selecione o Investimento</NativeSelectOption>
-      <NativeSelectOption value="acoes">Ações</NativeSelectOption>
-      <NativeSelectOption value="fiis">Fundos imobiliários</NativeSelectOption>
-      <NativeSelectOption value="renda-fixa">Renda Fixa</NativeSelectOption>
-    </NativeSelect>
+    <div className="grid w-full grid-rows-1 gap-4 md:grid-cols-2">
+      <NativeSelect className="w-full">
+        <NativeSelectOption value="">Selecione o Investimento</NativeSelectOption>
+        <NativeSelectOption value="acoes">Ações</NativeSelectOption>
+        <NativeSelectOption value="fiis">Fundos imobiliários</NativeSelectOption>
+        <NativeSelectOption value="renda-fixa">Renda Fixa</NativeSelectOption>
+      </NativeSelect>
+          <NativeSelect className="w-full">
+        <NativeSelectOption value="">Selecione o Investimento</NativeSelectOption>
+        <NativeSelectOption value="acoes">Ações</NativeSelectOption>
+        <NativeSelectOption value="fiis">Fundos imobiliários</NativeSelectOption>
+        <NativeSelectOption value="renda-fixa">Renda Fixa</NativeSelectOption>
+      </NativeSelect>
+    </div>
   );
 }
 

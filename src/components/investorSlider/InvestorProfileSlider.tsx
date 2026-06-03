@@ -26,27 +26,27 @@ const profiles: Record<string, InvestorProfile> = {
   },
   moderado: {
     label: "Investidor Moderado",
-    description: "Entre 70% e 90% em Renda Fixa",
+    description: "Entre 60% e 90% em Renda Fixa",
     icon: TrendingUp,
     color: "text-amber-700 dark:text-amber-400",
     bg: "bg-amber-50 dark:bg-amber-950",
     border: "border-amber-300 dark:border-amber-700",
-    range: "70% – 90% Renda Fixa",
+    range: "60% – 90% Renda Fixa",
   },
   arrojado: {
     label: "Investidor Arrojado",
-    description: "Menos de 70% em Renda Fixa",
+    description: "Menos de 60% em Renda Fixa",
     icon: Zap,
     color: "text-rose-700 dark:text-rose-400",
     bg: "bg-rose-50 dark:bg-rose-950",
     border: "border-rose-300 dark:border-rose-700",
-    range: "< 70% Renda Fixa",
+    range: "< 60% Renda Fixa",
   },
 };
 
 function getProfile(value: number): keyof typeof profiles {
   if (value > 90) return "conservador";
-  if (value >= 70) return "moderado";
+  if (value >= 60) return "moderado";
   return "arrojado";
 }
 
@@ -64,9 +64,6 @@ export function InvestorProfileSlider() {
         <h3 className="text-base font-semibold text-foreground">
           Perfil de Investidor
         </h3>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Ajuste a proporção de Renda Fixa na sua carteira
-        </p>
       </div>
 
       {/* Percentuais */}
@@ -103,13 +100,6 @@ export function InvestorProfileSlider() {
           <span className="text-emerald-500 font-medium">Conservador</span>
           <span>100%</span>
         </div>
-      </div>
-
-      {/* Barra de zonas coloridas */}
-      <div className="flex h-2 w-full rounded-full overflow-hidden gap-0.5">
-        <div className="bg-rose-400 flex-[70]" title="Arrojado: 0–69%" />
-        <div className="bg-amber-400 flex-[20]" title="Moderado: 70–90%" />
-        <div className="bg-emerald-400 flex-[10]" title="Conservador: 91–100%" />
       </div>
 
       {/* Card do perfil */}

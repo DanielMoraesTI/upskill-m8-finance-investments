@@ -2,11 +2,11 @@
 
 import { CardValues } from "@/components/cardsValues/CardValues";
 import PieLegends from "@/components/pieLegends/PieLegends";
+import { ItemCard, fakeItems } from "./investmentsList/FiisList";
 
 export default function Fiis() {
   return (
-    <div className="grid w-full max-w-7xl grid-cols-1 items-start justify-items-center gap-4 md:grid-cols-2">
-      <section className="flex w-full flex-col items-center gap-6">
+    <div className="flex flex-col w-full max-w-7xl grid-cols-1 items-start justify-items-center gap-4 md:grid-cols-2">
         <h1 className="text-2xl font-bold">Fundos Imobiliários</h1>
         <CardValues title="Fundos Imobiliários" value="R$ 20.000,00" />
         <PieLegends
@@ -33,7 +33,13 @@ export default function Fiis() {
             },
           ]}
         />
-      </section>
+        <ul className="flex w-full flex-col gap-3">
+          {fakeItems.map((item) => (
+            <li key={item.id}>
+              <ItemCard data={item} />
+            </li>
+          ))}
+        </ul>
     </div>
   );
 }
