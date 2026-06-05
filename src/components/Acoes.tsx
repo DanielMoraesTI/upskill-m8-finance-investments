@@ -1,6 +1,6 @@
 "use client";
 
-import { CardValues } from "@/components/cardsValues/CardValues";
+import CardValues from "@/components/chart-objects/CardValues";
 import { ItemCard, fakeItems } from "./investmentsList/StockList";
 
 export default function Acoes() {
@@ -16,7 +16,7 @@ export default function Acoes() {
             </li>
           ))}
         </ul>
-      </section>      
+      </section>
     </div>
   );
 }

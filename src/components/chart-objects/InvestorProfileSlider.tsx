@@ -50,7 +50,7 @@ function getProfile(value: number): keyof typeof profiles {
   return "arrojado";
 }
 
-export function InvestorProfileSlider() {
+export default function InvestorProfileSlider() {
   const [rendaFixa, setRendaFixa] = useState(85);
   const rendaVariavel = 100 - rendaFixa;
   const profileKey = getProfile(rendaFixa);

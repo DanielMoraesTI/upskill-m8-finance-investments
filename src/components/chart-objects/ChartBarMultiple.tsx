@@ -44,7 +44,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChartBarMultiple() {
+export default function ChartBarMultiple() {
   return (
     <Card>
       <CardHeader>

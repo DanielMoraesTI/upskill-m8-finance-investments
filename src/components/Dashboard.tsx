@@ -1,9 +1,9 @@
 "use client";
 
-import { ChartBarMultiple } from "@/components/multipleBar/MultipleBar";
-import { CardValues } from "@/components/cardsValues/CardValues";
-import { InvestorProfileSlider } from "@/components/investorSlider/InvestorProfileSlider";
-import PieLegends from "@/components/pieLegends/PieLegends";
+import ChartBarMultiple from "@/components/chart-objects/ChartBarMultiple";
+import CardValues from "@/components/chart-objects/CardValues";
+import InvestorProfileSlider from "@/components/chart-objects/InvestorProfileSlider";
+import PieLegends from "@/components/chart-objects/PieLegends";
 
 export const description = "A multiple bar chart";
 

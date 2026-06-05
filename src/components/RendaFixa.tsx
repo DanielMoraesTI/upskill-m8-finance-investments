@@ -1,6 +1,6 @@
 "use client";
 
-import { CardValues } from "@/components/cardsValues/CardValues";
+import CardValues from "@/components/chart-objects/CardValues";
 import { ItemCard, fakeItems } from "./investmentsList/FixedIncomeList";
 
 export default function RendaFixa() {
@@ -16,7 +16,7 @@ export default function RendaFixa() {
             </li>
           ))}
         </ul>
-      </section>      
+      </section>
     </div>
   );
 }

@@ -7,7 +7,7 @@ type CardValuesProps = {
   value: string;
 };
 
-export function CardValues({ title, value }: CardValuesProps) {
+export default function CardValues({ title, value }: CardValuesProps) {
   return (
     <Card className="w-full max-w-sm shadow-sm">
       <CardHeader>
