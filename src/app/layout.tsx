@@ -4,7 +4,7 @@ import "./styles.css";
 import { cn } from "@/lib/utils";
 import AppProvider from "@/context/AppProvider";
 import AuthProvider from "@/context/AuthProvider";
-import { ThemeProvider } from "@/components/mode/theme-provider";
+import ThemeProvider from "@/context/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 

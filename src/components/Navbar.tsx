@@ -22,7 +22,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggleButton } from "@/components/mode/theme-toggle-button";
+import ThemeToggleButton from "@/components/ThemeToggleButton";
 import { usePathname, useSearchParams } from "next/navigation";
 
 interface NavItemProps {
@@ -74,8 +74,6 @@ export default function Navbar() {
     return <Icon className="w-5 h-5" />;
   }
 
-  console.log("pathname", pathname);
-
   return (
     <Sidebar>
       <SidebarHeader>
@@ -101,7 +99,11 @@ export default function Navbar() {
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     className={
-                      pathname === item.href || (item.href.includes("asset") && asset === item.href.split("=")[1]) ? "bg-primary/20 text-primary" : ""
+                      pathname === item.href ||
+                      (item.href.includes("asset") &&
+                        asset === item.href.split("=")[1])
+                        ? "bg-primary/20 text-primary"
+                        : ""
                     }
                   >
                     <Link
