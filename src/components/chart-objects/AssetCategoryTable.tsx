@@ -31,7 +31,7 @@ function formatBRL(value: number): string {
   });
 }
 
-export function FiisCategory({
+export default function AssetCategoryTable({
   data = defaultData,
   titulo = "FIIs por Categoria",
 }: FiisPorCategoriaProps) {

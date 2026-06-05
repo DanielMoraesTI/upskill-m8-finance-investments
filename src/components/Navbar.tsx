@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggleButton } from "@/components/mode/theme-toggle-button";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 interface NavItemProps {
   href: string;
@@ -38,39 +38,43 @@ const navItemOptions: NavItemProps[] = [
     icon: BarChart3,
   },
   {
-    href: "/portal/acoes",
+    href: "/portal/carteira?asset=acoes",
     label: "Ações",
     icon: Wallet,
   },
   {
-    href: "/portal/fundos-imobiliarios",
+    href: "/portal/carteira?asset=fundos-imobiliarios",
     label: "Fundos Imobiliários",
     icon: Building2,
   },
   {
-    href: "/portal/renda-fixa",
+    href: "/portal/carteira?asset=renda-fixa",
     label: "Renda Fixa",
     icon: HandCoins,
+  },
+  {
+    href: "/portal/carteira?asset=all",
+    label: "Todos os Ativos",
+    icon: History,
   },
   {
     href: "/portal/comprar-vender",
     label: "Comprar/Vender",
     icon: HandCoins,
   },
-  {
-    href: "/portal/historico",
-    label: "Histórico",
-    icon: History,
-  },
 ] as const;
 
 export default function Navbar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const asset = searchParams.get("asset");
 
   function RenderedIcon({ icon }: { icon: LucideIcon }) {
     const Icon = icon;
     return <Icon className="w-5 h-5" />;
   }
+
+  console.log("pathname", pathname);
 
   return (
     <Sidebar>
@@ -97,7 +101,7 @@ export default function Navbar() {
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     className={
-                      pathname === item.href ? "bg-primary/20 text-primary" : ""
+                      pathname === item.href || (item.href.includes("asset") && asset === item.href.split("=")[1]) ? "bg-primary/20 text-primary" : ""
                     }
                   >
                     <Link
