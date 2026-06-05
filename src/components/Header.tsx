@@ -1,21 +1,21 @@
+"use client";
 import Image from "next/image";
+import { SidebarTrigger, useSidebar } from "./ui/sidebar";
 
 export default function Header() {
+  const { open } = useSidebar();
   return (
-    <header className="w-full border-b bg-background/70">
-      <div className="relative h-24 w-full bg-background">
-        {/*<Image
-          src="/assets/Logo-horizontal.png"
-          alt="Finance Investments"
-          fill
-          priority
-          sizes="100vw"
-          className="object-contain object-center"
-        />*/}
-        <h1 className="text-2xl font-bold text-foreground absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          Nome do Usuário Logado
-        </h1>
-      </div>
+    <header
+      className={`bg-sidebar flex flex-row justify-between items-center gap-2 w-full border-b p-2 ${open ? "md:flex-row md:justify-start" : "md:flex-row-reverse"}`}
+    >
+      <Image
+        src="/logo-black.png"
+        alt="Finance Investments"
+        width={441}
+        height={140}
+        className={`w-30 h-auto ${open ? "md:hidden" : "md:block"}`}
+      />
+      <SidebarTrigger className="" />
     </header>
   );
 }

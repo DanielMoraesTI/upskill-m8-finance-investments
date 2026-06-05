@@ -10,17 +10,19 @@ export default function PortalLayout({
 }>) {
   return (
     <SidebarProvider>
-      <Navbar />
-      <main className="flex min-h-screen flex-1 flex-col">
-        <SidebarTrigger className="flex flex-row gap-2 items-center justify-start" />
-        <section className="flex w-full flex-1 flex-col">
+      {/** Container para ocupar toda a tela com cara de "web app" */}
+      <div
+        className="min-w-screen max-w-screen min-h-screen max-h-screen overflow-hidden
+        flex flex-col md:flex-row
+      "
+      >
+        <Navbar />
+        <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full">
           <Header />
-          <div className="flex flex-1 items-start justify-center px-4 py-6">
-            {children}
-          </div>
+          <main className="flex-1 overflow-y-auto">{children}</main>
           <Footer />
-        </section>
-      </main>
+        </div>
+      </div>
     </SidebarProvider>
   );
 }

@@ -19,7 +19,6 @@ import {
   History,
   Wallet,
   LogIn,
-  Moon,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -96,7 +95,11 @@ export default function Navbar() {
             <SidebarMenu>
               {navItemOptions.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton isActive={pathname === item.href}>
+                  <SidebarMenuButton
+                    className={
+                      pathname === item.href ? "bg-primary/20 text-primary" : ""
+                    }
+                  >
                     <Link
                       href={item.href}
                       className="flex flex-row gap-2 items-center justify-start"

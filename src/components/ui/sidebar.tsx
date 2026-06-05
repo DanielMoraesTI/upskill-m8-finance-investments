@@ -272,7 +272,6 @@ function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon />
-      <div className="flex md:hidden">Logo</div>
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );
