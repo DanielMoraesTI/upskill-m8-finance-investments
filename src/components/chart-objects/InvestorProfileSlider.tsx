@@ -63,7 +63,7 @@ export default function InvestorProfileSlider() {
   const [profile, setProfile] = useState<InvestorProfile>(
     profiles[getProfile(rendaFixaInicial)],
   );
-  const [openHelp, setOpenHelp] = useState<boolean>(true);
+  const [openHelp, setOpenHelp] = useState<boolean>(false);
 
   const timeoutRef = useRef<number | null>(null); // Timeout para alterar o card só após o usuário parar de arrastar o slider por 300ms
 
