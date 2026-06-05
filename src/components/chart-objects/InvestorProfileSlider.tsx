@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
-import { ShieldCheck, TrendingUp, Zap } from "lucide-react";
+import { ShieldCheck, TrendingUp, Zap, CircleQuestionMark } from "lucide-react";
+import { Button } from "../ui/button";
 
 type InvestorProfile = {
   label: string;
@@ -14,7 +15,9 @@ type InvestorProfile = {
   range: string;
 };
 
-const profiles: Record<string, InvestorProfile> = {
+type TInvestorProfileOptions = "conservador" | "moderado" | "arrojado";
+
+const profiles: Record<TInvestorProfileOptions, InvestorProfile> = {
   conservador: {
     label: "Investidor Conservador",
     description: "Mais de 90% em Renda Fixa",
@@ -44,26 +47,68 @@ const profiles: Record<string, InvestorProfile> = {
   },
 };
 
-function getProfile(value: number): keyof typeof profiles {
+function getProfile(value: number): TInvestorProfileOptions {
   if (value > 90) return "conservador";
   if (value >= 60) return "moderado";
   return "arrojado";
 }
 
+const rendaFixaInicial = 85; // Esse número tem que ser calculado a partir do contexto da carteira.
+
 export default function InvestorProfileSlider() {
-  const [rendaFixa, setRendaFixa] = useState(85);
-  const rendaVariavel = 100 - rendaFixa;
-  const profileKey = getProfile(rendaFixa);
-  const profile = profiles[profileKey];
-  const Icon = profile.icon;
+  const [rendaFixa, setRendaFixa] = useState<number[]>([rendaFixaInicial]);
+  const [rendaVariavel, setRendaVariavel] = useState<number>(
+    100 - rendaFixaInicial,
+  );
+  const [profile, setProfile] = useState<InvestorProfile>(
+    profiles[getProfile(rendaFixaInicial)],
+  );
+  const [openHelp, setOpenHelp] = useState<boolean>(true);
+
+  const timeoutRef = useRef<number | null>(null); // Timeout para alterar o card só após o usuário parar de arrastar o slider por 300ms
+
+  useEffect(() => {
+    // Função para lidar com a mudança do slider e atualizar os estados de renda fixa, renda variável e perfil
+    const handleSliderChange = (value: number | number[]) => {
+      const rf = Array.isArray(value) ? value[0] : value;
+      setRendaFixa([rf]);
+      setRendaVariavel(100 - rf);
+      setProfile(profiles[getProfile(rf)]);
+    };
+
+    // Limpa o timeout anterior para evitar mudanças rápidas no card enquanto o usuário arrasta o slider
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Define um novo timeout para atualizar o card após 300ms
+    timeoutRef.current = window.setTimeout(() => {
+      handleSliderChange(rendaFixa[0]);
+    }, 300);
+
+    // Limpa o timeout quando o componente for desmontado ou quando rendaFixa mudar
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [rendaFixa]);
+
+  const renderProfileIcon = () => {
+    const Icon = profile.icon;
+    return <Icon className="w-6 h-6" />;
+  };
 
   return (
-    <div className="w-full max-w-lg space-y-6 p-6 rounded-2xl border bg-card shadow-sm">
+    <div className="relative w-full max-w-lg space-y-6 p-6 rounded-2xl border bg-card shadow-sm">
       {/* Header */}
-      <div>
+      <div className="flex flex-row justify-between items-center">
         <h3 className="text-base font-semibold text-foreground">
           Perfil de Investidor
         </h3>
+        <button onClick={() => setOpenHelp(!openHelp)}>
+          <CircleQuestionMark size={16} />
+        </button>
       </div>
 
       {/* Percentuais */}
@@ -87,49 +132,86 @@ export default function InvestorProfileSlider() {
         <Slider
           min={0}
           max={100}
-          step={1}
-          value={[rendaFixa]}
-          onValueChange={([val]) => setRendaFixa(val)}
+          step={10}
+          value={rendaFixa[0]}
+          onValueChange={(value) =>
+            setRendaFixa(Array.isArray(value) ? value : [value])
+          }
           className="w-full"
         />
-        {/* Labels das zonas */}
-        <div className="flex justify-between text-xs text-muted-foreground px-0.5 select-none">
-          <span>0%</span>
-          <span className="text-rose-500 font-medium">Arrojado</span>
-          <span className="text-amber-500 font-medium">Moderado</span>
-          <span className="text-emerald-500 font-medium">Conservador</span>
-          <span>100%</span>
+        {/* Zonas do perfil alinhadas aos intervalos reais */}
+        <div className="px-0.5 select-none">
+          <div className="relative h-2 w-full overflow-hidden rounded-full">
+            <div className="absolute inset-y-0 left-0 w-[60%] bg-rose-400/70" />
+            <div className="absolute inset-y-0 left-[60%] w-[30%] bg-amber-400/70" />
+            <div className="absolute inset-y-0 left-[90%] w-[10%] bg-emerald-400/70" />
+
+            {/* divisórias de corte */}
+            <div className="absolute inset-y-0 left-[60%] w-px bg-background/90" />
+            <div className="absolute inset-y-0 left-[90%] w-px bg-background/90" />
+          </div>
+
+          <div className="mt-2 flex text-[11px] leading-none">
+            <span className="w-[60%] text-center font-medium text-rose-500">
+              Arrojado
+            </span>
+            <span className="w-[30%] text-center font-medium text-amber-500">
+              Moderado
+            </span>
+            <span className="w-[10%] text-center font-medium text-emerald-500">
+              Conservador
+            </span>
+          </div>
+
+          <div className="relative mt-1 h-4 text-[10px] text-muted-foreground">
+            <span className="absolute left-0 translate-x-0">0%</span>
+            <span className="absolute left-[60%] -translate-x-1/2">60%</span>
+            <span className="absolute left-[90%] -translate-x-1/2">90%</span>
+            <span className="absolute right-0 translate-x-0">100%</span>
+          </div>
         </div>
       </div>
 
       {/* Card do perfil */}
-      <div
-        className={cn(
-          "flex items-center gap-4 rounded-xl border px-5 py-4 transition-all duration-300",
-          profile.bg,
-          profile.border
-        )}
-      >
-        <div className={cn("rounded-full p-2 bg-white/60 dark:bg-black/20", profile.color)}>
-          <Icon className="w-6 h-6" />
+      {openHelp && (
+        <div className="absolute inset-0 w-full h-full bg-background/20 backdrop-blur-sm flex flex-col gap-2 items-center justify-center p-4 rounded-2xl">
+          <div
+            className={cn(
+              "flex items-center gap-4 rounded-xl border px-5 py-4 transition-all duration-300",
+              profile.bg,
+              profile.border,
+            )}
+          >
+            <div
+              className={cn(
+                "rounded-full p-2 bg-white/60 dark:bg-black/20",
+                profile.color,
+              )}
+            >
+              {renderProfileIcon()}
+            </div>
+            <div>
+              <p className={cn("font-semibold text-sm", profile.color)}>
+                {profile.label}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {profile.description}
+              </p>
+            </div>
+            <span
+              className={cn(
+                "ml-auto text-xs font-mono font-medium px-2 py-1 rounded-md bg-white/60 dark:bg-black/20",
+                profile.color,
+              )}
+            >
+              {profile.range}
+            </span>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => setOpenHelp(false)}>
+            fechar
+          </Button>
         </div>
-        <div>
-          <p className={cn("font-semibold text-sm", profile.color)}>
-            {profile.label}
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {profile.description}
-          </p>
-        </div>
-        <span
-          className={cn(
-            "ml-auto text-xs font-mono font-medium px-2 py-1 rounded-md bg-white/60 dark:bg-black/20",
-            profile.color
-          )}
-        >
-          {profile.range}
-        </span>
-      </div>
+      )}
     </div>
   );
 }
