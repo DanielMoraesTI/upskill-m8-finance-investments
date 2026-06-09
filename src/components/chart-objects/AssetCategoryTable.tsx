@@ -49,7 +49,19 @@ export default function AssetCategoryTable({
           <TableHeader>
             <TableRow className="border-b border-[#2a2d3e] hover:bg-transparent">
               <TableHead className="text-gray-400 font-medium text-sm pl-0">
-                Categoria
+                SIGLA
+              </TableHead>
+              <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
+                Empresa ou Tipo
+              </TableHead>
+              <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
+                Valor Total
+              </TableHead>
+              <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
+                Valor Total
+              </TableHead>
+              <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
+                Valor Total
               </TableHead>
               <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
                 Valor Total

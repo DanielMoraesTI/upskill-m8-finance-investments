@@ -81,7 +81,7 @@ export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
         {/* Valor Total */}
         <div className="flex flex-col min-w-[120px]">
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Valor Total
+            Valor Atual
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
             {formatCurrency(data.valorTotal)}

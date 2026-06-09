@@ -8,22 +8,24 @@
 -- O utilizador só pode registrar movimentações de ativos previamente cadastrados.
 -- Vender: user só pode vender o que tem. Se tentar vender mais do que tem, deve dar erro.
 -- Comprar: ou adiciona mais quotas de um ativo atual ou adiciona um novo ativo à carteira.
--- Se um utilizador registra um ativo, ele ficará disponível apenas para ele.
+-- O utilizador só pode registrar ações inteiras (não suporta mercado fracionário).
 DROP DATABASE IF EXISTS finance_investments;
 
 CREATE DATABASE IF NOT EXISTS finance_investments;
 
 USE finance_investments;
 
-DROP TABLE IF EXISTS journal;
+DROP TABLE IF EXISTS wallet;
 
-DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS transaction;
 
-DROP TABLE IF EXISTS conversations;
+DROP TABLE IF EXISTS message;
+
+DROP TABLE IF EXISTS conversation;
 
 DROP TABLE IF EXISTS user;
 
-DROP TABLE IF EXISTS assets;
+DROP TABLE IF EXISTS asset;
 
 DROP TABLE IF EXISTS asset_type;
 
@@ -37,7 +39,7 @@ CREATE TABLE asset_type (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE assets (
+CREATE TABLE asset (
   id INT AUTO_INCREMENT PRIMARY KEY,
   asset_type_id INT NOT NULL,
   name VARCHAR(75) NOT NULL,
@@ -59,7 +61,7 @@ CREATE TABLE user (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE journal (
+CREATE TABLE transaction (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   asset_id INT NOT NULL,
@@ -71,10 +73,28 @@ CREATE TABLE journal (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES user(id),
-  FOREIGN KEY (asset_id) REFERENCES assets(id)
+  FOREIGN KEY (asset_id) REFERENCES asset(id)
 );
 
-CREATE TABLE conversations (
+CREATE TABLE wallet (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  asset_id INT NOT NULL,
+  -- Mutações quando uma transaction é registrado.
+  quantity DECIMAL(18, 8) NOT NULL DEFAULT 0,
+  average_price DECIMAL(18, 4) NOT NULL DEFAULT 0,
+  total_invested DECIMAL(18, 2) NOT NULL DEFAULT 0,
+  -- Marcação a mercado.
+  current_price DECIMAL(18, 4) DEFAULT 0,
+  current_market_value DECIMAL(18, 2) DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES user(id),
+  FOREIGN KEY (asset_id) REFERENCES asset(id),
+  UNIQUE KEY unique_user_asset (user_id, asset_id) -- Garante apenas um registro por ativo na carteira do usuário
+);
+
+CREATE TABLE conversation (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   title VARCHAR(255) NOT NULL,
@@ -83,11 +103,11 @@ CREATE TABLE conversations (
   FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
-CREATE TABLE messages (
+CREATE TABLE message (
   id INT AUTO_INCREMENT PRIMARY KEY,
   conversation_id INT NOT NULL,
   role VARCHAR(50) NOT NULL,
   content TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
+  FOREIGN KEY (conversation_id) REFERENCES conversation(id) ON DELETE CASCADE
 );
