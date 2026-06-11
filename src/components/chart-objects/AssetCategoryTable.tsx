@@ -37,6 +37,12 @@ export default function AssetCategoryTable({
 }: FiisPorCategoriaProps) {
   const total = data.reduce((acc, item) => acc + item.valorTotal, 0);
 
+  const dataWithPercentages = data.map((item) => ({
+    ...item,
+    porcentagem:
+      total > 0 ? `${((item.valorTotal / total) * 100).toFixed(2)}%` : "0%",
+  }));
+
   return (
     <Card className="bg-[#1a1d2e] border-[#2a2d3e] text-white w-full max-w-md rounded-2xl">
       <CardHeader className="pb-2">
@@ -45,39 +51,33 @@ export default function AssetCategoryTable({
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-4">
-        <Table>
+        <Table className="table-fixed w-full">
           <TableHeader>
             <TableRow className="border-b border-[#2a2d3e] hover:bg-transparent">
-              <TableHead className="text-gray-400 font-medium text-sm pl-0">
-                SIGLA
+              <TableHead className="w-[50%] text-gray-400 font-medium text-sm pl-0">
+                Categoria
               </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
-                Empresa ou Tipo
+              <TableHead className="w-[20%] text-gray-400 font-medium text-sm text-right pr-2 whitespace-nowrap">
+                Porcentagem
               </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
-                Valor Total
-              </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
-                Valor Total
-              </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
-                Valor Total
-              </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm text-right pr-0">
-                Valor Total
+              <TableHead className="w-[30%] text-gray-400 font-medium text-sm text-right pr-0 whitespace-nowrap">
+                Valor Atual
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item) => (
+            {dataWithPercentages.map((item) => (
               <TableRow
                 key={item.categoria}
                 className="border-b border-[#2a2d3e] hover:bg-[#23263a] transition-colors"
               >
-                <TableCell className="text-white text-sm py-3 pl-0">
+                <TableCell className="text-white text-sm py-3 pl-0 pr-2">
                   {item.categoria}
                 </TableCell>
-                <TableCell className="text-white text-sm py-3 text-right pr-0">
+                <TableCell className="text-white text-sm py-3 text-right pr-2 whitespace-nowrap">
+                  {item.porcentagem}
+                </TableCell>
+                <TableCell className="text-white text-sm py-3 text-right pr-0 whitespace-nowrap">
                   {formatBRL(item.valorTotal)}
                 </TableCell>
               </TableRow>
@@ -86,7 +86,10 @@ export default function AssetCategoryTable({
               <TableCell className="font-bold text-white text-sm py-3 pl-0 rounded-bl-xl">
                 TOTAL
               </TableCell>
-              <TableCell className="font-bold text-white text-sm py-3 text-right pr-0 rounded-br-xl">
+              <TableCell className="font-bold text-white text-sm py-3 text-right pr-2 whitespace-nowrap">
+                100%
+              </TableCell>
+              <TableCell className="font-bold text-white text-sm py-3 text-right pr-0 rounded-br-xl whitespace-nowrap">
                 {formatBRL(total)}
               </TableCell>
             </TableRow>

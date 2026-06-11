@@ -1,22 +1,30 @@
 "use client";
 import Image from "next/image";
 import { SidebarTrigger, useSidebar } from "./ui/sidebar";
+import InvestorProfileSlider from "@/components/chart-objects/InvestorProfileSlider";
 
 export default function Header() {
   const { open } = useSidebar();
 
   return (
-    <header
-      className={`bg-sidebar flex flex-row justify-between items-center gap-2 w-full border-b p-2
-        ${open ? "md:flex-row md:justify-start" : "md:flex-row-reverse"}`}
-    >
-      <div className={`block ${open ? "md:hidden" : "md:block"}`}>
+    <header className="bg-sidebar flex flex-row items-center gap-2 w-full border-b p-2">
+
+      <SidebarTrigger />
+
+      <h1 className="text-sm font-medium">Nome de Usuário</h1>
+
+      <div className="absolute left-1/2 -translate-x-1/2">
+        <InvestorProfileSlider />
+      </div>
+
+
+      <div className={`ml-auto ${open ? "hidden" : "block"}`}>
         <Image
           src="/logo-black.png"
           alt="Finance Investments"
           width={441}
           height={140}
-          className={`w-30 h-auto dark:hidden`}
+          className="w-30 h-auto dark:hidden"
           sizes="120px"
         />
         <Image
@@ -24,11 +32,11 @@ export default function Header() {
           alt="Finance Investments"
           width={441}
           height={140}
-          className={`hidden w-30 h-auto dark:block`}
+          className="hidden w-30 h-auto dark:block"
           sizes="120px"
         />
       </div>
-      <SidebarTrigger className="" />
+
     </header>
   );
 }

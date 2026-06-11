@@ -11,7 +11,8 @@ export interface ItemCardData {
   sigla: string;
   categoria: string;
   quantidade: number;
-  valorTotal: number;
+  valorInvestido: number;
+  valorAtual: number;
   dataAtualizacao: string; // ISO date string
 }
 
@@ -38,7 +39,7 @@ function formatDate(dateStr: string): string {
 }
 
 // --- Component ---
-export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
+export function ItemCardFiis({ data, onEdit, onDelete }: ItemCardProps) {
   return (
     <Card className="w-full">
       <CardContent className="flex items-center gap-6 px-6 py-4">
@@ -78,13 +79,25 @@ export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
 
         <div className="h-8 w-px bg-border" />
 
-        {/* Valor Total */}
+        {/* Valor Investido */}
         <div className="flex flex-col min-w-[120px]">
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Valor Total
+            Valor Investido
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
-            {formatCurrency(data.valorTotal)}
+            {formatCurrency(data.valorInvestido)}
+          </span>
+        </div>
+
+        <div className="h-8 w-px bg-border" />
+
+        {/* Valor Atual */}
+        <div className="flex flex-col min-w-[120px]">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Valor Atual
+          </span>
+          <span className="text-sm font-semibold text-foreground mt-1">
+            {formatCurrency(data.valorAtual)}
           </span>
         </div>
 
@@ -130,13 +143,14 @@ export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
 }
 
 // --- Fake Data ---
-export const fakeItems: ItemCardData[] = [
+export const fakeItemsFiis: ItemCardData[] = [
   {
     id: "1",
     sigla: "CPTS11",
     categoria: "Fundo de Papel",
     quantidade: 150,
-    valorTotal: 45000.0,
+    valorInvestido: 45000.0,
+    valorAtual: 47000.0,
     dataAtualizacao: "2024-05-28T10:30:00Z",
   },
   {
@@ -144,7 +158,8 @@ export const fakeItems: ItemCardData[] = [
     sigla: "XPML11",
     categoria: "Fundo de Tijolo",
     quantidade: 320,
-    valorTotal: 8750.5,
+    valorInvestido: 8750.5,
+    valorAtual: 9000.0,
     dataAtualizacao: "2024-05-27T14:15:00Z",
   },
   {
@@ -152,7 +167,8 @@ export const fakeItems: ItemCardData[] = [
     sigla: "RECR11",
     categoria: "Fundo de Papel",
     quantidade: 87,
-    valorTotal: 12300.75,
+    valorInvestido: 12300.75,
+    valorAtual: 12500.0,
     dataAtualizacao: "2024-05-26T09:00:00Z",
   },
 ];

@@ -11,7 +11,8 @@ export interface ItemCardData {
   sigla: string;
   name: string;
   quantidade: number;
-  valorTotal: number;
+  valorInvestido: number;
+  valorAtual: number;
   dataAtualizacao: string; // ISO date string
 }
 
@@ -38,7 +39,7 @@ function formatDate(dateStr: string): string {
 }
 
 // --- Component ---
-export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
+export function ItemCardStock({ data, onEdit, onDelete }: ItemCardProps) {
   return (
     <Card className="w-full">
       <CardContent className="flex items-center gap-6 px-6 py-4">
@@ -84,7 +85,7 @@ export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
             Valor Investido
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
-            {formatCurrency(data.valorTotal)}
+            {formatCurrency(data.valorInvestido)}
           </span>
         </div>
 
@@ -94,7 +95,7 @@ export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
             Valor Atualizado
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
-            {formatCurrency(data.valorTotal)}
+            {formatCurrency(data.valorAtual)}
           </span>
         </div>
 
@@ -140,13 +141,14 @@ export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
 }
 
 // --- Fake Data ---
-export const fakeItems: ItemCardData[] = [
+export const fakeItemsStock: ItemCardData[] = [
   {
     id: "1",
     sigla: "ITSA3",
     name: "ITAUSA S.A.",
     quantidade: 150,
-    valorTotal: 45000.0,
+    valorInvestido: 45000.0,
+    valorAtual: 47000.0,
     dataAtualizacao: "2024-05-28T10:30:00Z",
   },
   {
@@ -154,7 +156,8 @@ export const fakeItems: ItemCardData[] = [
     sigla: "PETR4",
     name: "PETROBRAS S.A.",
     quantidade: 320,
-    valorTotal: 8750.5,
+    valorInvestido: 8750.5,
+    valorAtual: 9000.0,
     dataAtualizacao: "2024-05-27T14:15:00Z",
   },
   {
@@ -162,7 +165,8 @@ export const fakeItems: ItemCardData[] = [
     sigla: "CMIG4",
     name: "Cemig Energia MG S.A.",
     quantidade: 87,
-    valorTotal: 12300.75,
+    valorInvestido: 12300.75,
+    valorAtual: 12500.0,
     dataAtualizacao: "2024-05-26T09:00:00Z",
   },
 ];

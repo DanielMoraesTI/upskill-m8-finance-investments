@@ -2,7 +2,9 @@
 import CardValues from "@/components/chart-objects/CardValues";
 import PieLegends from "@/components/chart-objects/PieLegends";
 import AssetCategoryTable from "@/components/chart-objects/AssetCategoryTable";
-import { fakeItems, ItemCard } from "@/components/investmentsList/StockList";
+import { fakeItemsStock, ItemCardStock } from "@/components/investmentsList/StockList";
+import { fakeItemsFixed, ItemCardFixed } from "@/components/investmentsList/FixedIncomeList";
+import { fakeItemsFiis, ItemCardFiis } from "@/components/investmentsList/FiisList";
 import { useSearchParams } from "next/navigation";
 
 interface ICarteiraItemProps {
@@ -48,7 +50,7 @@ export default function Carteira() {
         />
         {asset === "fundos-imobiliarios" && (
           <div className="flex flex-row w-full items-center justify-center gap-4 flex-1">
-            <PieLegends
+            {/*<PieLegends
               title="Distribuição da Carteira"
               description="Fundos de Tijolo, Fundos de Papel e Fundos Híbridos"
               data={[
@@ -71,7 +73,7 @@ export default function Carteira() {
                   color: "var(--chart-3)",
                 },
               ]}
-            />
+            />*/}
             <AssetCategoryTable
               data={[
                 { categoria: "Fundos de Papel", valorTotal: 20075.33 },
@@ -83,9 +85,29 @@ export default function Carteira() {
           </div>
         )}
         <ul className="flex w-full flex-col gap-3">
-          {fakeItems.map((item) => (
+          {fakeItemsStock.map((item) => (
             <li key={item.id}>
-              <ItemCard data={item} />
+              {asset === "acoes" && (
+                <ItemCardStock data={item} />
+              )}
+            </li>
+          ))}
+        </ul>
+        <ul className="flex w-full flex-col gap-3">
+          {fakeItemsFiis.map((item) => (
+            <li key={item.id}>
+              {asset === "fundos-imobiliarios" && (
+                <ItemCardFiis data={item} />
+              )}
+            </li>
+          ))}
+        </ul>
+        <ul className="flex w-full flex-col gap-3">
+          {fakeItemsFixed.map((item) => (
+            <li key={item.id}>
+              {asset === "renda-fixa" && (
+                <ItemCardFixed data={item} />
+              )}
             </li>
           ))}
         </ul>

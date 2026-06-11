@@ -1,6 +1,5 @@
 import ChartBarMultiple from "@/components/chart-objects/ChartBarMultiple";
 import CardValues from "@/components/chart-objects/CardValues";
-import InvestorProfileSlider from "@/components/chart-objects/InvestorProfileSlider";
 import PieLegends from "@/components/chart-objects/PieLegends";
 
 export default function DashboardPage() {
@@ -45,7 +44,6 @@ export default function DashboardPage() {
           ]}
         />
         <ChartBarMultiple />
-        <InvestorProfileSlider />
       </div>
     </div>
   );

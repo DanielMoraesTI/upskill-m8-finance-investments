@@ -10,8 +10,8 @@ export interface ItemCardData {
   id: string;
   name: string;
   dataInicial: string; // ISO date string
-  valorInicial: number;
-  valorTotal: number;
+  valorInvestido: number;
+  valorAtual: number;
   dataAtualizacao: string; // ISO date string
 }
 
@@ -38,7 +38,7 @@ function formatDate(dateStr: string): string {
 }
 
 // --- Component ---
-export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
+export function ItemCardFixed({ data, onEdit, onDelete }: ItemCardProps) {
   return (
     <Card className="w-full">
       <CardContent className="flex items-center gap-6 px-6 py-4">
@@ -66,25 +66,25 @@ export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
 
         <div className="h-8 w-px bg-border" />
 
-        {/* Valor Inicial */}
+        {/* Valor Investido */}
         <div className="flex flex-col min-w-[80px]">
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Valor Inicial
+            Valor Investido
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
-            {formatCurrency(data.valorInicial)}
+            {formatCurrency(data.valorInvestido)}
           </span>
         </div>
 
         <div className="h-8 w-px bg-border" />
 
-        {/* Valor Total */}
+        {/* Valor Atual */}
         <div className="flex flex-col min-w-[120px]">
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Valor Atual
+            Valor Atualizado
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
-            {formatCurrency(data.valorTotal)}
+            {formatCurrency(data.valorAtual)}
           </span>
         </div>
 
@@ -130,21 +130,21 @@ export function ItemCard({ data, onEdit, onDelete }: ItemCardProps) {
 }
 
 // --- Fake Data ---
-export const fakeItems: ItemCardData[] = [
+export const fakeItemsFixed: ItemCardData[] = [
   {
     id: "1",
     name: "Itaú Crédito Bancário Renda Fixa Crédito Privado",
     dataInicial: "15/05/2024",
-    valorInicial: 30000.0,
-    valorTotal: 45000.0,
+    valorInvestido: 30000.0,
+    valorAtual: 45000.0,
     dataAtualizacao: "2024-05-28T10:30:00Z",
   },
   {
     id: "2",
     name: "Nubank Caixinha",
     dataInicial: "20/05/2024",
-    valorInicial: 5000.0,
-    valorTotal: 8750.5,
+    valorInvestido: 5000.0,
+    valorAtual: 8750.5,
     dataAtualizacao: "2024-05-27T14:15:00Z",
   },
 ];
