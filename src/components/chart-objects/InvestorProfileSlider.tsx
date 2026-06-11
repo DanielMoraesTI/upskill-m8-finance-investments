@@ -51,46 +51,58 @@ export default function InvestorProfileSlider() {
   const Icon = profile.icon;
 
   return (
-    <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg border bg-card shadow-sm w-max">
+    <div className="flex items-center gap-4 px-4 py-2 rounded-xl border border-sidebar-border bg-card shadow-sm w-max">
 
       {/* Label + badge numa linha só */}
-      <span className="text-xs font-semibold text-foreground whitespace-nowrap">
-        Perfil de Investidor
-      </span>
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-semibold text-foreground whitespace-nowrap">
+          Perfil de Investidor
+        </span>
 
-      <div className={cn(
-        "flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap",
-        profile.bg, profile.border, profile.color
-      )}>
-        <Icon className="w-3 h-3" />
-        {profile.label}
+        <div className={cn(
+          "flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap shadow-sm",
+          profile.bg, profile.border, profile.color
+        )}>
+          <Icon className="w-3 h-3" />
+          {profile.label}
+        </div>
       </div>
+
+      <span className="text-muted-foreground/30 text-xs hidden md:inline">|</span>
 
       {/* Percentuais */}
-      <div className="flex items-center gap-1.5 text-xs tabular-nums text-muted-foreground whitespace-nowrap">
-        <span><span className="font-bold text-foreground">{rendaFixa}%</span> RF</span>
-        <span>·</span>
-        <span><span className="font-bold text-foreground">{rendaVariavel}%</span> RV</span>
+      <div className="flex items-center gap-2 text-xs tabular-nums text-muted-foreground whitespace-nowrap">
+        <span><span className="font-semibold text-foreground">{rendaFixa}%</span> Renda Fixa</span>
+        <span className="text-muted-foreground/40">·</span>
+        <span><span className="font-semibold text-foreground">{rendaVariavel}%</span> Renda Variável</span>
       </div>
 
-      {/* Barra compacta */}
-      <div className="flex flex-col gap-0.5 w-40">
-        <div className="relative h-2 w-full rounded-full overflow-hidden">
-          <div className="absolute inset-y-0 left-0 w-[10%] bg-emerald-400/80" />
-          <div className="absolute inset-y-0 left-[10%] w-[30%] bg-amber-400/80" />
-          <div className="absolute inset-y-0 left-[40%] w-[60%] bg-rose-400/80" />
-          <div className="absolute inset-y-0 left-[10%] w-px bg-background/90" />
-          <div className="absolute inset-y-0 left-[40%] w-px bg-background/90" />
-          {/* Indicador */}
+      <span className="text-muted-foreground/30 text-xs hidden md:inline">|</span>
+
+      {/* Barra Esticada e Elegante */}
+      <div className="flex flex-col gap-1 w-64 md:w-72"> {/* Aumentado para w-64 no mobile e w-72 no desktop */}
+        <div className="relative h-2 w-full rounded-full overflow-hidden bg-muted">
+          {/* Fatias proporcionais à regra de negócio (baseado na Renda Variável) */}
+          <div className="absolute inset-y-0 left-0 w-[10%] bg-emerald-500/80" />
+          <div className="absolute inset-y-0 left-[10%] w-[30%] bg-amber-500/80" />
+          <div className="absolute inset-y-0 left-[40%] w-[60%] bg-rose-500/80" />
+          
+          {/* Divisores internos sutis */}
+          <div className="absolute inset-y-0 left-[10%] w-px bg-background/50" />
+          <div className="absolute inset-y-0 left-[40%] w-px bg-background/50" />
+          
+          {/* Indicador Atual */}
           <div
-            className="absolute inset-y-0 w-0.5 bg-foreground/80 z-10"
+            className="absolute inset-y-0 w-0.5 bg-foreground z-10 shadow-[0_0_4px_rgba(0,0,0,0.3)]"
             style={{ left: `${rendaVariavel}%` }}
           />
         </div>
-        <div className="flex text-[8px] leading-none">
-          <span className="w-[10%] text-center text-emerald-600 dark:text-emerald-400 font-medium">C</span>
-          <span className="w-[30%] text-center text-amber-500 font-medium">M</span>
-          <span className="w-[60%] text-center text-rose-500 font-medium">A</span>
+        
+        {/* Textos inferiores com alinhamentos corrigidos */}
+        <div className="flex text-[9px] font-medium tracking-wide leading-none text-muted-foreground">
+          <span className="w-[25%] text-left text-emerald-600 dark:text-emerald-400">Conservador</span>
+          <span className="w-[35%] text-center text-amber-600 dark:text-amber-500">Moderado</span>
+          <span className="w-[40%] text-right text-rose-600 dark:text-rose-400">Arrojado</span>
         </div>
       </div>
 

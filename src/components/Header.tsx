@@ -11,13 +11,6 @@ export default function Header() {
 
       <SidebarTrigger />
 
-      <h1 className="text-sm font-medium">Nome de Usuário</h1>
-
-      <div className="absolute left-1/2 -translate-x-1/2">
-        <InvestorProfileSlider />
-      </div>
-
-
       <div className={`ml-auto ${open ? "hidden" : "block"}`}>
         <Image
           src="/logo-black.png"
@@ -36,6 +29,12 @@ export default function Header() {
           sizes="120px"
         />
       </div>
+
+      <div className="flex flex-1 w-full justify-center">
+        <InvestorProfileSlider />
+      </div>
+
+      <h1 className="text-sm font-medium">Nome de Usuário</h1>
 
     </header>
   );

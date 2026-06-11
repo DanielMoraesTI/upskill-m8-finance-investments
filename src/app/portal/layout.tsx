@@ -8,6 +8,7 @@ export default function PortalLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <SidebarProvider>
       {/** Container para ocupar toda a tela com cara de "web app" */}
@@ -19,7 +20,7 @@ export default function PortalLayout({
         <Navbar />
         <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full">
           <Header />
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <main className="flex flex-1 flex-col w-full items-center">{children}</main>
           <Footer />
         </div>
       </div>

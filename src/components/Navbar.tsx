@@ -19,6 +19,7 @@ import {
   History,
   Wallet,
   LogIn,
+  Landmark,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -50,10 +51,10 @@ const navItemOptions: NavItemProps[] = [
   {
     href: "/portal/carteira?asset=renda-fixa",
     label: "Renda Fixa",
-    icon: HandCoins,
+    icon: Landmark,
   },
   {
-    href: "/portal/carteira?asset=all",
+    href: "/portal/transaction",
     label: "Histórico de Transações",
     icon: History,
   },
