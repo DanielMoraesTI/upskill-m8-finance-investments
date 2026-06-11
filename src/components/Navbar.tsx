@@ -54,7 +54,7 @@ const navItemOptions: NavItemProps[] = [
   },
   {
     href: "/portal/carteira?asset=all",
-    label: "Todos os Ativos",
+    label: "Histórico de Transações",
     icon: History,
   },
   {
