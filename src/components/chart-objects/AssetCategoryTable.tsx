@@ -44,24 +44,24 @@ export default function AssetCategoryTable({
   }));
 
   return (
-    <Card className="bg-[#1a1d2e] border-[#2a2d3e] text-white w-full max-w-md rounded-2xl">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold text-white">
+    <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-lg w-full max-w-md rounded-2xl">
+      <CardHeader className="pb-2 px-5 pt-5">
+        <CardTitle className="text-base font-semibold text-foreground">
           {titulo}
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-4">
         <Table className="table-fixed w-full">
           <TableHeader>
-            <TableRow className="border-b border-[#2a2d3e] hover:bg-transparent">
-              <TableHead className="w-[50%] text-gray-400 font-medium text-sm pl-0">
+            <TableRow className="border-b border-border/40 hover:bg-transparent">
+              <TableHead className="w-[50%] text-muted-foreground/50 font-semibold text-xs uppercase tracking-widest pl-0">
                 Categoria
               </TableHead>
-              <TableHead className="w-[20%] text-gray-400 font-medium text-sm text-right pr-2 whitespace-nowrap">
-                Porcentagem
+              <TableHead className="w-[20%] text-muted-foreground/50 font-semibold text-xs uppercase tracking-widest text-right pr-2 whitespace-nowrap">
+                %
               </TableHead>
-              <TableHead className="w-[30%] text-gray-400 font-medium text-sm text-right pr-0 whitespace-nowrap">
-                Valor Atual
+              <TableHead className="w-[30%] text-muted-foreground/50 font-semibold text-xs uppercase tracking-widest text-right pr-0 whitespace-nowrap">
+                Valor
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -69,27 +69,27 @@ export default function AssetCategoryTable({
             {dataWithPercentages.map((item) => (
               <TableRow
                 key={item.categoria}
-                className="border-b border-[#2a2d3e] hover:bg-[#23263a] transition-colors"
+                className="border-b border-border/30 hover:bg-muted/20 transition-colors"
               >
-                <TableCell className="text-white text-sm py-3 pl-0 pr-2">
+                <TableCell className="text-foreground text-sm py-3 pl-0 pr-2">
                   {item.categoria}
                 </TableCell>
-                <TableCell className="text-white text-sm py-3 text-right pr-2 whitespace-nowrap">
+                <TableCell className="text-muted-foreground text-sm py-3 text-right pr-2 whitespace-nowrap">
                   {item.porcentagem}
                 </TableCell>
-                <TableCell className="text-white text-sm py-3 text-right pr-0 whitespace-nowrap">
+                <TableCell className="text-foreground text-sm py-3 text-right pr-0 whitespace-nowrap font-semibold">
                   {formatBRL(item.valorTotal)}
                 </TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-[#23263a] hover:bg-[#23263a] border-0 rounded-b-xl">
-              <TableCell className="font-bold text-white text-sm py-3 pl-0 rounded-bl-xl">
+            <TableRow className="bg-muted/20 hover:bg-muted/20 border-0 rounded-b-xl">
+              <TableCell className="font-bold text-primary text-sm py-3 pl-0 rounded-bl-xl">
                 TOTAL
               </TableCell>
-              <TableCell className="font-bold text-white text-sm py-3 text-right pr-2 whitespace-nowrap">
+              <TableCell className="font-bold text-foreground text-sm py-3 text-right pr-2 whitespace-nowrap">
                 100%
               </TableCell>
-              <TableCell className="font-bold text-white text-sm py-3 text-right pr-0 rounded-br-xl whitespace-nowrap">
+              <TableCell className="font-bold text-primary text-sm py-3 text-right pr-0 rounded-br-xl whitespace-nowrap">
                 {formatBRL(total)}
               </TableCell>
             </TableRow>

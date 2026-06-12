@@ -1,6 +1,13 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { ShieldCheck, TrendingUp, Zap } from "lucide-react";
+// Importações do Shadcn UI Tooltip
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type InvestorProfile = {
   label: string;
@@ -8,6 +15,7 @@ type InvestorProfile = {
   color: string;
   bg: string;
   border: string;
+  description: string; // Nova propriedade para explicar o parâmetro
 };
 
 type TInvestorProfileOptions = "conservador" | "moderado" | "arrojado";
@@ -19,6 +27,8 @@ const profiles: Record<TInvestorProfileOptions, InvestorProfile> = {
     color: "text-emerald-700 dark:text-emerald-400",
     bg: "bg-emerald-50 dark:bg-emerald-950",
     border: "border-emerald-300 dark:border-emerald-700",
+    description:
+      "Possui mais de 90% do patrimônio alocado em Renda Fixa. Foco total em segurança e preservação de capital.",
   },
   moderado: {
     label: "Moderado",
@@ -26,6 +36,8 @@ const profiles: Record<TInvestorProfileOptions, InvestorProfile> = {
     color: "text-amber-700 dark:text-amber-400",
     bg: "bg-amber-50 dark:bg-amber-950",
     border: "border-amber-300 dark:border-amber-700",
+    description:
+      "Possui entre 60% e 90% em Renda Fixa. Busca equilíbrio entre segurança e uma moderada busca por rentabilidade.",
   },
   arrojado: {
     label: "Arrojado",
@@ -33,6 +45,8 @@ const profiles: Record<TInvestorProfileOptions, InvestorProfile> = {
     color: "text-rose-700 dark:text-rose-400",
     bg: "bg-rose-50 dark:bg-rose-950",
     border: "border-rose-300 dark:border-rose-700",
+    description:
+      "Possui menos de 60% em Renda Fixa (maior exposição à Renda Variável). Foco em maximização de ganhos a longo prazo.",
   },
 };
 
@@ -51,61 +65,82 @@ export default function InvestorProfileSlider() {
   const Icon = profile.icon;
 
   return (
-    <div className="flex items-center gap-4 px-4 py-2 rounded-xl border border-sidebar-border bg-card shadow-sm w-max">
+    // Provedor do Tooltip envolvendo o componente
+    <TooltipProvider delay={200}>
+      <div className="flex flex-wrap items-center gap-4 px-4 py-2.5 rounded-xl border border-border/50 bg-card/80 backdrop-blur-sm shadow-sm w-max max-w-full">
+        {/* Label + badge */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest whitespace-nowrap">
+            Perfil
+          </span>
 
-      {/* Label + badge numa linha só */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-semibold text-foreground whitespace-nowrap">
-          Perfil de Investidor
-        </span>
+          <Tooltip>
+            <TooltipTrigger>
+              <div
+                className={cn(
+                  "flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap cursor-help transition-opacity hover:opacity-90",
+                  profile.bg,
+                  profile.border,
+                  profile.color,
+                )}
+              >
+                <Icon className="w-3 h-3" />
+                {profile.label}
+              </div>
+            </TooltipTrigger>
 
-        <div className={cn(
-          "flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap shadow-sm",
-          profile.bg, profile.border, profile.color
-        )}>
-          <Icon className="w-3 h-3" />
-          {profile.label}
+            <TooltipContent className="max-w-xs p-3 text-xs bg-popover text-popover-foreground border border-border/60 shadow-xl rounded-xl">
+              <p className="font-semibold mb-1 flex items-center gap-1">
+                <Icon className={cn("w-3.5 h-3.5", profile.color)} />
+                Parâmetros do Perfil {profile.label}
+              </p>
+              <p className="text-muted-foreground leading-relaxed">
+                {profile.description}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+
+        <div className="w-px h-5 bg-border/50 hidden md:block" />
+
+        {/* Percentuais */}
+        <div className="flex items-center gap-2 text-xs tabular-nums text-muted-foreground whitespace-nowrap">
+          <span>
+            <span className="font-bold text-foreground">{rendaFixa}%</span>{" "}
+            Renda Fixa
+          </span>
+          <span className="text-border">·</span>
+          <span>
+            <span className="font-bold text-foreground">{rendaVariavel}%</span>{" "}
+            Renda Variável
+          </span>
+        </div>
+
+        <div className="w-px h-5 bg-border/50 hidden md:block" />
+
+        {/* Barra */}
+        <div className="flex flex-col gap-1 w-48 sm:w-64 md:w-72">
+          <div className="relative h-2 w-full rounded-full overflow-hidden bg-muted/60">
+            <div className="absolute inset-y-0 left-0 w-[10%] bg-emerald-500/70" />
+            <div className="absolute inset-y-0 left-[10%] w-[30%] bg-amber-500/70" />
+            <div className="absolute inset-y-0 left-[40%] w-[60%] bg-rose-500/70" />
+
+            <div className="absolute inset-y-0 left-[10%] w-px bg-background/40" />
+            <div className="absolute inset-y-0 left-[40%] w-px bg-background/40" />
+
+            <div
+              className="absolute inset-y-0 w-0.5 bg-foreground/90 z-10 shadow-[0_0_6px_rgba(255,255,255,0.3)]"
+              style={{ left: `${rendaVariavel}%` }}
+            />
+          </div>
+
+          <div className="flex text-[9px] font-semibold tracking-wide leading-none">
+            <span className="w-[25%] text-left text-emerald-500">Conservador</span>
+            <span className="w-[35%] text-center text-amber-500">Moderado</span>
+            <span className="w-[40%] text-right text-rose-500">Arrojado</span>
+          </div>
         </div>
       </div>
-
-      <span className="text-muted-foreground/30 text-xs hidden md:inline">|</span>
-
-      {/* Percentuais */}
-      <div className="flex items-center gap-2 text-xs tabular-nums text-muted-foreground whitespace-nowrap">
-        <span><span className="font-semibold text-foreground">{rendaFixa}%</span> Renda Fixa</span>
-        <span className="text-muted-foreground/40">·</span>
-        <span><span className="font-semibold text-foreground">{rendaVariavel}%</span> Renda Variável</span>
-      </div>
-
-      <span className="text-muted-foreground/30 text-xs hidden md:inline">|</span>
-
-      {/* Barra Esticada e Elegante */}
-      <div className="flex flex-col gap-1 w-64 md:w-72"> {/* Aumentado para w-64 no mobile e w-72 no desktop */}
-        <div className="relative h-2 w-full rounded-full overflow-hidden bg-muted">
-          {/* Fatias proporcionais à regra de negócio (baseado na Renda Variável) */}
-          <div className="absolute inset-y-0 left-0 w-[10%] bg-emerald-500/80" />
-          <div className="absolute inset-y-0 left-[10%] w-[30%] bg-amber-500/80" />
-          <div className="absolute inset-y-0 left-[40%] w-[60%] bg-rose-500/80" />
-          
-          {/* Divisores internos sutis */}
-          <div className="absolute inset-y-0 left-[10%] w-px bg-background/50" />
-          <div className="absolute inset-y-0 left-[40%] w-px bg-background/50" />
-          
-          {/* Indicador Atual */}
-          <div
-            className="absolute inset-y-0 w-0.5 bg-foreground z-10 shadow-[0_0_4px_rgba(0,0,0,0.3)]"
-            style={{ left: `${rendaVariavel}%` }}
-          />
-        </div>
-        
-        {/* Textos inferiores com alinhamentos corrigidos */}
-        <div className="flex text-[9px] font-medium tracking-wide leading-none text-muted-foreground">
-          <span className="w-[25%] text-left text-emerald-600 dark:text-emerald-400">Conservador</span>
-          <span className="w-[35%] text-center text-amber-600 dark:text-amber-500">Moderado</span>
-          <span className="w-[40%] text-right text-rose-600 dark:text-rose-400">Arrojado</span>
-        </div>
-      </div>
-
-    </div>
+    </TooltipProvider>
   );
 }

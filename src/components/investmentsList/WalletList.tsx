@@ -51,69 +51,69 @@ function formatDate(dateStr: string): string {
 // --- Componente ---
 export function ItemCard({ asset, data, onEdit, onDelete }: ItemCardProps) {
   return (
-    <Card className="w-full">
-      <CardContent className="flex items-center gap-6 px-6 py-4">
+    <Card className="w-full border-border/50 bg-card/80 backdrop-blur-sm shadow-sm card-hover group overflow-x-auto">
+      <CardContent className="flex items-center gap-5 px-5 py-4 min-w-max">
         {/* Sigla — acoes e fundos-imobiliarios */}
         {(asset === "acoes" || asset === "fundos-imobiliarios") && (
           <>
-            <div className="flex w-22.5 shrink-0 flex-col">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="flex w-20 shrink-0 flex-col">
+              <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Sigla
               </span>
               <span
-                className="mt-1 truncate text-sm font-semibold text-foreground"
+                className="mt-1 truncate text-sm font-bold text-primary"
                 title={data.sigla}
               >
                 {data.sigla}
               </span>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px bg-border/50" />
           </>
         )}
 
         {/* Empresa — acoes */}
         {asset === "acoes" && (
           <>
-            <div className="flex w-45 shrink-0 flex-col">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="flex w-44 shrink-0 flex-col">
+              <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Empresa
               </span>
               <Badge
                 variant="secondary"
-                className="mt-1 inline-flex max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs"
+                className="mt-1 inline-flex max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs bg-secondary/60 border-border/40"
                 title={data.name}
               >
                 {data.name}
               </Badge>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px bg-border/50" />
           </>
         )}
 
         {/* Categoria — fundos-imobiliarios */}
         {asset === "fundos-imobiliarios" && (
           <>
-            <div className="flex w-45 shrink-0 flex-col">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="flex w-44 shrink-0 flex-col">
+              <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Categoria
               </span>
               <Badge
                 variant="secondary"
-                className="mt-1 inline-flex max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs"
+                className="mt-1 inline-flex max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs bg-secondary/60 border-border/40"
                 title={data.categoria}
               >
                 {data.categoria}
               </Badge>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px bg-border/50" />
           </>
         )}
 
         {/* Nome — renda-fixa */}
         {asset === "renda-fixa" && (
           <>
-            <div className="flex w-45 shrink-0 flex-col">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="flex w-44 shrink-0 flex-col">
+              <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Nome
               </span>
               <span
@@ -123,43 +123,46 @@ export function ItemCard({ asset, data, onEdit, onDelete }: ItemCardProps) {
                 {data.name}
               </span>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px bg-border/50" />
           </>
         )}
 
         {/* Data Inicial — renda-fixa */}
         {asset === "renda-fixa" && (
           <>
-            <div className="flex w-30 shrink-0 flex-col">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="flex w-28 shrink-0 flex-col">
+              <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Data Inicial
               </span>
-              <Badge variant="secondary" className="mt-1 w-fit text-xs">
+              <Badge
+                variant="secondary"
+                className="mt-1 w-fit text-xs bg-secondary/60 border-border/40"
+              >
                 {data.dataInicial}
               </Badge>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px bg-border/50" />
           </>
         )}
 
         {/* Quantidade — acoes e fundos-imobiliarios */}
         {(asset === "acoes" || asset === "fundos-imobiliarios") && (
           <>
-            <div className="flex w-25 shrink-0 flex-col">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            <div className="flex w-24 shrink-0 flex-col">
+              <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Quantidade
               </span>
               <span className="mt-1 text-sm font-semibold text-foreground">
                 {data.quantidade?.toLocaleString("pt-BR")}
               </span>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px bg-border/50" />
           </>
         )}
 
-        {/* Valor Investido — todos */}
-        <div className="flex w-32.5 shrink-0 flex-col">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        {/* Valor Investido */}
+        <div className="flex w-32 shrink-0 flex-col">
+          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Valor Investido
           </span>
           <span className="mt-1 text-sm font-semibold text-foreground">
@@ -167,24 +170,26 @@ export function ItemCard({ asset, data, onEdit, onDelete }: ItemCardProps) {
           </span>
         </div>
 
-        <div className="h-8 w-px bg-border" />
+        <div className="h-8 w-px bg-border/50" />
 
-        {/* Valor Atual — todos */}
-        <div className="flex w-32.5 shrink-0 flex-col">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        {/* Valor Atual */}
+        <div className="flex w-32 shrink-0 flex-col">
+          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Valor Atualizado
           </span>
-          <span className="mt-1 text-sm font-semibold text-foreground">
+          <span
+            className={`mt-1 text-sm font-bold ${data.valorAtual >= data.valorInvestido ? "text-chart-1" : "text-chart-5"}`}
+          >
             {formatCurrency(data.valorAtual)}
           </span>
         </div>
 
-        <div className="h-8 w-px bg-border" />
+        <div className="h-8 w-px bg-border/50" />
 
-        {/* Data Atualização — todos */}
-        <div className="flex w-30 shrink-0 flex-col">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Data Atualização
+        {/* Data Atualização */}
+        <div className="flex w-28 shrink-0 flex-col">
+          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
+            Atualização
           </span>
           <span className="mt-1 text-sm font-semibold text-foreground">
             {formatDate(data.dataAtualizacao)}
@@ -200,16 +205,15 @@ export function ItemCard({ asset, data, onEdit, onDelete }: ItemCardProps) {
             variant="outline"
             size="sm"
             onClick={() => onEdit?.(data.id)}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 border-border/50 hover:border-primary/40 hover:bg-primary/8 hover:text-primary transition-all"
           >
             <Pencil className="h-3.5 w-3.5" />
             Editar
           </Button>
           <Button
-            variant="outline" // "outline" ou "ghost" são perfeitos para navegação secundária
+            variant="ghost"
             size="sm"
-            //onClick={() => router.push("/portal/transaction")}
-            className="flex items-center gap-2 hover:bg-accent hover:text-accent-foreground text-muted-foreground transition-colors"
+            className="flex items-center gap-2 text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 transition-all"
           >
             <History className="h-4 w-4" />
             Histórico

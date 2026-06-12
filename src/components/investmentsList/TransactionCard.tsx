@@ -48,94 +48,100 @@ function formatDate(dateStr: string): string {
 }
 
 // --- Component ---
-export function TransactionCard({ data, onEdit, onDelete }: TransactionCardProps) {
+export function TransactionCard({
+  data,
+  onEdit,
+  onDelete,
+}: TransactionCardProps) {
   const isRendaFixa = data.asset === "renda-fixa";
   const isCompra = data.tipo === "compra";
 
   return (
-    <Card className="w-full">
-      <CardContent className="flex items-center gap-6 px-6 py-4">
-
+    <Card className="w-full border-border/50 bg-card/80 backdrop-blur-sm shadow-sm card-hover group overflow-x-auto">
+      <CardContent className="flex items-center gap-5 px-5 py-4 min-w-max">
         {/* Tipo: Compra / Venda */}
-        <div className="flex flex-col w-[90px] shrink-0">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        <div className="flex flex-col w-[88px] shrink-0">
+          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Tipo
           </span>
           <Badge
-            // Mudamos o variant da Compra para "secondary" (ou deixamos sem variant) 
-            // para que o fundo preto padrão do shadcn não sobressaia
             variant="outline"
             className={cn(
-              "mt-1 w-fit text-xs font-semibold flex items-center gap-1 border px-2 py-0.5 rounded-full shadow-sm",
-              isCompra 
-                ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800" 
-                : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800"
+              "mt-1 w-fit text-xs font-semibold flex items-center gap-1 border px-2 py-0.5 rounded-full",
+              isCompra
+                ? "bg-emerald-950/50 text-emerald-400 border-emerald-800/50"
+                : "bg-rose-950/50 text-rose-400 border-rose-800/50",
             )}
           >
             {isCompra ? (
-              <TrendingUp className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+              <TrendingUp className="h-3 w-3" />
             ) : (
-              <TrendingDown className="h-3 w-3 text-rose-600 dark:text-rose-400" />
+              <TrendingDown className="h-3 w-3" />
             )}
             {isCompra ? "Compra" : "Venda"}
           </Badge>
         </div>
 
-        <div className="h-8 w-px bg-border" />
+        <div className="h-8 w-px bg-border/50" />
 
-        {/* Sigla — acoes + fundos-imobiliarios | Nome — renda-fixa */}
+        {/* Sigla / Nome */}
         <div className="flex flex-col w-[180px] shrink-0">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             {isRendaFixa ? "Nome" : "Sigla"}
           </span>
-          <span className="text-sm font-semibold text-foreground mt-1 truncate" title={isRendaFixa ? data.name : data.sigla}>
+          <span
+            className={`text-sm font-bold mt-1 truncate ${isRendaFixa ? "text-foreground" : "text-primary"}`}
+            title={isRendaFixa ? data.name : data.sigla}
+          >
             {isRendaFixa ? data.name : data.sigla}
           </span>
         </div>
 
-        <div className="h-8 w-px bg-border" />
+        <div className="h-8 w-px bg-border/50" />
 
-        {/* Quantidade — acoes + fundos-imobiliarios | espaço vazio — renda-fixa */}
+        {/* Quantidade */}
         <div className="flex flex-col w-[100px] shrink-0">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             {!isRendaFixa ? "Quantidade" : "\u00A0"}
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
-            {!isRendaFixa ? data.quantidade?.toLocaleString("pt-BR") : "\u00A0"}
+            {!isRendaFixa ? data.quantidade?.toLocaleString("pt-BR") : "--"}
           </span>
         </div>
 
-        <div className="h-8 w-px bg-border" />
+        <div className="h-8 w-px bg-border/50" />
 
-        {/* Valor Unitário — acoes + fundos-imobiliarios | espaço vazio — renda-fixa */}
+        {/* Valor Unitário */}
         <div className="flex flex-col w-[130px] shrink-0">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            {!isRendaFixa ? "Valor Unitário" : "\u00A0"}
+          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
+            {!isRendaFixa ? "Valor Unitário" : ""}
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
             {!isRendaFixa && data.valorUnitario
               ? formatCurrency(data.valorUnitario)
-              : "\u00A0"}
+              : "--"}
           </span>
         </div>
 
-        <div className="h-8 w-px bg-border" />
+        <div className="h-8 w-px bg-border/50" />
 
-        {/* Valor Total — all */}
+        {/* Valor Total */}
         <div className="flex flex-col w-[130px] shrink-0">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Valor Total
           </span>
-          <span className="text-sm font-semibold text-foreground mt-1">
+          <span
+            className={`text-sm font-bold mt-1 ${isCompra ? "text-chart-1" : "text-chart-5"}`}
+          >
             {formatCurrency(data.valorTotal)}
           </span>
         </div>
 
-        <div className="h-8 w-px bg-border" />
+        <div className="h-8 w-px bg-border/50" />
 
-        {/* Data — all */}
+        {/* Data */}
         <div className="flex flex-col w-[100px] shrink-0">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Data
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
@@ -152,16 +158,16 @@ export function TransactionCard({ data, onEdit, onDelete }: TransactionCardProps
             variant="outline"
             size="sm"
             onClick={() => onEdit?.(data.id)}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 border-border/50 hover:border-primary/40 hover:bg-primary/8 hover:text-primary transition-all"
           >
             <Pencil className="h-3.5 w-3.5" />
             Editar
           </Button>
           <Button
-            variant="destructive"
+            variant="ghost"
             size="sm"
             onClick={() => onDelete?.(data.id)}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 transition-all"
           >
             <Trash2 className="h-3.5 w-3.5" />
             Deletar

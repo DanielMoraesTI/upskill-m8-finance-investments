@@ -1,8 +1,16 @@
 "use client";
+import { Suspense } from "react";
+export const dynamic = "force-dynamic";
 import CardValues from "@/components/chart-objects/CardValues";
 import AssetCategoryTable from "@/components/chart-objects/AssetCategoryTable";
 import { useSearchParams } from "next/navigation";
-import { AssetType, ItemCardData, fakeItemsFiis, fakeItemsStock, fakeItemsFixed } from "@/components/investmentsList/WalletList";
+import {
+  AssetType,
+  ItemCardData,
+  fakeItemsFiis,
+  fakeItemsStock,
+  fakeItemsFixed,
+} from "@/components/investmentsList/WalletList";
 import { ItemCard } from "@/components/investmentsList/WalletList";
 import { Building2, Landmark, Wallet } from "lucide-react";
 
@@ -33,33 +41,43 @@ const carteiraMap: Record<TCarteiraItem, ICarteiraItemProps> = {
 };
 
 const itemsByAsset: Record<AssetType, ItemCardData[]> = {
-  "acoes": fakeItemsStock,
+  acoes: fakeItemsStock,
   "fundos-imobiliarios": fakeItemsFiis,
   "renda-fixa": fakeItemsFixed,
 };
 
-
 export default function Carteira() {
+  return (
+    <Suspense>
+      <CarteiraContent />
+    </Suspense>
+  );
+}
+
+function CarteiraContent() {
   const searchParams = useSearchParams();
 
-  const asset = searchParams.get("asset") as AssetType || null;
+  const asset = (searchParams.get("asset") as AssetType) || null;
   const items = asset ? (itemsByAsset[asset] ?? []) : [];
 
   return (
-    <div className="flex flex-col w-full max-w-7xl grid-cols-1 items-start justify-items-center gap-4 md:grid-cols-2">
-      <section className="flex w-full flex-col items-center gap-6">
-        <h1 className="text-2xl font-bold">
-          {carteiraMap[asset as TCarteiraItem]?.title}
-        </h1>
-        <CardValues
-          title={carteiraMap[asset as TCarteiraItem]?.title}
-          value={carteiraMap[asset as TCarteiraItem]?.value}
-          icon={carteiraMap[asset as TCarteiraItem]?.icon === "Wallet"
-            ? Wallet
-            : carteiraMap[asset as TCarteiraItem]?.icon === "Building2"
-              ? Building2
-              : Landmark}
-        />
+    <div className="flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
+      <section className="flex w-full flex-col items-center gap-5">
+        {/* Cabeçalho da página */}
+        <div className="flex w-full items-center gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+              {carteiraMap[asset as TCarteiraItem]?.title}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground/60">
+              Visão detalhada dos seus ativos
+            </p>
+          </div>
+        </div>
+
+        {/* Linha divisória */}
+        <div className="w-full h-px bg-linear-to-r from-transparent via-border/60 to-transparent" />
+
         {asset === "fundos-imobiliarios" && (
           <div className="flex flex-row w-full items-center justify-center gap-4 flex-1">
             <AssetCategoryTable
@@ -72,6 +90,7 @@ export default function Carteira() {
             />
           </div>
         )}
+
         <ul className="flex w-full flex-col gap-3">
           {items.map((item) => (
             <li key={item.id}>

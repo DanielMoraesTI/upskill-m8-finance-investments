@@ -29,7 +29,7 @@ export default function RootLayout({
         <AppProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="light"
+            defaultTheme="dark"
             enableSystem={false}
           >
             <AuthProvider>{children}</AuthProvider>

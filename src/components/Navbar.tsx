@@ -80,52 +80,66 @@ export default function Navbar() {
       <SidebarHeader>
         <Link
           href="/portal"
-          className="relative flex h-50 w-full items-center justify-center overflow-hidden bg-background"
+          className="relative flex h-44 w-full items-center justify-center overflow-hidden bg-sidebar"
         >
+          {/* Glow decorativo atrás do logo */}
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-primary/8 via-transparent to-transparent" />
           <Image
             src="/assets/logo-b.png"
             alt="Logo do Sistema de Investimentos"
             fill
             priority
-            className="object-cover object-center border-2 border-gray-300"
+            className="object-cover object-center opacity-90"
           />
         </Link>
+        {/* Linha divisória com brilho */}
+        <div className="h-px w-full bg-linear-to-r from-transparent via-sidebar-border to-transparent" />
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="px-2 py-3">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {navItemOptions.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    className={
-                      pathname === item.href ||
-                      (item.href.includes("asset") &&
-                        asset === item.href.split("=")[1])
-                        ? "bg-primary/20 text-primary"
-                        : ""
-                    }
-                  >
-                    <Link
-                      href={item.href}
-                      className="flex flex-row gap-2 items-center justify-start"
+            <SidebarMenu className="gap-1">
+              {navItemOptions.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href.includes("asset") &&
+                    asset === item.href.split("=")[1]);
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      render={<Link href={item.href} />}
+                      isActive={isActive}
+                      className={
+                        isActive
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold shadow-sm rounded-xl px-3 py-2.5 flex flex-row gap-3 items-center"
+                          : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 rounded-xl transition-all duration-150 px-3 py-2.5 flex flex-row gap-3 items-center"
+                      }
                     >
                       <RenderedIcon icon={item.icon} />
-                      {item.label}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                      <span className="text-sm">{item.label}</span>
+                      {isActive && (
+                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-sidebar-accent-foreground/80" />
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="mb-4">
-        <Button variant="outline" size="sm">
+      <SidebarFooter className="px-3 pb-4 gap-2">
+        {/* Linha divisória */}
+        <div className="h-px w-full bg-linear-to-r from-transparent via-sidebar-border to-transparent mb-1" />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-sidebar-foreground/60 hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all"
+        >
           <LogIn className="w-4 h-4" />
-          Sair
+          <span className="text-sm">Sair</span>
         </Button>
         <ThemeToggleButton />
       </SidebarFooter>
