@@ -758,6 +758,13 @@ export default function BusinessAction() {
   const [nomeRendaFixa, setNomeRendaFixa] = useState("");
   const [totalRendaFixa, setTotalRendaFixa] = useState<string>("");
 
+  // Ações
+  const [empresa, setEmpresa] = useState("");
+
+  // Fundos Imobiliários
+  const [categoria, setCategoria] = useState("");
+  const CATEGORIAS_FII = ["Fundo de Papel", "Fundo de Tijolo", "Fundo Híbrido"];
+
   // Cálculo do total para ações/FIIs
   const total = useMemo(() => {
     const q = parseFloat(quantidade);
@@ -797,20 +804,29 @@ export default function BusinessAction() {
     setValor("");
     setNomeRendaFixa("");
     setTotalRendaFixa("");
+    setEmpresa("");
+    setCategoria("");
   }
 
   function handleConfirmar() {
-    // Aqui você integra com a sua API / lógica de negócio
-    console.log({
-      operacao,
-      investimento,
-      ticker: investimento !== "renda-fixa" ? ticker : undefined,
-      nome: investimento === "renda-fixa" ? nomeRendaFixa : undefined,
-      quantidade: investimento !== "renda-fixa" ? quantidade : undefined,
-      valor: investimento !== "renda-fixa" ? valor : undefined,
-      total: investimento !== "renda-fixa" ? total : totalRendaFixa,
-    });
-  }
+      console.log({
+        operacao,
+        investimento,
+        ticker: investimento !== "renda-fixa" ? ticker : undefined,
+        nome: investimento === "renda-fixa" ? nomeRendaFixa : undefined,
+        quantidade: investimento !== "renda-fixa" ? quantidade : undefined,
+        valor: investimento !== "renda-fixa" ? valor : undefined,
+        total: investimento !== "renda-fixa" ? total : totalRendaFixa,
+        empresa:
+          investimento === "acoes" && operacao === "compra"
+            ? empresa
+            : undefined,
+        categoria:
+          investimento === "fiis" && operacao === "compra"
+            ? categoria
+            : undefined,
+      });
+    }
 
   const isRendaFixa = investimento === "renda-fixa";
   const isAcoesOuFiis = investimento === "acoes" || investimento === "fiis";
@@ -819,7 +835,15 @@ export default function BusinessAction() {
     investimento !== "" &&
     (isRendaFixa
       ? nomeRendaFixa.trim() !== "" && totalRendaFixa !== ""
-      : ticker !== "" && quantidade !== "" && valor !== "");
+      : ticker !== "" &&
+        quantidade !== "" &&
+        valor !== "" &&
+        (investimento === "acoes" && operacao === "compra"
+          ? empresa.trim() !== ""
+          : true) &&
+        (investimento === "fiis" && operacao === "compra"
+          ? categoria !== ""
+          : true));
 
   return (
     <div className="flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6 items-center">
@@ -942,6 +966,52 @@ export default function BusinessAction() {
                   {listaFiltrada.length !== 1 ? "s" : ""}
                 </p>
               )}
+            </Field>
+          )}
+
+          {/* ── Empresa (Ações - Compra) ── */}
+          {investimento === "acoes" && operacao === "compra" && (
+            <Field>
+              <FieldLabel
+                htmlFor="empresa"
+                className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
+              >
+                Empresa
+              </FieldLabel>
+              <Input
+                id="empresa"
+                placeholder="Ex: Petróleo Brasileiro S.A."
+                value={empresa}
+                onChange={(e) => setEmpresa(e.target.value)}
+                className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+              />
+            </Field>
+          )}
+
+          {/* ── Categoria (FIIs - Compra) ── */}
+          {investimento === "fiis" && operacao === "compra" && (
+            <Field>
+              <FieldLabel
+                htmlFor="categoria"
+                className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
+              >
+                Categoria
+              </FieldLabel>
+              <NativeSelect
+                id="categoria"
+                className="w-full bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+                value={categoria}
+                onChange={(e) => setCategoria(e.target.value)}
+              >
+                <NativeSelectOption value="">
+                  Escolha a categoria
+                </NativeSelectOption>
+                {CATEGORIAS_FII.map((c) => (
+                  <NativeSelectOption key={c} value={c}>
+                    {c}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
             </Field>
           )}
 
