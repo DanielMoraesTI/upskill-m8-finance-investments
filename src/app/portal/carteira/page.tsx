@@ -3,38 +3,25 @@ import { Suspense } from "react";
 export const dynamic = "force-dynamic";
 import AssetCategoryTable from "@/components/chart-objects/AssetCategoryTable";
 import { useSearchParams } from "next/navigation";
-import {
-  AssetType,
-  ItemCardData,
-  fakeItemsFiis,
-  fakeItemsStock,
-  fakeItemsFixed,
+import WalletCard, {
+  type AssetType,
+  type ItemCardData,
 } from "@/components/investmentsList/WalletCard";
-import WalletCard from "@/components/investmentsList/WalletCard";
+import {
+  fakeItemsFiis,
+  fakeItemsFixed,
+  fakeItemsStock,
+} from "@/utils/mockData";
 
-interface ICarteiraItemProps {
-  title: string;
-  value: string;
-  icon: "Wallet" | "Building2" | "Landmark"; // Tipagem mais restrita para os ícones
-}
-
-type TCarteiraItem = "acoes" | "fundos-imobiliarios" | "renda-fixa";
-
-const carteiraMap: Record<TCarteiraItem, ICarteiraItemProps> = {
+const carteiraMap: Record<AssetType, { title: string }> = {
   acoes: {
     title: "Ações",
-    value: "R$ 10.000,00",
-    icon: "Wallet",
   },
   "fundos-imobiliarios": {
     title: "Fundos Imobiliários",
-    value: "R$ 20.000,00",
-    icon: "Building2",
   },
   "renda-fixa": {
     title: "Renda Fixa",
-    value: "R$ 20.000,00",
-    icon: "Landmark",
   },
 };
 
@@ -55,7 +42,13 @@ export default function Carteira() {
 function CarteiraContent() {
   const searchParams = useSearchParams();
 
-  const asset = (searchParams.get("asset") as AssetType) || null;
+  const queryAsset = searchParams.get("asset");
+  const asset: AssetType | null =
+    queryAsset === "acoes" ||
+    queryAsset === "fundos-imobiliarios" ||
+    queryAsset === "renda-fixa"
+      ? queryAsset
+      : null;
   const items = asset ? (itemsByAsset[asset] ?? []) : [];
 
   return (
@@ -65,7 +58,7 @@ function CarteiraContent() {
         <div className="flex w-full items-center gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-              {carteiraMap[asset as TCarteiraItem]?.title}
+              {asset ? carteiraMap[asset].title : "Carteira"}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground/60">
               Visão detalhada dos seus ativos
@@ -90,11 +83,12 @@ function CarteiraContent() {
         )}
 
         <ul className="flex w-full flex-col gap-3">
-          {items.map((item) => (
-            <li key={item.id}>
-              <WalletCard asset={asset as AssetType} data={item} />
-            </li>
-          ))}
+          {asset &&
+            items.map((item) => (
+              <li key={item.id}>
+                <WalletCard asset={asset} data={item} />
+              </li>
+            ))}
         </ul>
       </section>
     </div>

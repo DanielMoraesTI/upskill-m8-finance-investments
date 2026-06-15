@@ -5,46 +5,43 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/utils/dataTypeUtils";
+import { formatCurrency } from "@/utils/dataTypeUtils";
+import type { TFii, TRendaFixa, TStock } from "@/schemas/assetSchema";
+import type { TTransaction } from "@/schemas/transactionSchema";
 
 // --- Types ---
 export type TransactionType = "compra" | "venda";
 export type TransactionAsset = "acoes" | "fundos-imobiliarios" | "renda-fixa";
 
-export interface TransactionCardData {
+type BaseTransactionCardData = {
   id: string;
   tipo: TransactionType;
   asset: TransactionAsset;
-  // acoes + fundos-imobiliarios
-  sigla?: string;
-  quantidade?: number;
-  valorUnitario?: number;
-  // renda-fixa
-  name?: string;
-  // shared
-  valorTotal: number;
-  data: string; // ISO date string
-}
+  valorTotal: TTransaction["total_value"];
+  data: TTransaction["date"];
+};
+
+type VariableIncomeTransactionCardData = BaseTransactionCardData & {
+  asset: "acoes" | "fundos-imobiliarios";
+  sigla: TStock["ticker"] | TFii["ticker"];
+  quantidade: TTransaction["quantity"];
+  valorUnitario: TTransaction["unit_price"];
+};
+
+type FixedIncomeTransactionCardData = BaseTransactionCardData & {
+  asset: "renda-fixa";
+  name: TRendaFixa["company"];
+};
+
+export type TransactionCardData =
+  | VariableIncomeTransactionCardData
+  | FixedIncomeTransactionCardData;
 
 interface TransactionCardProps {
   data: TransactionCardData;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
-}
-
-// --- Helpers ---
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
-}
-
-function formatDate(dateStr: string): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(dateStr));
 }
 
 // --- Component ---
@@ -55,6 +52,10 @@ export function TransactionCard({
 }: TransactionCardProps) {
   const isRendaFixa = data.asset === "renda-fixa";
   const isCompra = data.tipo === "compra";
+  const ticker = "sigla" in data ? data.sigla : undefined;
+  const quantity = "quantidade" in data ? data.quantidade : undefined;
+  const unitValue = "valorUnitario" in data ? data.valorUnitario : undefined;
+  const fixedIncomeName = "name" in data ? data.name : undefined;
 
   return (
     <Card className="w-full border-border/50 bg-card/80 backdrop-blur-sm shadow-sm card-hover group overflow-x-auto">
@@ -91,9 +92,9 @@ export function TransactionCard({
           </span>
           <span
             className={`text-sm font-bold mt-1 truncate ${isRendaFixa ? "text-foreground" : "text-primary"}`}
-            title={isRendaFixa ? data.name : data.sigla}
+            title={isRendaFixa ? fixedIncomeName : ticker}
           >
-            {isRendaFixa ? data.name : data.sigla}
+            {isRendaFixa ? fixedIncomeName : ticker}
           </span>
         </div>
 
@@ -105,7 +106,7 @@ export function TransactionCard({
             {!isRendaFixa ? "Quantidade" : "\u00A0"}
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
-            {!isRendaFixa ? data.quantidade?.toLocaleString("pt-BR") : "--"}
+            {!isRendaFixa ? quantity?.toLocaleString("pt-BR") : "--"}
           </span>
         </div>
 
@@ -117,9 +118,7 @@ export function TransactionCard({
             {!isRendaFixa ? "Valor Unitário" : ""}
           </span>
           <span className="text-sm font-semibold text-foreground mt-1">
-            {!isRendaFixa && data.valorUnitario
-              ? formatCurrency(data.valorUnitario)
-              : "--"}
+            {!isRendaFixa && unitValue ? formatCurrency(unitValue) : "--"}
           </span>
         </div>
 
@@ -177,63 +176,3 @@ export function TransactionCard({
     </Card>
   );
 }
-
-// --- Fake Data ---
-export const fakeTransactions: TransactionCardData[] = [
-  {
-    id: "1",
-    tipo: "compra",
-    asset: "acoes",
-    sigla: "ITSA3",
-    quantidade: 100,
-    valorUnitario: 10.5,
-    valorTotal: 1050.0,
-    data: "2024-05-28T10:30:00Z",
-  },
-  {
-    id: "2",
-    tipo: "venda",
-    asset: "acoes",
-    sigla: "PETR4",
-    quantidade: 50,
-    valorUnitario: 38.2,
-    valorTotal: 1910.0,
-    data: "2024-05-27T14:15:00Z",
-  },
-  {
-    id: "3",
-    tipo: "compra",
-    asset: "fundos-imobiliarios",
-    sigla: "CPTS11",
-    quantidade: 200,
-    valorUnitario: 9.85,
-    valorTotal: 1970.0,
-    data: "2024-05-26T09:00:00Z",
-  },
-  {
-    id: "4",
-    tipo: "venda",
-    asset: "fundos-imobiliarios",
-    sigla: "XPML11",
-    quantidade: 80,
-    valorUnitario: 105.3,
-    valorTotal: 8424.0,
-    data: "2024-05-25T11:45:00Z",
-  },
-  {
-    id: "5",
-    tipo: "compra",
-    asset: "renda-fixa",
-    name: "Nubank Caixinha",
-    valorTotal: 5000.0,
-    data: "2024-05-24T08:00:00Z",
-  },
-  {
-    id: "6",
-    tipo: "venda",
-    asset: "renda-fixa",
-    name: "Itaú Crédito Bancário Renda Fixa Crédito Privado",
-    valorTotal: 12000.0,
-    data: "2024-05-23T16:30:00Z",
-  },
-];

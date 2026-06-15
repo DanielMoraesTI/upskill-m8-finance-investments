@@ -142,9 +142,11 @@ export default function Authentication() {
                       required
                       className="bg-muted/40 border-border/60 focus:border-primary/60 focus:ring-primary/20 transition-colors"
                     />
-                    <FieldDescription className="text-xs text-muted-foreground/70">
-                      Deve ter pelo menos 6 caracteres.
-                    </FieldDescription>
+                    {!isLogin && (
+                      <FieldDescription className="text-xs text-muted-foreground/70">
+                        Deve ter pelo menos 6 caracteres.
+                      </FieldDescription>
+                    )}
                   </Field>
                   {!isLogin && (
                     <Field>

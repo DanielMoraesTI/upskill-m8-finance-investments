@@ -2,14 +2,12 @@
 export const dynamic = "force-dynamic";
 
 import { useState } from "react";
-import {
-  TransactionCard,
-  fakeTransactions,
-} from "@/components/investmentsList/TransactionCard";
+import { TransactionCard } from "@/components/investmentsList/TransactionCard";
 import {
   TransactionFilter,
   FilterType,
 } from "@/components/investmentsList/TransactionFilter";
+import { fakeTransactions } from "@/utils/mockData";
 
 export default function TransactionPage() {
   const [filter, setFilter] = useState<FilterType>("all");

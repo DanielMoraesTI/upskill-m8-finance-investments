@@ -4,52 +4,59 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, History } from "lucide-react";
+import { formatDate } from "@/utils/dataTypeUtils";
+import { formatCurrency } from "@/utils/dataTypeUtils";
+import type { TFii, TRendaFixa, TStock } from "@/schemas/assetSchema";
+import type { TWallet } from "@/schemas/walletSchema";
+import type { TTransaction } from "@/schemas/transactionSchema";
 
 // --- Types ---
 export type AssetType = "acoes" | "fundos-imobiliarios" | "renda-fixa";
 
-export interface ItemCardData {
+type BaseItemCardData = {
   id: string;
-  // acoes + fundos-imobiliarios
-  sigla?: string;
-  quantidade?: number;
-  // acoes
-  name?: string;
-  // fundos-imobiliarios
-  categoria?: string;
-  // renda-fixa
-  dataInicial?: string;
-  // shared
-  valorInvestido: number;
+  valorInvestido: TWallet["total_invested"];
   valorAtual: number;
-  dataAtualizacao: string; // ISO date string
-}
+  dataAtualizacao: TWallet["updated_at"];
+};
 
-interface ItemCardProps {
+type StockItemCardData = BaseItemCardData & {
+  sigla: TStock["ticker"];
+  quantidade: TWallet["quantity"];
+  name: TStock["company"];
+};
+
+type FiiItemCardData = BaseItemCardData & {
+  sigla: TFii["ticker"];
+  quantidade: TWallet["quantity"];
+  categoria: TFii["category"];
+};
+
+type FixedIncomeItemCardData = BaseItemCardData & {
+  name: TRendaFixa["company"];
+  dataInicial: string | TTransaction["date"];
+};
+
+export type ItemCardData =
+  | StockItemCardData
+  | FiiItemCardData
+  | FixedIncomeItemCardData;
+
+type ItemCardProps = {
   asset: AssetType;
   data: ItemCardData;
-}
-
-// --- Helpers ---
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
-}
-
-function formatDate(dateStr: string): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(dateStr));
-}
+};
 
 // --- Componente ---
-export default function WalletCard({ asset, data}: ItemCardProps) {
+export default function WalletCard({ asset, data }: ItemCardProps) {
+  const sigla = "sigla" in data ? data.sigla : undefined;
+  const quantity = "quantidade" in data ? data.quantidade : undefined;
+  const companyName = "name" in data ? data.name : undefined;
+  const category = "categoria" in data ? data.categoria : undefined;
+  const initialDate = "dataInicial" in data ? data.dataInicial : undefined;
 
-  const handleEditClick = () => {}
+  const handleEditClick = () => {};
+  const handleHistoryClick = () => {};
 
   return (
     <Card className="w-full border-border/50 bg-card/80 backdrop-blur-sm shadow-sm card-hover group overflow-x-auto">
@@ -63,9 +70,9 @@ export default function WalletCard({ asset, data}: ItemCardProps) {
               </span>
               <span
                 className="mt-1 truncate text-sm font-bold text-primary"
-                title={data.sigla}
+                title={sigla}
               >
-                {data.sigla}
+                {sigla}
               </span>
             </div>
             <div className="h-8 w-px bg-border/50" />
@@ -82,9 +89,9 @@ export default function WalletCard({ asset, data}: ItemCardProps) {
               <Badge
                 variant="secondary"
                 className="mt-1 inline-flex max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs bg-secondary/60 border-border/40"
-                title={data.name}
+                title={companyName}
               >
-                {data.name}
+                {companyName}
               </Badge>
             </div>
             <div className="h-8 w-px bg-border/50" />
@@ -101,9 +108,9 @@ export default function WalletCard({ asset, data}: ItemCardProps) {
               <Badge
                 variant="secondary"
                 className="mt-1 inline-flex max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs bg-secondary/60 border-border/40"
-                title={data.categoria}
+                title={category}
               >
-                {data.categoria}
+                {category}
               </Badge>
             </div>
             <div className="h-8 w-px bg-border/50" />
@@ -119,9 +126,9 @@ export default function WalletCard({ asset, data}: ItemCardProps) {
               </span>
               <span
                 className="mt-1 truncate text-sm font-semibold text-foreground"
-                title={data.name}
+                title={companyName}
               >
-                {data.name}
+                {companyName}
               </span>
             </div>
             <div className="h-8 w-px bg-border/50" />
@@ -139,7 +146,7 @@ export default function WalletCard({ asset, data}: ItemCardProps) {
                 variant="secondary"
                 className="mt-1 w-fit text-xs bg-secondary/60 border-border/40"
               >
-                {data.dataInicial}
+                {initialDate}
               </Badge>
             </div>
             <div className="h-8 w-px bg-border/50" />
@@ -154,7 +161,7 @@ export default function WalletCard({ asset, data}: ItemCardProps) {
                 Quantidade
               </span>
               <span className="mt-1 text-sm font-semibold text-foreground">
-                {data.quantidade?.toLocaleString("pt-BR")}
+                {quantity?.toLocaleString("pt-BR")}
               </span>
             </div>
             <div className="h-8 w-px bg-border/50" />
@@ -215,7 +222,7 @@ export default function WalletCard({ asset, data}: ItemCardProps) {
             variant="ghost"
             size="sm"
             className="flex items-center gap-2 text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 transition-all"
-            onClick={() => {}}
+            onClick={() => handleHistoryClick()}
           >
             <History className="h-4 w-4" />
             Histórico
@@ -225,85 +232,3 @@ export default function WalletCard({ asset, data}: ItemCardProps) {
     </Card>
   );
 }
-
-// --- Fake Data ---
-export const fakeItemsFiis: ItemCardData[] = [
-  {
-    id: "1",
-    sigla: "CPTS11",
-    categoria: "Fundo de Papel",
-    quantidade: 150,
-    valorInvestido: 45000.0,
-    valorAtual: 47000.0,
-    dataAtualizacao: "2024-05-28T10:30:00Z",
-  },
-  {
-    id: "2",
-    sigla: "XPML11",
-    categoria: "Fundo de Tijolo",
-    quantidade: 320,
-    valorInvestido: 8750.5,
-    valorAtual: 9000.0,
-    dataAtualizacao: "2024-05-27T14:15:00Z",
-  },
-  {
-    id: "3",
-    sigla: "RECR11",
-    categoria: "Fundo de Papel",
-    quantidade: 87,
-    valorInvestido: 12300.75,
-    valorAtual: 12500.0,
-    dataAtualizacao: "2024-05-26T09:00:00Z",
-  },
-];
-
-// --- Fake Data ---
-export const fakeItemsStock: ItemCardData[] = [
-  {
-    id: "1",
-    sigla: "ITSA3",
-    name: "ITAUSA S.A.",
-    quantidade: 150,
-    valorInvestido: 45000.0,
-    valorAtual: 47000.0,
-    dataAtualizacao: "2024-05-28T10:30:00Z",
-  },
-  {
-    id: "2",
-    sigla: "PETR4",
-    name: "PETROBRAS S.A.",
-    quantidade: 320,
-    valorInvestido: 8750.5,
-    valorAtual: 9000.0,
-    dataAtualizacao: "2024-05-27T14:15:00Z",
-  },
-  {
-    id: "3",
-    sigla: "CMIG4",
-    name: "Cemig Energia MG S.A.",
-    quantidade: 87,
-    valorInvestido: 12300.75,
-    valorAtual: 12500.0,
-    dataAtualizacao: "2024-05-26T09:00:00Z",
-  },
-];
-
-// --- Fake Data ---
-export const fakeItemsFixed: ItemCardData[] = [
-  {
-    id: "1",
-    name: "Itaú Crédito Bancário Renda Fixa Crédito Privado",
-    dataInicial: "15/05/2024",
-    valorInvestido: 30000.0,
-    valorAtual: 45000.0,
-    dataAtualizacao: "2024-05-28T10:30:00Z",
-  },
-  {
-    id: "2",
-    name: "Nubank Caixinha",
-    dataInicial: "20/05/2024",
-    valorInvestido: 5000.0,
-    valorAtual: 8750.5,
-    dataAtualizacao: "2024-05-27T14:15:00Z",
-  },
-];
