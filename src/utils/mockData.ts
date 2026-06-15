@@ -1,64 +1,476 @@
-// interface ItemCardData {
-//     id: string;
-//     name: string;
-//     dataInicial: string; // ISO date string
-//     valorInicial: number;
-//     valorTotal: number;
-//     dataAtualizacao: string; // ISO date string
-// }
+import type { TAssetType, TStock, TFii, TRendaFixa } from "@/schemas/assetSchema";
+import type { TWallet } from "@/schemas/walletSchema";
+import type { TTransaction } from "@/schemas/transactionSchema";
 
-// // Registra o histórico
-// interface ITransaction {
-//     id: number;
-//     asset: {
-//         id: number;
-//         name: string;
-//         description: string;
-//         type: string;
-//     },
-//     entry_type: 'buy' | 'sell';
-//     date: string; // ISO date string
-//     quantity: number;
-//     unit_price: number;
-//     total_value: number;
-// }
+// =============================================================================
+//                              ASSET DATA MOCKUP
+// =============================================================================
+export const assetTypeList: TAssetType[] = [{
+  id: 1,
+  asset_type: "Ação",
+}, {
+  id: 2,
+  asset_type: "FII",
+}, {
+  id: 3,
+  asset_type: "Renda Fixa",
+}]
 
-// // Exibe os campos calculados
+export const stockList: TStock[] = [{
+  id: 1,
+  asset_type_id: 1,
+  ticker: "ITSA3",
+  company: "ITAUSA S.A.",
+  current_price: 31.33,
+  created_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+  updated_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+}, {
+  id: 2,
+  asset_type_id: 1,
+  ticker: "PETR4",
+  company: "PETROBRAS S.A.",
+  current_price: 28.12,
+  created_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+  updated_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+}, {
+  id: 3,
+  asset_type_id: 1,
+  ticker: "CMIG4",
+  company: "Cemig Energia MG S.A.",
+  current_price: 143.67,
+  created_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+  updated_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+}];
 
+export const fiisList: TFii[] = [{
+  id: 4,
+  asset_type_id: 2,
+  ticker: "CPTS11",
+  category: "Fundo de Papel",
+  current_price: 313.33,
+  created_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+  updated_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+}, {
+  id: 5,
+  asset_type_id: 2,
+  ticker: "XPML11",
+  category: "Fundo de Tijolo",
+  current_price: 28.12,
+  created_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+  updated_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+}, {
+  id: 6,
+  asset_type_id: 2,
+  ticker: "RECR11",
+  category: "Fundo de Papel",
+  current_price: 143.67,
+  created_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+  updated_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+}];
 
+export const rendaFixaList: TRendaFixa[] = [{
+  id: 7,
+  asset_type_id: 3,
+  company: "Itaú Crédito Bancário Renda Fixa Crédito Privado",
+  created_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+  updated_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+}, {
+  id: 8,
+  asset_type_id: 3,
+  company: "Nubank Caixinha",
+  created_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+  updated_at: new Date("2024-05-28T10:30:00Z").toISOString(),
+}];
 
+// =============================================================================
+//                              TRANSACTIONS DATA MOCKUP
+// =============================================================================
+export const transactionsList: TTransaction[] = [
+  // Ações - ITSA3 (Asset 1)
+  {
+    id: 1,
+    asset_id: 1,
+    entry_type: "buy",
+    date: new Date("2025-01-10T10:00:00Z").toISOString(),
+    quantity: 100,
+    unit_price: 10.00,
+    total_value: 1000.00,
+    created_at: new Date("2025-01-10T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-01-10T10:00:00Z").toISOString(),
+  },
+  {
+    id: 2,
+    asset_id: 1,
+    entry_type: "buy",
+    date: new Date("2025-02-15T10:00:00Z").toISOString(),
+    quantity: 50,
+    unit_price: 11.00,
+    total_value: 550.00,
+    created_at: new Date("2025-02-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-02-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 3,
+    asset_id: 1,
+    entry_type: "sell",
+    date: new Date("2025-03-20T10:00:00Z").toISOString(),
+    quantity: 30,
+    unit_price: 12.00,
+    total_value: 360.00,
+    created_at: new Date("2025-03-20T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-03-20T10:00:00Z").toISOString(),
+  },
 
-// // Renda Fixa
-// const rendaFixa: ItemCardData[] = [
-//   {
-//     id: "1",
-//     name: "Itaú Crédito Bancário Renda Fixa Crédito Privado",
-//     dataInicial: "15/05/2024",
-//     valorInicial: 30000.0,
-//     valorAtual: 45000.0,
-//     dataAtualizacao: "2024-05-28T10:30:00Z",
-//   }
-// ];
+  // Ações - PETR4 (Asset 2)
+  {
+    id: 4,
+    asset_id: 2,
+    entry_type: "buy",
+    date: new Date("2025-01-12T10:00:00Z").toISOString(),
+    quantity: 200,
+    unit_price: 25.00,
+    total_value: 5000.00,
+    created_at: new Date("2025-01-12T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-01-12T10:00:00Z").toISOString(),
+  },
+  {
+    id: 5,
+    asset_id: 2,
+    entry_type: "sell",
+    date: new Date("2025-02-18T10:00:00Z").toISOString(),
+    quantity: 100,
+    unit_price: 26.00,
+    total_value: 2600.00,
+    created_at: new Date("2025-02-18T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-02-18T10:00:00Z").toISOString(),
+  },
+  {
+    id: 6,
+    asset_id: 2,
+    entry_type: "buy",
+    date: new Date("2025-04-05T10:00:00Z").toISOString(),
+    quantity: 50,
+    unit_price: 28.00,
+    total_value: 1400.00,
+    created_at: new Date("2025-04-05T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-04-05T10:00:00Z").toISOString(),
+  },
 
-// // FIIs
-// const fiis: ItemCardData[] = [
-//   {
-//     id: "1",
-//     sigla: "CPTS11",
-//     categoria: "Fundo de Papel",
-//     quantidade: 150,
-//     valorTotal: 45000.0,
-//     dataAtualizacao: "2024-05-28T10:30:00Z",
-//   }
-// ];
+  // Ações - CMIG4 (Asset 3)
+  {
+    id: 7,
+    asset_id: 3,
+    entry_type: "buy",
+    date: new Date("2024-11-20T10:00:00Z").toISOString(),
+    quantity: 50,
+    unit_price: 130.00,
+    total_value: 6500.00,
+    created_at: new Date("2024-11-20T10:00:00Z").toISOString(),
+    updated_at: new Date("2024-11-20T10:00:00Z").toISOString(),
+  },
+  {
+    id: 8,
+    asset_id: 3,
+    entry_type: "buy",
+    date: new Date("2024-12-10T10:00:00Z").toISOString(),
+    quantity: 50,
+    unit_price: 140.00,
+    total_value: 7000.00,
+    created_at: new Date("2024-12-10T10:00:00Z").toISOString(),
+    updated_at: new Date("2024-12-10T10:00:00Z").toISOString(),
+  },
+  {
+    id: 9,
+    asset_id: 3,
+    entry_type: "sell",
+    date: new Date("2025-01-25T10:00:00Z").toISOString(),
+    quantity: 100,
+    unit_price: 145.00,
+    total_value: 14500.00,
+    created_at: new Date("2025-01-25T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-01-25T10:00:00Z").toISOString(),
+  },
+  {
+    id: 10,
+    asset_id: 3,
+    entry_type: "buy",
+    date: new Date("2025-05-10T10:00:00Z").toISOString(),
+    quantity: 20,
+    unit_price: 143.00,
+    total_value: 2860.00,
+    created_at: new Date("2025-05-10T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-10T10:00:00Z").toISOString(),
+  },
 
-// const acoes: ItemCardData[] = [
-//   {
-//     id: "1",
-//     sigla: "ITSA3",
-//     name: "ITAUSA S.A.",
-//     quantidade: 150,
-//     valorTotal: 45000.0,
-//     dataAtualizacao: "2024-05-28T10:30:00Z",
-//   }
-// ];
+  // FIIs - CPTS11 (Asset 4)
+  {
+    id: 11,
+    asset_id: 4,
+    entry_type: "buy",
+    date: new Date("2025-01-05T10:00:00Z").toISOString(),
+    quantity: 10,
+    unit_price: 300.00,
+    total_value: 3000.00,
+    created_at: new Date("2025-01-05T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-01-05T10:00:00Z").toISOString(),
+  },
+  {
+    id: 12,
+    asset_id: 4,
+    entry_type: "buy",
+    date: new Date("2025-02-05T10:00:00Z").toISOString(),
+    quantity: 5,
+    unit_price: 310.00,
+    total_value: 1550.00,
+    created_at: new Date("2025-02-05T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-02-05T10:00:00Z").toISOString(),
+  },
+  {
+    id: 13,
+    asset_id: 4,
+    entry_type: "sell",
+    date: new Date("2025-04-10T10:00:00Z").toISOString(),
+    quantity: 5,
+    unit_price: 315.00,
+    total_value: 1575.00,
+    created_at: new Date("2025-04-10T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-04-10T10:00:00Z").toISOString(),
+  },
+
+  // FIIs - XPML11 (Asset 5)
+  {
+    id: 14,
+    asset_id: 5,
+    entry_type: "buy",
+    date: new Date("2024-10-15T10:00:00Z").toISOString(),
+    quantity: 100,
+    unit_price: 25.00,
+    total_value: 2500.00,
+    created_at: new Date("2024-10-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2024-10-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 15,
+    asset_id: 5,
+    entry_type: "buy",
+    date: new Date("2024-11-15T10:00:00Z").toISOString(),
+    quantity: 100,
+    unit_price: 26.00,
+    total_value: 2600.00,
+    created_at: new Date("2024-11-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2024-11-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 16,
+    asset_id: 5,
+    entry_type: "sell",
+    date: new Date("2025-03-01T10:00:00Z").toISOString(),
+    quantity: 150,
+    unit_price: 28.00,
+    total_value: 4200.00,
+    created_at: new Date("2025-03-01T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-03-01T10:00:00Z").toISOString(),
+  },
+
+  // FIIs - RECR11 (Asset 6)
+  {
+    id: 17,
+    asset_id: 6,
+    entry_type: "buy",
+    date: new Date("2025-02-10T10:00:00Z").toISOString(),
+    quantity: 50,
+    unit_price: 140.00,
+    total_value: 7000.00,
+    created_at: new Date("2025-02-10T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-02-10T10:00:00Z").toISOString(),
+  },
+  {
+    id: 18,
+    asset_id: 6,
+    entry_type: "sell",
+    date: new Date("2025-03-15T10:00:00Z").toISOString(),
+    quantity: 20,
+    unit_price: 145.00,
+    total_value: 2900.00,
+    created_at: new Date("2025-03-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-03-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 19,
+    asset_id: 6,
+    entry_type: "buy",
+    date: new Date("2025-05-20T10:00:00Z").toISOString(),
+    quantity: 30,
+    unit_price: 142.00,
+    total_value: 4260.00,
+    created_at: new Date("2025-05-20T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-20T10:00:00Z").toISOString(),
+  },
+
+  // Renda Fixa - Itaú Crédito Bancário (Asset 7)
+  {
+    id: 20,
+    asset_id: 7,
+    entry_type: "buy",
+    date: new Date("2025-01-02T10:00:00Z").toISOString(),
+    quantity: 1,
+    unit_price: 5000.00,
+    total_value: 5000.00,
+    created_at: new Date("2025-01-02T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-01-02T10:00:00Z").toISOString(),
+  },
+  {
+    id: 21,
+    asset_id: 7,
+    entry_type: "buy",
+    date: new Date("2025-02-02T10:00:00Z").toISOString(),
+    quantity: 1,
+    unit_price: 3000.00,
+    total_value: 3000.00,
+    created_at: new Date("2025-02-02T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-02-02T10:00:00Z").toISOString(),
+  },
+  {
+    id: 22,
+    asset_id: 7,
+    entry_type: "buy",
+    date: new Date("2025-03-02T10:00:00Z").toISOString(),
+    quantity: 1,
+    unit_price: 2000.00,
+    total_value: 2000.00,
+    created_at: new Date("2025-03-02T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-03-02T10:00:00Z").toISOString(),
+  },
+
+  // Renda Fixa - Nubank Caixinha (Asset 8)
+  {
+    id: 23,
+    asset_id: 8,
+    entry_type: "buy",
+    date: new Date("2025-01-15T10:00:00Z").toISOString(),
+    quantity: 1,
+    unit_price: 1000.00,
+    total_value: 1000.00,
+    created_at: new Date("2025-01-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-01-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 24,
+    asset_id: 8,
+    entry_type: "buy",
+    date: new Date("2025-02-15T10:00:00Z").toISOString(),
+    quantity: 1,
+    unit_price: 500.00,
+    total_value: 500.00,
+    created_at: new Date("2025-02-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-02-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 25,
+    asset_id: 8,
+    entry_type: "buy",
+    date: new Date("2025-03-15T10:00:00Z").toISOString(),
+    quantity: 1,
+    unit_price: 1500.00,
+    total_value: 1500.00,
+    created_at: new Date("2025-03-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-03-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 26,
+    asset_id: 8,
+    entry_type: "sell",
+    date: new Date("2025-04-15T10:00:00Z").toISOString(),
+    quantity: 1,
+    unit_price: 1000.00,
+    total_value: 1000.00,
+    created_at: new Date("2025-04-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-04-15T10:00:00Z").toISOString(),
+  },
+];
+
+// =============================================================================
+//                              WALLET DATA MOCKUP
+// =============================================================================
+export const walletList: TWallet[] = [
+  {
+    id: 1,
+    asset_id: 1,
+    quantity: 120,
+    average_price: 10.3333,
+    total_invested: 1240.00,
+    income: 0,
+    created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 2,
+    asset_id: 2,
+    quantity: 150,
+    average_price: 26.0000,
+    total_invested: 3900.00,
+    income: 0,
+    created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 3,
+    asset_id: 3,
+    quantity: 20,
+    average_price: 143.0000,
+    total_invested: 2860.00,
+    income: 0,
+    created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 4,
+    asset_id: 4,
+    quantity: 10,
+    average_price: 303.3333,
+    total_invested: 3033.33,
+    income: 0,
+    created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 5,
+    asset_id: 5,
+    quantity: 50,
+    average_price: 25.5000,
+    total_invested: 1275.00,
+    income: 0,
+    created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 6,
+    asset_id: 6,
+    quantity: 60,
+    average_price: 141.0000,
+    total_invested: 8460.00,
+    income: 0,
+    created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 7,
+    asset_id: 7,
+    quantity: 3,
+    average_price: 3333.3333,
+    total_invested: 10000.00,
+    income: 0,
+    created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+  },
+  {
+    id: 8,
+    asset_id: 8,
+    quantity: 2,
+    average_price: 1000.0000,
+    total_invested: 2000.00,
+    income: 0,
+    created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+    updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
+  }
+];

@@ -42,8 +42,14 @@ CREATE TABLE asset_type (
 CREATE TABLE asset (
   id INT AUTO_INCREMENT PRIMARY KEY,
   asset_type_id INT NOT NULL,
-  name VARCHAR(75) NOT NULL,
-  description VARCHAR(150) DEFAULT NULL,
+  -- Sigla para Ação e FIIs
+  ticker VARCHAR(10) DEFAULT NULL,
+  -- Nome da renda fixa ou empresa da ação
+  company VARCHAR(75) DEFAULT NULL,
+  -- Categoria do FII: Papel, Tijolo, Híbrido.
+  category VARCHAR(50) DEFAULT NULL,
+  -- Marcação a mercado de renda variável.
+  current_price DECIMAL(18, 4) DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (asset_type_id) REFERENCES asset_type(id)
@@ -67,8 +73,8 @@ CREATE TABLE transaction (
   asset_id INT NOT NULL,
   entry_type VARCHAR(10) NOT NULL,
   date DATE NOT NULL,
-  quantity DECIMAL(18, 8) NOT NULL DEFAULT 0,
-  unit_price DECIMAL(18, 4) NOT NULL,
+  quantity DECIMAL(18, 8) NOT NULL DEFAULT 1,
+  unit_price DECIMAL(18, 4) NOT NULL DEFAULT 1,
   total_value DECIMAL(18, 2) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -84,9 +90,8 @@ CREATE TABLE wallet (
   quantity DECIMAL(18, 8) NOT NULL DEFAULT 0,
   average_price DECIMAL(18, 4) NOT NULL DEFAULT 0,
   total_invested DECIMAL(18, 2) NOT NULL DEFAULT 0,
-  -- Marcação a mercado.
-  current_price DECIMAL(18, 4) DEFAULT 0,
-  current_market_value DECIMAL(18, 2) DEFAULT 0,
+  -- Rendimento da renda fixa.
+  income DECIMAL(18, 2) DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES user(id),

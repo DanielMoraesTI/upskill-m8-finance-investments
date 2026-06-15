@@ -28,8 +28,6 @@ export interface ItemCardData {
 interface ItemCardProps {
   asset: AssetType;
   data: ItemCardData;
-  onEdit?: (id: string) => void;
-  onDelete?: (id: string) => void;
 }
 
 // --- Helpers ---
@@ -49,7 +47,10 @@ function formatDate(dateStr: string): string {
 }
 
 // --- Componente ---
-export function ItemCard({ asset, data, onEdit, onDelete }: ItemCardProps) {
+export default function WalletCard({ asset, data}: ItemCardProps) {
+
+  const handleEditClick = () => {}
+
   return (
     <Card className="w-full border-border/50 bg-card/80 backdrop-blur-sm shadow-sm card-hover group overflow-x-auto">
       <CardContent className="flex items-center gap-5 px-5 py-4 min-w-max">
@@ -204,7 +205,7 @@ export function ItemCard({ asset, data, onEdit, onDelete }: ItemCardProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onEdit?.(data.id)}
+            onClick={() => handleEditClick()}
             className="flex items-center gap-1.5 border-border/50 hover:border-primary/40 hover:bg-primary/8 hover:text-primary transition-all"
           >
             <Pencil className="h-3.5 w-3.5" />
@@ -214,6 +215,7 @@ export function ItemCard({ asset, data, onEdit, onDelete }: ItemCardProps) {
             variant="ghost"
             size="sm"
             className="flex items-center gap-2 text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 transition-all"
+            onClick={() => {}}
           >
             <History className="h-4 w-4" />
             Histórico

@@ -1,7 +1,6 @@
 "use client";
 import { Suspense } from "react";
 export const dynamic = "force-dynamic";
-import CardValues from "@/components/chart-objects/CardValues";
 import AssetCategoryTable from "@/components/chart-objects/AssetCategoryTable";
 import { useSearchParams } from "next/navigation";
 import {
@@ -10,9 +9,8 @@ import {
   fakeItemsFiis,
   fakeItemsStock,
   fakeItemsFixed,
-} from "@/components/investmentsList/WalletList";
-import { ItemCard } from "@/components/investmentsList/WalletList";
-import { Building2, Landmark, Wallet } from "lucide-react";
+} from "@/components/investmentsList/WalletCard";
+import WalletCard from "@/components/investmentsList/WalletCard";
 
 interface ICarteiraItemProps {
   title: string;
@@ -94,7 +92,7 @@ function CarteiraContent() {
         <ul className="flex w-full flex-col gap-3">
           {items.map((item) => (
             <li key={item.id}>
-              <ItemCard asset={asset as AssetType} data={item} />
+              <WalletCard asset={asset as AssetType} data={item} />
             </li>
           ))}
         </ul>
