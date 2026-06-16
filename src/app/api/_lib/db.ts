@@ -6,7 +6,6 @@ const db = mysql.createPool({
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_NAME,
   connectionLimit: 10,
-  rowsAsArray: true,
   typeCast: function (field, next) {
     if (field.type === "TINY" && field.length === 1) {
       return field.string() === "1";

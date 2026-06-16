@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import AppProvider from "@/context/AppProvider";
 import AuthProvider from "@/context/AuthProvider";
 import ThemeProvider from "@/context/ThemeProvider";
+import QueryProvider from "@/context/QueryProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,17 +27,17 @@ export default function RootLayout({
           inter.className,
         )}
       >
-        <AppProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem={false}
-          >
-            <AuthProvider>
-              {children}
-            </AuthProvider>
-          </ThemeProvider>
-        </AppProvider>
+        <QueryProvider>
+          <AppProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem={false}
+            >
+              <AuthProvider>{children}</AuthProvider>
+            </ThemeProvider>
+          </AppProvider>
+        </QueryProvider>
       </body>
     </html>
   );

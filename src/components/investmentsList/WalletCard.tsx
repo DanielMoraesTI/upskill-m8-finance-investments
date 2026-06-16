@@ -12,11 +12,11 @@ import { useAsset } from "@/context/AssetProvider";
 export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
   const { currentAssetType, assetList } = useAsset();
   const assetType = currentAssetType?.asset_type || null;
-  
+
   const currentAsset = assetList.find(
     (asset) => asset.id === walletItem.asset_id,
   );
-  
+
   if (!currentAsset) return null;
 
   const sigla = "ticker" in currentAsset ? currentAsset.ticker : "XPTO";
@@ -122,7 +122,7 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
                 variant="secondary"
                 className="mt-1 w-fit text-xs bg-secondary/60 border-border/40"
               >
-                {initialDate}
+                {formatDate(initialDate || new Date().toISOString())}
               </Badge>
             </div>
             <div className="h-8 w-px bg-border/50" />

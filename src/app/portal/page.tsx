@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 import ChartBarMultiple from "@/components/chart-objects/ChartBarMultiple";
 import CardValues from "@/components/chart-objects/CardValues";
 import { Vault, Building2, Landmark, Wallet } from "lucide-react";

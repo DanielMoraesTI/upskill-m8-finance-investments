@@ -27,6 +27,7 @@ export default function WalletProvider({
 
   useEffect(() => {
     const handleFilterWallet = () => {
+
       if (!currentAssetType) {
         setFilteredWalletList(walletList);
       } else {

@@ -1,27 +1,25 @@
 "use client";
 import React, { createContext, useState, useContext } from "react";
-import {
-  mockStockList,
-  mockFiisList,
-  mockRendaFixaList,
-} from "@/utils/mockData";
-import type { TAssetType, TAsset } from "@/schemas/assetSchema";
+import type { TAssetType, TAssetList, TAssetTypeList } from "@/schemas/assetSchema";
+import { useQuery } from "@tanstack/react-query";
+import { getAssetSystemData } from "@/services/assetService";
 
 interface AssetContextProps {
   currentAssetType: TAssetType | null;
-  assetList: TAsset[];
+  assetList: TAssetList;
+  assetTypeList: TAssetTypeList;
   setCurrentAssetType: React.Dispatch<React.SetStateAction<TAssetType | null>>;
 }
 
 const initialAssetContext: AssetContextProps = {
   currentAssetType: null,
   assetList: [],
+  assetTypeList: [],
   setCurrentAssetType: () => {},
 };
 
 const AssetContext = createContext<AssetContextProps>(initialAssetContext);
 
-// 2. Provider
 export default function AssetProvider({
   children,
 }: {
@@ -31,17 +29,17 @@ export default function AssetProvider({
     null,
   );
 
-  const [assetList, setAssetList] = useState<TAsset[]>([
-    ...mockStockList,
-    ...mockFiisList,
-    ...mockRendaFixaList,
-  ]);
+  const { data } = useQuery({
+    queryKey: ["assetList"],
+    queryFn: getAssetSystemData,
+  });
 
   return (
     <AssetContext.Provider
       value={{
         currentAssetType,
-        assetList,
+        assetList: data?.assetList || [],
+        assetTypeList: data?.assetTypeList || [],
         setCurrentAssetType,
       }}
     >
@@ -50,7 +48,6 @@ export default function AssetProvider({
   );
 }
 
-// 3. Usar o context
 export const useAsset = () => {
   const assetContext = useContext(AssetContext);
   if (!assetContext) {

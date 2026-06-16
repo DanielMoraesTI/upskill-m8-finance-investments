@@ -61,7 +61,7 @@ export function TransactionCard({
     <Card className="w-full border-border/50 bg-card/80 backdrop-blur-sm shadow-sm card-hover group overflow-x-auto">
       <CardContent className="flex items-center gap-5 px-5 py-4 min-w-max">
         {/* Tipo: Compra / Venda */}
-        <div className="flex flex-col w-[88px] shrink-0">
+        <div className="flex flex-col w-22 shrink-0">
           <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Tipo
           </span>
@@ -86,7 +86,7 @@ export function TransactionCard({
         <div className="h-8 w-px bg-border/50" />
 
         {/* Sigla / Nome */}
-        <div className="flex flex-col w-[180px] shrink-0">
+        <div className="flex flex-col w-45 shrink-0">
           <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             {isRendaFixa ? "Nome" : "Sigla"}
           </span>
@@ -101,7 +101,7 @@ export function TransactionCard({
         <div className="h-8 w-px bg-border/50" />
 
         {/* Quantidade */}
-        <div className="flex flex-col w-[100px] shrink-0">
+        <div className="flex flex-col w-25 shrink-0">
           <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             {!isRendaFixa ? "Quantidade" : "\u00A0"}
           </span>
@@ -113,7 +113,7 @@ export function TransactionCard({
         <div className="h-8 w-px bg-border/50" />
 
         {/* Valor Unitário */}
-        <div className="flex flex-col w-[130px] shrink-0">
+        <div className="flex flex-col w-32.5 shrink-0">
           <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             {!isRendaFixa ? "Valor Unitário" : ""}
           </span>
@@ -125,7 +125,7 @@ export function TransactionCard({
         <div className="h-8 w-px bg-border/50" />
 
         {/* Valor Total */}
-        <div className="flex flex-col w-[130px] shrink-0">
+        <div className="flex flex-col w-32.5 shrink-0">
           <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Valor Total
           </span>
@@ -139,7 +139,7 @@ export function TransactionCard({
         <div className="h-8 w-px bg-border/50" />
 
         {/* Data */}
-        <div className="flex flex-col w-[100px] shrink-0">
+        <div className="flex flex-col w-25 shrink-0">
           <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Data
           </span>

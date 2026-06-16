@@ -1,10 +1,10 @@
-import { Suspense } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
 import WalletProvider from "@/context/WalletProvider";
 import AssetProvider from "@/context/AssetProvider";
+import { Suspense } from "react";
 
 export default function PortalLayout({
   children,

@@ -56,7 +56,7 @@ export default function ChartBarMultiple() {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-4 pb-4">
-        <ChartContainer config={chartConfig} className="min-h-[220px] w-full">
+        <ChartContainer config={chartConfig} className="min-h-55 w-full">
           <BarChart accessibilityLayer data={chartData} barCategoryGap="30%">
             <CartesianGrid
               vertical={false}

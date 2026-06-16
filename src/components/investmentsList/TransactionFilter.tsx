@@ -1,7 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-
 // 1. Expandimos os tipos aceitos pelo filtro
 export type FilterType =
   | "all"
