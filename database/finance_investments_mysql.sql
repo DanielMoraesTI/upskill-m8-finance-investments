@@ -92,6 +92,8 @@ CREATE TABLE wallet (
   total_invested DECIMAL(18, 2) NOT NULL DEFAULT 0,
   -- Rendimento da renda fixa.
   income DECIMAL(18, 2) DEFAULT 0,
+  -- Data do primeiro aporte da renda fixa.
+  initial_date DATE DEFAULT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES user(id),

@@ -24,11 +24,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ThemeToggleButton from "@/components/ThemeToggleButton";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { TAssetType } from "@/schemas/assetSchema";
+import { useAsset } from "@/context/AssetProvider";
 
 interface NavItemProps {
   href: string;
   label: string;
+  assetType?: TAssetType;
   icon: LucideIcon;
 }
 
@@ -39,18 +42,30 @@ const navItemOptions: NavItemProps[] = [
     icon: BarChart3,
   },
   {
-    href: "/portal/carteira?asset=acoes",
+    href: "/portal/carteira?asset=acao",
     label: "Ações",
+    assetType: {
+      id: 1,
+      asset_type: "Ação",
+    },
     icon: Wallet,
   },
   {
-    href: "/portal/carteira?asset=fundos-imobiliarios",
+    href: "/portal/carteira?asset=fii",
     label: "Fundos Imobiliários",
+    assetType: {
+      id: 2,
+      asset_type: "FII",
+    },
     icon: Building2,
   },
   {
     href: "/portal/carteira?asset=renda-fixa",
     label: "Renda Fixa",
+    assetType: {
+      id: 3,
+      asset_type: "Renda Fixa",
+    },
     icon: Landmark,
   },
   {
@@ -68,12 +83,21 @@ const navItemOptions: NavItemProps[] = [
 export default function Navbar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { setCurrentAssetType } = useAsset();
   const asset = searchParams.get("asset");
 
   function RenderedIcon({ icon }: { icon: LucideIcon }) {
     const Icon = icon;
     return <Icon className="w-5 h-5" />;
   }
+
+  const handleRouteChange = (navItem: NavItemProps) => {
+    if (navItem.href.includes("carteira") && navItem.assetType) {
+      setCurrentAssetType(navItem.assetType);
+    }
+    router.push(navItem.href);
+  };
 
   return (
     <Sidebar>
@@ -108,7 +132,7 @@ export default function Navbar() {
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
-                      render={<Link href={item.href} />}
+                      onClick={() => handleRouteChange(item)}
                       isActive={isActive}
                       className={
                         isActive

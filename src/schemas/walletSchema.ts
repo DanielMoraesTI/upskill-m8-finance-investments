@@ -7,6 +7,7 @@ export const WalletSchema = z.object({
     average_price: z.number(),
     total_invested: z.number(),
     income: z.number().optional(),
+    initial_date: z.iso.date().optional(),
     created_at: z.iso.date(),
     updated_at: z.iso.date(),
 });

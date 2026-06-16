@@ -32,7 +32,9 @@ export default function RootLayout({
             defaultTheme="dark"
             enableSystem={false}
           >
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
           </ThemeProvider>
         </AppProvider>
       </body>

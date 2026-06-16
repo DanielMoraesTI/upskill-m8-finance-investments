@@ -6,63 +6,39 @@ import { Badge } from "@/components/ui/badge";
 import { Pencil, History } from "lucide-react";
 import { formatDate } from "@/utils/dataTypeUtils";
 import { formatCurrency } from "@/utils/dataTypeUtils";
-import type { TFii, TRendaFixa, TStock } from "@/schemas/assetSchema";
 import type { TWallet } from "@/schemas/walletSchema";
-import type { TTransaction } from "@/schemas/transactionSchema";
+import { useAsset } from "@/context/AssetProvider";
 
-// --- Types ---
-export type AssetType = "acoes" | "fundos-imobiliarios" | "renda-fixa";
+export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
+  const { currentAssetType, assetList } = useAsset();
+  const assetType = currentAssetType?.asset_type || null;
+  
+  const currentAsset = assetList.find(
+    (asset) => asset.id === walletItem.asset_id,
+  );
+  
+  if (!currentAsset) return null;
 
-type BaseItemCardData = {
-  id: string;
-  valorInvestido: TWallet["total_invested"];
-  valorAtual: number;
-  dataAtualizacao: TWallet["updated_at"];
-};
-
-type StockItemCardData = BaseItemCardData & {
-  sigla: TStock["ticker"];
-  quantidade: TWallet["quantity"];
-  name: TStock["company"];
-};
-
-type FiiItemCardData = BaseItemCardData & {
-  sigla: TFii["ticker"];
-  quantidade: TWallet["quantity"];
-  categoria: TFii["category"];
-};
-
-type FixedIncomeItemCardData = BaseItemCardData & {
-  name: TRendaFixa["company"];
-  dataInicial: string | TTransaction["date"];
-};
-
-export type ItemCardData =
-  | StockItemCardData
-  | FiiItemCardData
-  | FixedIncomeItemCardData;
-
-type ItemCardProps = {
-  asset: AssetType;
-  data: ItemCardData;
-};
-
-// --- Componente ---
-export default function WalletCard({ asset, data }: ItemCardProps) {
-  const sigla = "sigla" in data ? data.sigla : undefined;
-  const quantity = "quantidade" in data ? data.quantidade : undefined;
-  const companyName = "name" in data ? data.name : undefined;
-  const category = "categoria" in data ? data.categoria : undefined;
-  const initialDate = "dataInicial" in data ? data.dataInicial : undefined;
+  const sigla = "ticker" in currentAsset ? currentAsset.ticker : "XPTO";
+  const quantity = walletItem.quantity;
+  const companyName =
+    "company" in currentAsset ? currentAsset.company : undefined;
+  const category =
+    "category" in currentAsset ? currentAsset.category : undefined;
+  const initialDate = walletItem?.initial_date || "";
+  const investedAmount = walletItem.total_invested;
+  const actualAmount = (walletItem?.income || 0) + investedAmount;
 
   const handleEditClick = () => {};
   const handleHistoryClick = () => {};
+
+  if (!assetType) return null;
 
   return (
     <Card className="w-full border-border/50 bg-card/80 backdrop-blur-sm shadow-sm card-hover group overflow-x-auto">
       <CardContent className="flex items-center gap-5 px-5 py-4 min-w-max">
         {/* Sigla — acoes e fundos-imobiliarios */}
-        {(asset === "acoes" || asset === "fundos-imobiliarios") && (
+        {(assetType === "Ação" || assetType === "FII") && (
           <>
             <div className="flex w-20 shrink-0 flex-col">
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
@@ -80,7 +56,7 @@ export default function WalletCard({ asset, data }: ItemCardProps) {
         )}
 
         {/* Empresa — acoes */}
-        {asset === "acoes" && (
+        {assetType === "Ação" && (
           <>
             <div className="flex w-44 shrink-0 flex-col">
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
@@ -99,7 +75,7 @@ export default function WalletCard({ asset, data }: ItemCardProps) {
         )}
 
         {/* Categoria — fundos-imobiliarios */}
-        {asset === "fundos-imobiliarios" && (
+        {assetType === "FII" && (
           <>
             <div className="flex w-44 shrink-0 flex-col">
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
@@ -118,7 +94,7 @@ export default function WalletCard({ asset, data }: ItemCardProps) {
         )}
 
         {/* Nome — renda-fixa */}
-        {asset === "renda-fixa" && (
+        {assetType === "Renda Fixa" && (
           <>
             <div className="flex w-44 shrink-0 flex-col">
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
@@ -136,7 +112,7 @@ export default function WalletCard({ asset, data }: ItemCardProps) {
         )}
 
         {/* Data Inicial — renda-fixa */}
-        {asset === "renda-fixa" && (
+        {assetType === "Renda Fixa" && (
           <>
             <div className="flex w-28 shrink-0 flex-col">
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
@@ -154,14 +130,14 @@ export default function WalletCard({ asset, data }: ItemCardProps) {
         )}
 
         {/* Quantidade — acoes e fundos-imobiliarios */}
-        {(asset === "acoes" || asset === "fundos-imobiliarios") && (
+        {(assetType === "Ação" || assetType === "FII") && (
           <>
             <div className="flex w-24 shrink-0 flex-col">
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Quantidade
               </span>
               <span className="mt-1 text-sm font-semibold text-foreground">
-                {quantity?.toLocaleString("pt-BR")}
+                {quantity}
               </span>
             </div>
             <div className="h-8 w-px bg-border/50" />
@@ -174,7 +150,7 @@ export default function WalletCard({ asset, data }: ItemCardProps) {
             Valor Investido
           </span>
           <span className="mt-1 text-sm font-semibold text-foreground">
-            {formatCurrency(data.valorInvestido)}
+            {formatCurrency(investedAmount)}
           </span>
         </div>
 
@@ -186,9 +162,9 @@ export default function WalletCard({ asset, data }: ItemCardProps) {
             Valor Atualizado
           </span>
           <span
-            className={`mt-1 text-sm font-bold ${data.valorAtual >= data.valorInvestido ? "text-chart-1" : "text-chart-5"}`}
+            className={`mt-1 text-sm font-bold ${actualAmount >= investedAmount ? "text-chart-1" : "text-chart-5"}`}
           >
-            {formatCurrency(data.valorAtual)}
+            {formatCurrency(actualAmount)}
           </span>
         </div>
 
@@ -200,7 +176,7 @@ export default function WalletCard({ asset, data }: ItemCardProps) {
             Atualização
           </span>
           <span className="mt-1 text-sm font-semibold text-foreground">
-            {formatDate(data.dataAtualizacao)}
+            {formatDate(walletItem?.updated_at || new Date().toISOString())}
           </span>
         </div>
 

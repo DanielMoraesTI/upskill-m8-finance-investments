@@ -1,55 +1,29 @@
 "use client";
-import { Suspense } from "react";
-export const dynamic = "force-dynamic";
 import AssetCategoryTable from "@/components/chart-objects/AssetCategoryTable";
-import { useSearchParams } from "next/navigation";
-import WalletCard, {
-  type AssetType,
-  type ItemCardData,
-} from "@/components/investmentsList/WalletCard";
-import {
-  fakeItemsFiis,
-  fakeItemsFixed,
-  fakeItemsStock,
-} from "@/utils/mockData";
-
-const carteiraMap: Record<AssetType, { title: string }> = {
-  acoes: {
-    title: "Ações",
-  },
-  "fundos-imobiliarios": {
-    title: "Fundos Imobiliários",
-  },
-  "renda-fixa": {
-    title: "Renda Fixa",
-  },
-};
-
-const itemsByAsset: Record<AssetType, ItemCardData[]> = {
-  acoes: fakeItemsStock,
-  "fundos-imobiliarios": fakeItemsFiis,
-  "renda-fixa": fakeItemsFixed,
-};
+import WalletCard from "@/components/investmentsList/WalletCard";
+import { useWallet } from "@/context/WalletProvider";
+import { useAsset } from "@/context/AssetProvider";
 
 export default function Carteira() {
-  return (
-    <Suspense>
-      <CarteiraContent />
-    </Suspense>
-  );
-}
+  const { filteredWalletList } = useWallet();
+  const { currentAssetType } = useAsset();
+  
+  const assetType = currentAssetType?.asset_type;
 
-function CarteiraContent() {
-  const searchParams = useSearchParams();
+  const getPageTitle = () => {
+    let title = "Carteira";
+    switch (assetType) {
+      case "Ação":
+      case "Renda Fixa":
+        title = assetType;
+        break;
+      case "FII":
+        title = "Fundos Imobiliários";
+        break;
+    }
 
-  const queryAsset = searchParams.get("asset");
-  const asset: AssetType | null =
-    queryAsset === "acoes" ||
-    queryAsset === "fundos-imobiliarios" ||
-    queryAsset === "renda-fixa"
-      ? queryAsset
-      : null;
-  const items = asset ? (itemsByAsset[asset] ?? []) : [];
+    return title;
+  }
 
   return (
     <div className="flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6">
@@ -58,7 +32,7 @@ function CarteiraContent() {
         <div className="flex w-full items-center gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-              {asset ? carteiraMap[asset].title : "Carteira"}
+              {getPageTitle()}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground/60">
               Visão detalhada dos seus ativos
@@ -69,7 +43,7 @@ function CarteiraContent() {
         {/* Linha divisória */}
         <div className="w-full h-px bg-linear-to-r from-transparent via-border/60 to-transparent" />
 
-        {asset === "fundos-imobiliarios" && (
+        {assetType === "FII" && (
           <div className="flex flex-row w-full items-center justify-center gap-4 flex-1">
             <AssetCategoryTable
               data={[
@@ -83,10 +57,10 @@ function CarteiraContent() {
         )}
 
         <ul className="flex w-full flex-col gap-3">
-          {asset &&
-            items.map((item) => (
-              <li key={item.id}>
-                <WalletCard asset={asset} data={item} />
+          {filteredWalletList.length > 0 &&
+            filteredWalletList.map((item) => (
+              <li key={`wallet-list-item-${item.id}`}>
+                <WalletCard walletItem={item} />
               </li>
             ))}
         </ul>

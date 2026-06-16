@@ -6,13 +6,12 @@ import type {
 } from "@/schemas/assetSchema";
 import type { TWallet } from "@/schemas/walletSchema";
 import type { TTransaction } from "@/schemas/transactionSchema";
-import type { ItemCardData } from "@/components/investmentsList/WalletCard";
 import type { TransactionCardData } from "@/components/investmentsList/TransactionCard";
 
 // =============================================================================
 //                              ASSET DATA MOCKUP
 // =============================================================================
-export const assetTypeList: TAssetType[] = [
+export const mockAssetTypeList: TAssetType[] = [
   {
     id: 1,
     asset_type: "Ação",
@@ -27,7 +26,7 @@ export const assetTypeList: TAssetType[] = [
   },
 ];
 
-export const stockList: TStock[] = [
+export const mockStockList: TStock[] = [
   {
     id: 1,
     asset_type_id: 1,
@@ -57,7 +56,7 @@ export const stockList: TStock[] = [
   },
 ];
 
-export const fiisList: TFii[] = [
+export const mockFiisList: TFii[] = [
   {
     id: 4,
     asset_type_id: 2,
@@ -87,7 +86,7 @@ export const fiisList: TFii[] = [
   },
 ];
 
-export const rendaFixaList: TRendaFixa[] = [
+export const mockRendaFixaList: TRendaFixa[] = [
   {
     id: 7,
     asset_type_id: 3,
@@ -107,7 +106,7 @@ export const rendaFixaList: TRendaFixa[] = [
 // =============================================================================
 //                              TRANSACTIONS DATA MOCKUP
 // =============================================================================
-export const transactionsList: TTransaction[] = [
+export const mockTransactionsList: TTransaction[] = [
   // Ações - ITSA3 (Asset 1)
   {
     id: 1,
@@ -414,7 +413,7 @@ export const transactionsList: TTransaction[] = [
 // =============================================================================
 //                              WALLET DATA MOCKUP
 // =============================================================================
-export const walletList: TWallet[] = [
+export const mockWalletList: TWallet[] = [
   {
     id: 1,
     asset_id: 1,
@@ -482,6 +481,7 @@ export const walletList: TWallet[] = [
     average_price: 3333.3333,
     total_invested: 10000.0,
     income: 0,
+    initial_date: new Date("2025-01-02T10:00:00Z").toISOString(),
     created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
     updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
   },
@@ -492,10 +492,42 @@ export const walletList: TWallet[] = [
     average_price: 1000.0,
     total_invested: 2000.0,
     income: 0,
+    initial_date: new Date("2025-01-15T10:00:00Z").toISOString(),
     created_at: new Date("2025-05-15T10:00:00Z").toISOString(),
     updated_at: new Date("2025-05-15T10:00:00Z").toISOString(),
   },
 ];
+
+
+// TYPAGEM ANTIGA - TO BE DELETED
+type BaseItemCardData = {
+  id: string;
+  valorInvestido: TWallet["total_invested"];
+  valorAtual: number;
+  dataAtualizacao: TWallet["updated_at"];
+};
+
+type StockItemCardData = BaseItemCardData & {
+  sigla: TStock["ticker"];
+  quantidade: TWallet["quantity"];
+  name: TStock["company"];
+};
+
+type FiiItemCardData = BaseItemCardData & {
+  sigla: TFii["ticker"];
+  quantidade: TWallet["quantity"];
+  categoria: TFii["category"];
+};
+
+type FixedIncomeItemCardData = BaseItemCardData & {
+  name: TRendaFixa["company"];
+  dataInicial: string | TTransaction["date"];
+};
+
+export type ItemCardData =
+  | StockItemCardData
+  | FiiItemCardData
+  | FixedIncomeItemCardData;
 
 // =============================================================================
 //                            WALLET CARD DATA MOCKUP
