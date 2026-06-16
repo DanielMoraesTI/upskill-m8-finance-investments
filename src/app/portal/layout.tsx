@@ -1,7 +1,10 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
+import WalletProvider from "@/context/WalletProvider";
+import AssetProvider from "@/context/AssetProvider";
+import { Suspense } from "react";
 
 export default function PortalLayout({
   children,
@@ -9,18 +12,30 @@ export default function PortalLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <Navbar />
-      <main className="flex min-h-screen flex-1 flex-col">
-        <SidebarTrigger className="flex flex-row gap-2 items-center justify-start" />
-        <section className="flex w-full flex-1 flex-col">
-          <Header />
-          <div className="flex flex-1 items-start justify-center px-4 py-6">
-            {children}
+    <AssetProvider>
+      <WalletProvider>
+        <SidebarProvider>
+          {/** Container para ocupar toda a tela com cara de "web app" */}
+          <div
+            className="min-w-screen max-w-screen min-h-screen max-h-screen overflow-hidden
+        flex flex-col md:flex-row bg-background
+      "
+          >
+            <Suspense>
+              <Navbar />
+            </Suspense>
+            <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full overflow-auto">
+              <Header />
+              <main className="flex flex-1 flex-col w-full items-center overflow-y-auto">
+                {children}
+              </main>
+              <Suspense>
+                <Footer />
+              </Suspense>
+            </div>
           </div>
-          <Footer />
-        </section>
-      </main>
-    </SidebarProvider>
+        </SidebarProvider>
+      </WalletProvider>
+    </AssetProvider>
   );
 }

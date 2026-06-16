@@ -61,18 +61,28 @@ export default function PieLegends({
   );
 
   return (
-    <Card className="flex h-full w-full flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+    <Card className="flex h-full w-full flex-col border-border/50 bg-card/80 backdrop-blur-sm shadow-lg">
+      <CardHeader className="items-center pb-0 px-5 pt-5">
+        <CardTitle className="text-base font-semibold text-foreground">
+          {title}
+        </CardTitle>
+        <CardDescription className="text-xs text-muted-foreground/70">
+          {description}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-1 items-center justify-center pb-2">
+      <CardContent className="flex flex-1 items-center justify-center pb-4 px-4">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square h-full max-h-80 w-full"
         >
           <PieChart>
-            <Pie data={chartData} dataKey="valor" nameKey="categoria" />
+            <Pie
+              data={chartData}
+              dataKey="valor"
+              nameKey="categoria"
+              strokeWidth={2}
+              stroke="var(--background)"
+            />
             <ChartLegend
               content={<ChartLegendContent nameKey="categoria" />}
               className={`-translate-y-1 flex-wrap gap-2 ${legendColumnsClass} *:justify-center`}

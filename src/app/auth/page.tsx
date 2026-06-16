@@ -1,6 +1,6 @@
 "use client";
 import type { SubmitEventHandler } from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -69,17 +69,23 @@ export default function Authentication() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <div className="flex w-full md:w-[30%] items-center justify-center bg-gray-100 p-8">
+    <div className="flex min-h-screen bg-background">
+      {/* ── Painel do formulário ── */}
+      <div className="relative flex w-full md:w-[38%] lg:w-[32%] items-center justify-center bg-card/80 backdrop-blur-sm border-r border-border p-8 md:p-12">
         {/** Efeito Overlay enquanto orquestra o redirecionamento */}
         {result === "success" && <Loading />}
 
-        <div className="w-full max-w-md">
-          <Card>
-            <CardHeader>
-              <CardTitle>{isLogin ? "Entrar" : "Crie sua conta"}</CardTitle>
-              <CardDescription>
-                {`Informe seus dados abaixo para ${isLogin ? "entrar" : "criar sua conta"}`}
+        {/* Glow decorativo no topo */}
+        <div className="pointer-events-none absolute -top-32 -left-32 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-sm">
+          <Card className="border-border/60 bg-card/60 backdrop-blur-sm shadow-2xl">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-base font-semibold text-foreground">
+                {isLogin ? "Entrar na conta" : "Preencha seus dados"}
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">
+                {`${isLogin ? "Informe seu e-mail e senha" : "Crie sua conta gratuitamente"}`}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -87,45 +93,67 @@ export default function Authentication() {
                 <FieldGroup>
                   {!isLogin && (
                     <Field>
-                      <FieldLabel htmlFor="name">Nome Completo</FieldLabel>
+                      <FieldLabel
+                        htmlFor="name"
+                        className="text-sm font-medium text-foreground/80"
+                      >
+                        Nome Completo
+                      </FieldLabel>
                       <Input
                         id="name"
                         name="name"
                         type="text"
-                        placeholder="Escreva seu nome completo aqui"
+                        placeholder="Seu nome completo"
                         required
+                        className="bg-muted/40 border-border/60 focus:border-primary/60 focus:ring-primary/20 transition-colors"
                       />
                     </Field>
                   )}
                   <Field>
-                    <FieldLabel htmlFor="email">E-mail</FieldLabel>
+                    <FieldLabel
+                      htmlFor="email"
+                      className="text-sm font-medium text-foreground/80"
+                    >
+                      E-mail
+                    </FieldLabel>
                     <Input
                       id="email"
                       name="email"
                       type="email"
                       placeholder="nome@exemplo.com"
                       required
+                      className="bg-muted/40 border-border/60 focus:border-primary/60 focus:ring-primary/20 transition-colors"
                     />
-                    <FieldDescription>
-                      Utilizaremos esta informação para entrar em contato. Seu
-                      e-mail não será compartilhado com terceiros.
+                    <FieldDescription className="text-xs text-muted-foreground/70">
+                      Seu e-mail não será compartilhado com terceiros.
                     </FieldDescription>
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="password">Senha</FieldLabel>
+                    <FieldLabel
+                      htmlFor="password"
+                      className="text-sm font-medium text-foreground/80"
+                    >
+                      Senha
+                    </FieldLabel>
                     <Input
                       id="password"
                       type="password"
                       name="password"
                       required
+                      className="bg-muted/40 border-border/60 focus:border-primary/60 focus:ring-primary/20 transition-colors"
                     />
-                    <FieldDescription>
-                      Deve ter pelo menos 6 caracteres.
-                    </FieldDescription>
+                    {!isLogin && (
+                      <FieldDescription className="text-xs text-muted-foreground/70">
+                        Deve ter pelo menos 6 caracteres.
+                      </FieldDescription>
+                    )}
                   </Field>
                   {!isLogin && (
                     <Field>
-                      <FieldLabel htmlFor="confirm-password">
+                      <FieldLabel
+                        htmlFor="confirm-password"
+                        className="text-sm font-medium text-foreground/80"
+                      >
                         Confirmar Senha
                       </FieldLabel>
                       <Input
@@ -133,8 +161,9 @@ export default function Authentication() {
                         type="password"
                         name="confirm-password"
                         required
+                        className="bg-muted/40 border-border/60 focus:border-primary/60 focus:ring-primary/20 transition-colors"
                       />
-                      <FieldDescription>
+                      <FieldDescription className="text-xs text-muted-foreground/70">
                         Por favor, confirme sua senha
                       </FieldDescription>
                     </Field>
@@ -142,7 +171,7 @@ export default function Authentication() {
                   {resultMessage && (
                     <Field>
                       <FieldDescription
-                        className={`w-full text-center font-medium ${result === "error" ? "text-red-500" : "text-green-500"}`}
+                        className={`w-full text-center text-xs font-medium px-3 py-2 rounded-lg ${result === "error" ? "text-destructive bg-destructive/10 border border-destructive/20" : "text-emerald-400 bg-emerald-950/50 border border-emerald-800/40"}`}
                       >
                         {resultMessage}
                       </FieldDescription>
@@ -150,16 +179,19 @@ export default function Authentication() {
                   )}
                   <FieldGroup>
                     <Field>
-                      <Button type="submit">
+                      <Button
+                        type="submit"
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg glow-blue transition-all duration-200"
+                      >
                         {isLogin ? "Entrar" : "Criar conta"}
                       </Button>
-                      <FieldDescription className="px-6 text-center">
+                      <FieldDescription className="px-6 text-center text-xs text-muted-foreground">
                         {isLogin
                           ? "Ainda não possui uma conta?"
                           : "Já possui uma conta?"}{" "}
                         <button
                           type="button"
-                          className="text-blue-500 hover:underline"
+                          className="text-primary hover:text-primary/80 hover:underline font-medium transition-colors"
                           onClick={() => setIsLogin(!isLogin)}
                         >
                           {isLogin ? "Cadastre-se" : "Faça login"}
@@ -173,8 +205,10 @@ export default function Authentication() {
           </Card>
         </div>
       </div>
+
+      {/* ── Painel visual direito ── */}
       <div
-        className="hidden md:block md:w-[70%] min-h-screen bg-cover bg-center"
+        className="hidden md:flex md:flex-1 min-h-screen bg-cover bg-center"
         style={{ backgroundImage: "url('/assets/logo-b.png')" }}
       />
     </div>

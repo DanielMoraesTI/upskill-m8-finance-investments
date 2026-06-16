@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import BusinessAction from "@/components/BusinessAction";
 
 export default function Business() {
