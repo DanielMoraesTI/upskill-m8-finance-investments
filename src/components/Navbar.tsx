@@ -15,7 +15,7 @@ import Image from "next/image";
 import {
   BarChart3,
   Building2,
-  HandCoins,
+  Lightbulb,
   History,
   Wallet,
   LogIn,
@@ -72,6 +72,11 @@ const navItemOptions: NavItemProps[] = [
     href: "/portal/transaction",
     label: "Histórico de Transações",
     icon: History,
+  },
+  {
+    href: "/portal/insights",
+    label: "Insights",
+    icon: Lightbulb,
   },
 ] as const;
 
