@@ -722,6 +722,7 @@ const FIIS_DISPONIVEIS = [
   "ZIFI11",
 ];
 
+// Mock da carteira do usuário — substitua por dados reais via props/API
 const CARTEIRA_ACOES: string[] = ["PETR3", "VALE3", "ITUB3", "BBDC4", "ABEV3"];
 const CARTEIRA_FIIS: string[] = ["MXRF11", "HGLG11", "KNRI11", "XPLG11"];
 const CARTEIRA_RENDA_FIXA: string[] = [
@@ -730,43 +731,41 @@ const CARTEIRA_RENDA_FIXA: string[] = [
   "LCI Bradesco 2026",
 ];
 
+// Tipos de Operação e Investimento
+
 type OperationType = "compra" | "venda";
-export type InvestmentType = "acoes" | "fiis" | "renda-fixa" | "";
+type InvestmentType = "acoes" | "fiis" | "renda-fixa" | "";
+
+// Formatação de moeda para BRL
 
 function formatBRL(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-interface BusinessActionProps {
-  /** Pré-seleciona o tipo de investimento e bloqueia a troca */
-  defaultInvestimento?: InvestmentType;
-  /** Pré-seleciona a operação (compra/venda) */
-  defaultOperacao?: OperationType;
-  /** Se true, o seletor de tipo de investimento fica oculto/bloqueado */
-  lockInvestimento?: boolean;
-}
+// Componente exportação
 
-export default function BusinessAction({
-  defaultInvestimento = "",
-  defaultOperacao = "compra",
-  lockInvestimento = false,
-}: BusinessActionProps) {
-  const [operacao, setOperacao] = useState<OperationType>(defaultOperacao);
-  const [investimento, setInvestimento] =
-    useState<InvestmentType>(defaultInvestimento);
+export default function BusinessAction() {
+  const [operacao, setOperacao] = useState<OperationType>("compra");
+  const [investimento, setInvestimento] = useState<InvestmentType>("");
 
+  // Ações / FIIs
   const [ticker, setTicker] = useState("");
   const [tickerSearch, setTickerSearch] = useState("");
   const [quantidade, setQuantidade] = useState<string>("");
   const [valor, setValor] = useState<string>("");
 
+  // Renda Fixa
   const [nomeRendaFixa, setNomeRendaFixa] = useState("");
   const [totalRendaFixa, setTotalRendaFixa] = useState<string>("");
 
+  // Ações
   const [empresa, setEmpresa] = useState("");
+
+  // Fundos Imobiliários
   const [categoria, setCategoria] = useState("");
   const CATEGORIAS_FII = ["Fundo de Papel", "Fundo de Tijolo", "Fundo Híbrido"];
 
+  // Cálculo do total para ações/FIIs
   const total = useMemo(() => {
     const q = parseFloat(quantidade);
     const v = parseFloat(valor.replace(",", "."));
@@ -794,7 +793,6 @@ export default function BusinessAction({
   }
 
   function handleInvestimentoChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    if (lockInvestimento) return;
     setInvestimento(e.target.value as InvestmentType);
     resetFields();
   }
@@ -811,27 +809,28 @@ export default function BusinessAction({
   }
 
   function handleConfirmar() {
-    console.log({
-      operacao,
-      investimento,
-      ticker: investimento !== "renda-fixa" ? ticker : undefined,
-      nome: investimento === "renda-fixa" ? nomeRendaFixa : undefined,
-      quantidade: investimento !== "renda-fixa" ? quantidade : undefined,
-      valor: investimento !== "renda-fixa" ? valor : undefined,
-      total: investimento !== "renda-fixa" ? total : totalRendaFixa,
-      empresa:
-        investimento === "acoes" && operacao === "compra" ? empresa : undefined,
-      categoria:
-        investimento === "fiis" && operacao === "compra"
-          ? categoria
-          : undefined,
-    });
-  }
+      console.log({
+        operacao,
+        investimento,
+        ticker: investimento !== "renda-fixa" ? ticker : undefined,
+        nome: investimento === "renda-fixa" ? nomeRendaFixa : undefined,
+        quantidade: investimento !== "renda-fixa" ? quantidade : undefined,
+        valor: investimento !== "renda-fixa" ? valor : undefined,
+        total: investimento !== "renda-fixa" ? total : totalRendaFixa,
+        empresa:
+          investimento === "acoes" && operacao === "compra"
+            ? empresa
+            : undefined,
+        categoria:
+          investimento === "fiis" && operacao === "compra"
+            ? categoria
+            : undefined,
+      });
+    }
 
   const isRendaFixa = investimento === "renda-fixa";
   const isAcoesOuFiis = investimento === "acoes" || investimento === "fiis";
   const labelTicker = investimento === "fiis" ? "Fundo Imobiliário" : "Ação";
-
   const canConfirm =
     investimento !== "" &&
     (isRendaFixa
@@ -848,6 +847,7 @@ export default function BusinessAction({
 
   return (
     <div className="flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6 items-center">
+      {/* Cabeçalho */}
       <div className="flex w-full flex-col items-center gap-2">
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
           Comprar / Vender
@@ -865,7 +865,7 @@ export default function BusinessAction({
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-5 px-6 pb-6">
-          {/* Tabs Compra / Venda */}
+          {/* ── Tabs Compra / Venda ── */}
           <Tabs
             value={operacao}
             onValueChange={handleOperacaoChange}
@@ -889,47 +889,34 @@ export default function BusinessAction({
             </TabsList>
           </Tabs>
 
-          {/* Tipo de investimento — oculto se lockInvestimento=true */}
-          {!lockInvestimento && (
-            <Field>
-              <FieldLabel
-                htmlFor="investimento"
-                className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
-              >
-                Tipo de Investimento
-              </FieldLabel>
-              <NativeSelect
-                id="investimento"
-                className="w-full bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-                value={investimento}
-                onChange={handleInvestimentoChange}
-              >
-                <NativeSelectOption value="">
-                  Selecione o investimento
-                </NativeSelectOption>
-                <NativeSelectOption value="acoes">Ações</NativeSelectOption>
-                <NativeSelectOption value="fiis">
-                  Fundos Imobiliários
-                </NativeSelectOption>
-                <NativeSelectOption value="renda-fixa">
-                  Renda Fixa
-                </NativeSelectOption>
-              </NativeSelect>
-            </Field>
-          )}
+          {/* ── Tipo de investimento ── */}
+          <Field>
+            <FieldLabel
+              htmlFor="investimento"
+              className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
+            >
+              Tipo de Investimento
+            </FieldLabel>
+            <NativeSelect
+              id="investimento"
+              className="w-full bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+              value={investimento}
+              onChange={handleInvestimentoChange}
+            >
+              <NativeSelectOption value="">
+                Selecione o investimento
+              </NativeSelectOption>
+              <NativeSelectOption value="acoes">Ações</NativeSelectOption>
+              <NativeSelectOption value="fiis">
+                Fundos Imobiliários
+              </NativeSelectOption>
+              <NativeSelectOption value="renda-fixa">
+                Renda Fixa
+              </NativeSelectOption>
+            </NativeSelect>
+          </Field>
 
-          {/* Badge indicando o tipo bloqueado */}
-          {lockInvestimento && investimento !== "" && (
-            <div className="flex items-center justify-center">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                {investimento === "acoes" && "Ações"}
-                {investimento === "fiis" && "Fundos Imobiliários"}
-                {investimento === "renda-fixa" && "Renda Fixa"}
-              </span>
-            </div>
-          )}
-
-          {/* Ações ou FIIs */}
+          {/* ── Ações ou FIIs ── */}
           {isAcoesOuFiis && (
             <Field>
               <FieldLabel
@@ -960,9 +947,11 @@ export default function BusinessAction({
                 onChange={(e) => setTicker(e.target.value)}
               >
                 <NativeSelectOption value="">
-                  {listaFiltrada.length === 0
-                    ? "Nenhum ativo na carteira"
-                    : `Escolha ${investimento === "fiis" ? "o fundo" : "a ação"}`}
+                  {operacao === "compra"
+                    ? `Escolha ${investimento === "fiis" ? "o fundo" : "a ação"}`
+                    : listaFiltrada.length === 0
+                      ? "Nenhum ativo na carteira"
+                      : `Escolha ${investimento === "fiis" ? "o fundo" : "a ação"}`}
                 </NativeSelectOption>
                 {listaFiltrada.map((t) => (
                   <NativeSelectOption key={t} value={t}>
@@ -980,7 +969,7 @@ export default function BusinessAction({
             </Field>
           )}
 
-          {/* Empresa — Ações compra */}
+          {/* ── Empresa (Ações - Compra) ── */}
           {investimento === "acoes" && operacao === "compra" && (
             <Field>
               <FieldLabel
@@ -999,7 +988,7 @@ export default function BusinessAction({
             </Field>
           )}
 
-          {/* Categoria — FIIs compra */}
+          {/* ── Categoria (FIIs - Compra) ── */}
           {investimento === "fiis" && operacao === "compra" && (
             <Field>
               <FieldLabel
@@ -1026,7 +1015,7 @@ export default function BusinessAction({
             </Field>
           )}
 
-          {/* Renda Fixa — Compra: nome livre */}
+          {/* ── Renda Fixa — Compra: nome livre ── */}
           {isRendaFixa && operacao === "compra" && (
             <Field>
               <FieldLabel
@@ -1045,7 +1034,7 @@ export default function BusinessAction({
             </Field>
           )}
 
-          {/* Renda Fixa — Venda: lista da carteira */}
+          {/* ── Renda Fixa — Venda: lista da carteira ── */}
           {isRendaFixa && operacao === "venda" && (
             <Field>
               <FieldLabel
@@ -1074,7 +1063,7 @@ export default function BusinessAction({
             </Field>
           )}
 
-          {/* Campos de valor: Ações / FIIs */}
+          {/* ── Campos de valor: Ações / FIIs ── */}
           {isAcoesOuFiis && (
             <FieldGroup className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
               <Field>
@@ -1130,7 +1119,7 @@ export default function BusinessAction({
             </FieldGroup>
           )}
 
-          {/* Campos de valor: Renda Fixa */}
+          {/* ── Campos de valor: Renda Fixa ── */}
           {isRendaFixa && (
             <Field>
               <FieldLabel
@@ -1152,7 +1141,7 @@ export default function BusinessAction({
             </Field>
           )}
 
-          {/* Botão */}
+          {/* ── Botão ── */}
           <Button
             className={`w-full font-semibold shadow-lg transition-all duration-200 ${
               operacao === "compra"
