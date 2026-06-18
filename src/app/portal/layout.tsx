@@ -26,7 +26,7 @@ export default function PortalLayout({
             </Suspense>
             <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full overflow-auto">
               <Header />
-              <main className="flex flex-1 flex-col w-full items-center overflow-y-auto">
+              <main className="flex flex-1 h-full overflow-hidden flex-col w-full items-center overflow-y-auto">
                 {children}
               </main>
               <Suspense>

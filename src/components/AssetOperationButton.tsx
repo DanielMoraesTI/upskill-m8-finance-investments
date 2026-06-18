@@ -94,6 +94,7 @@ export function AssetOperationButton({
           defaultInvestimento={assetType as InvestmentType}
           defaultOperacao={defaultOperacao}
           lockInvestimento
+          lockOperacao
         />
       </SheetContent>
     </Sheet>

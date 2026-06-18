@@ -8,6 +8,9 @@ import {
   FIIOperationButton,
   FixedIncomeOperationButton,
 } from "@/components/AssetButtons";
+import { Vault, Building2, FileText, Shuffle } from "lucide-react";
+import CardValues from "@/components/chart-objects/CardValues";
+import { formatCurrency, calcPct } from "@/utils/dataTypeUtils";
 
 export default function Carteira() {
   const { filteredWalletList } = useWallet();
@@ -80,17 +83,34 @@ export default function Carteira() {
         <div className="w-full h-px bg-linear-to-r from-transparent via-border/60 to-transparent" />
 
         {assetType === "FII" && (
-          <div className="flex flex-row w-full items-center justify-center gap-4 flex-1">
-            <AssetCategoryTable
-              data={[
-                { categoria: "Fundos de Papel", valorTotal: 20075.33 },
-                { categoria: "Fundos de Tijolo", valorTotal: 32080.14 },
-                { categoria: "Fundos Híbridos", valorTotal: 15000.0 },
-              ]}
-              titulo="Minha Carteira de FIIs"
-            />
-          </div>
-        )}
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 w-full">
+          <CardValues
+            title="Total FIIs"
+            value={formatCurrency(20075.33 + 32080.14 + 15000.0)}
+            percentage="100% do portfólio"
+            icon={Vault}
+            highlight
+          />
+          <CardValues
+            title="Fundos de Papel"
+            value={formatCurrency(20075.33)}
+            percentage={calcPct(20075.33, 20075.33 + 32080.14 + 15000.0)}
+            icon={FileText}
+          />
+          <CardValues
+            title="Fundos de Tijolo"
+            value={formatCurrency(32080.14)}
+            percentage={calcPct(32080.14, 20075.33 + 32080.14 + 15000.0)}
+            icon={Building2}
+          />
+          <CardValues
+            title="Fundos Híbridos"
+            value={formatCurrency(15000.0)}
+            percentage={calcPct(15000.0, 20075.33 + 32080.14 + 15000.0)}
+            icon={Shuffle}
+          />
+        </div>
+      )}
 
         <ul className="flex w-full flex-col gap-3">
           {filteredWalletList.length > 0 &&

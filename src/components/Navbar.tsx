@@ -73,11 +73,6 @@ const navItemOptions: NavItemProps[] = [
     label: "Histórico de Transações",
     icon: History,
   },
-  {
-    href: "/portal/comprar-vender",
-    label: "Comprar/Vender",
-    icon: HandCoins,
-  },
 ] as const;
 
 export default function Navbar() {

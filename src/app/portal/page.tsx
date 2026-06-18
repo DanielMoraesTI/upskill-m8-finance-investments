@@ -32,41 +32,38 @@ export default function DashboardPage() {
             title="Valor Total Investido"
             value="R$ 50.000,00"
             icon={Vault}
+            highlight
           />
-          <CardValues title="Ações" value="R$ 10.000,00" icon={Wallet} />
+          <CardValues
+            title="Ações"
+            value="R$ 10.000,00"
+            percentage="20%"
+            icon={Wallet}
+          />
           <CardValues
             title="Fundos Imobiliários"
             value="R$ 20.000,00"
+            percentage="40%"
             icon={Building2}
           />
-          <CardValues title="Renda Fixa" value="R$ 20.000,00" icon={Landmark} />
+          <CardValues
+            title="Renda Fixa"
+            value="R$ 20.000,00"
+            percentage="40%"
+            icon={Landmark}
+          />
         </div>
 
         {/* PieLegends */}
         <div className="flex w-full h-full min-h-70">
           <PieLegends
-            title="Distribuição da Carteira"
-            description="Ações, FIIs e Renda Fixa"
+            title="Distribuição de Fundos Imobiliários"
+            description="Fundos de Papel, Fundos de Tijolo e Fundos Híbridos"
             legendColumnsClass="*:basis-1/4"
             data={[
-              {
-                key: "acoes",
-                label: "Ações",
-                value: 10000,
-                color: "var(--chart-1)",
-              },
-              {
-                key: "fiis",
-                label: "FIIs",
-                value: 20000,
-                color: "var(--chart-2)",
-              },
-              {
-                key: "rendaFixa",
-                label: "Renda Fixa",
-                value: 20000,
-                color: "var(--chart-3)",
-              },
+              { key: "papel", label: "Fundos de Papel", value: 40 },
+              { key: "tijolo", label: "Fundos de Tijolo", value: 30 },
+              { key: "hibrido", label: "Fundos Híbridos", value: 30 },
             ]}
           />
         </div>

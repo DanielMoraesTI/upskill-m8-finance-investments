@@ -2,6 +2,7 @@
 
 import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { formatCurrency } from "@/utils/dataTypeUtils";
 
 import {
   Card,
@@ -45,14 +46,34 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function ChartBarMultiple() {
+  const handleTooltipFormatter = (
+    value: number | string | readonly (number | string)[] | undefined,
+    name?: string | number | any,
+  ) => {
+    if (value === undefined || Array.isArray(value)) return "";
+    const numericValue =
+      typeof value === "number" ? value : Number.parseFloat(String(value));
+    const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
+    const absoluteValue = formatCurrency(safeValue);
+
+    return (
+      <div className="flex w-full items-center justify-between gap-3">
+        <span className="text-muted-foreground">{name || "Valor"}</span>
+        <span className="font-mono font-semibold text-foreground tabular-nums">
+          {absoluteValue}
+        </span>
+      </div>
+    );
+  };
+
   return (
     <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-lg">
       <CardHeader className="px-6 pt-5 pb-3">
         <CardTitle className="text-base font-semibold text-foreground">
-          Comparativo de Investimentos
+          Comparativo por Classe de Ativo
         </CardTitle>
         <CardDescription className="text-xs text-muted-foreground/70">
-          Evolução mensal — Ações, Fundos Imobiliários e Renda Fixa
+          Evolução mensal consolidada por classe: Ações, FIIs e Renda Fixa
         </CardDescription>
       </CardHeader>
       <CardContent className="px-4 pb-4">
@@ -73,7 +94,12 @@ export default function ChartBarMultiple() {
             />
             <ChartTooltip
               cursor={{ fill: "currentColor", opacity: 0.04 }}
-              content={<ChartTooltipContent indicator="dot" />}
+              content={
+                <ChartTooltipContent
+                  indicator="dot"
+                  formatter={handleTooltipFormatter}
+                />
+              }
             />
             <ChartLegend content={<ChartLegendContent />} />
             <Bar

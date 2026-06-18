@@ -744,12 +744,15 @@ interface BusinessActionProps {
   defaultOperacao?: OperationType;
   /** Se true, o seletor de tipo de investimento fica oculto/bloqueado */
   lockInvestimento?: boolean;
+  /** Se true, oculta a aba da operação oposta (ex.: abrindo via botão Comprar esconde a aba Vender) */
+  lockOperacao?: boolean;
 }
 
 export default function BusinessAction({
   defaultInvestimento = "",
   defaultOperacao = "compra",
   lockInvestimento = false,
+  lockOperacao = false,
 }: BusinessActionProps) {
   const [operacao, setOperacao] = useState<OperationType>(defaultOperacao);
   const [investimento, setInvestimento] =
@@ -850,10 +853,10 @@ export default function BusinessAction({
     <div className="flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6 items-center">
       <div className="flex w-full flex-col items-center gap-2">
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-          Comprar / Vender
+          {operacao === "compra" ? "Comprar" : "Vender"}
         </h1>
         <p className="text-sm text-muted-foreground/60">
-          Registre suas operações de compra e venda de ativos
+          {operacao === "compra" ? "Registre suas operações de compra" : "Registre suas operações de venda"}
         </p>
       </div>
       <div className="w-full h-px bg-linear-to-r from-transparent via-border/60 to-transparent" />
@@ -871,21 +874,27 @@ export default function BusinessAction({
             onValueChange={handleOperacaoChange}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2 bg-muted/40 border border-border/40">
-              <TabsTrigger
-                value="compra"
-                className="data-[state=active]:bg-emerald-950/60 data-[state=active]:text-emerald-400 data-[state=active]:border data-[state=active]:border-emerald-800/50"
-              >
-                <TrendingUp className="mr-1.5 h-4 w-4" />
-                Compra
-              </TabsTrigger>
-              <TabsTrigger
-                value="venda"
-                className="data-[state=active]:bg-rose-950/60 data-[state=active]:text-rose-400 data-[state=active]:border data-[state=active]:border-rose-800/50"
-              >
-                <TrendingDown className="mr-1.5 h-4 w-4" />
-                Venda
-              </TabsTrigger>
+            <TabsList
+              className={`grid w-full bg-muted/40 border border-border/40 ${lockOperacao ? "grid-cols-1" : "grid-cols-2"}`}
+            >
+              {(!lockOperacao || operacao === "compra") && (
+                <TabsTrigger
+                  value="compra"
+                  className="data-[state=active]:bg-emerald-950/60 data-[state=active]:text-emerald-400 data-[state=active]:border data-[state=active]:border-emerald-800/50"
+                >
+                  <TrendingUp className="mr-1.5 h-4 w-4" />
+                  Compra
+                </TabsTrigger>
+              )}
+              {(!lockOperacao || operacao === "venda") && (
+                <TabsTrigger
+                  value="venda"
+                  className="data-[state=active]:bg-rose-950/60 data-[state=active]:text-rose-400 data-[state=active]:border data-[state=active]:border-rose-800/50"
+                >
+                  <TrendingDown className="mr-1.5 h-4 w-4" />
+                  Venda
+                </TabsTrigger>
+              )}
             </TabsList>
           </Tabs>
 

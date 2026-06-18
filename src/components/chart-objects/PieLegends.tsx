@@ -1,6 +1,7 @@
 "use client";
 
 import { Pie, PieChart } from "recharts";
+import { formatCurrency } from "@/utils/dataTypeUtils";
 
 import {
   Card,
@@ -13,6 +14,8 @@ import {
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
 
@@ -20,7 +23,7 @@ type PieLegendsItem = {
   key: string;
   label: string;
   value: number;
-  color: string;
+  color?: string;
 };
 
 type PieLegendsProps = {
@@ -35,20 +38,47 @@ export default function PieLegends({
   title,
   description,
   data,
-  valueLabel = "Valor",
+  valueLabel = "Distribuição por Categoria",
   legendColumnsClass = "*:basis-1/3",
 }: PieLegendsProps) {
-  const chartData = data.map((item) => ({
+  const totalValue = data.reduce((sum, item) => sum + item.value, 0);
+
+  const resolveThemeColor = (key: string, index: number, color?: string) => {
+    if (color) {
+      return color;
+    }
+
+    const normalizedKey = key.toLowerCase();
+    const semanticTokenMap: Record<string, string> = {
+      papel: "var(--chart-4)",
+      tijolo: "var(--chart-5)",
+      hibrido: "var(--chart-6)",
+      hibridos: "var(--chart-6)",
+    };
+
+    if (semanticTokenMap[normalizedKey]) {
+      return semanticTokenMap[normalizedKey];
+    }
+
+    const fallbackTokens = [
+      "var(--chart-4)",
+      "var(--chart-5)",
+      "var(--chart-6)",
+    ];
+    return fallbackTokens[index % fallbackTokens.length];
+  };
+
+  const chartData = data.map((item, index) => ({
     categoria: item.key,
     valor: item.value,
-    fill: `var(--color-${item.key})`,
+    fill: resolveThemeColor(item.key, index, item.color),
   }));
 
   const chartConfig: ChartConfig = data.reduce(
-    (config, item) => {
+    (config, item, index) => {
       config[item.key] = {
         label: item.label,
-        color: item.color,
+        color: resolveThemeColor(item.key, index, item.color),
       };
 
       return config;
@@ -76,6 +106,38 @@ export default function PieLegends({
           className="mx-auto aspect-square h-full max-h-80 w-full"
         >
           <PieChart>
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  nameKey="categoria"
+                  formatter={(value, name) => {
+                    const numericValue =
+                      typeof value === "number"
+                        ? value
+                        : Number.parseFloat(String(value));
+                    const safeValue = Number.isFinite(numericValue)
+                      ? numericValue
+                      : 0;
+
+                    const percent =
+                      totalValue > 0 ? (safeValue / totalValue) * 100 : 0;
+                    const absoluteValue = formatCurrency(safeValue);
+
+                    return (
+                      <div className="flex w-full items-center justify-between gap-3">
+                        <span className="text-muted-foreground">
+                          {String(name)}
+                        </span>
+                        <span className="font-mono font-semibold text-foreground tabular-nums">
+                          {absoluteValue} | {percent.toFixed(1)}%
+                        </span>
+                      </div>
+                    );
+                  }}
+                />
+              }
+            />
             <Pie
               data={chartData}
               dataKey="valor"

@@ -12,3 +12,8 @@ export function formatDate(dateStr: string): string {
         year: "numeric",
     }).format(new Date(dateStr));
 }
+
+export function calcPct(value: number, total: number, decimals = 1): string {
+    if (total === 0) return "0%";
+    return `${((value / total) * 100).toFixed(decimals)}% do total`;
+}

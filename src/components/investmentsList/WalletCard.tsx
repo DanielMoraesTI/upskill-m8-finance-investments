@@ -144,12 +144,12 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
           </>
         )}
 
-        {/* Valor Atual — acoes e fundos-imobiliarios */}
+        {/* Preço Médio — acoes e fundos-imobiliarios */}
         {(assetType === "Ação" || assetType === "FII") && (
           <>
             <div className="flex w-24 shrink-0 flex-col">
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
-                Valor Atual
+                Preço Médio
               </span>
               <span className="mt-1 text-sm font-semibold text-foreground">
                 {formatCurrency(investedAmount)}
@@ -160,7 +160,6 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
         )}
 
         {/* Valor Investido — renda-fixa */}
-        {assetType === "Renda Fixa" && (
         <div className="flex w-32 shrink-0 flex-col">
           <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Valor Investido
@@ -169,7 +168,6 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
             {formatCurrency(investedAmount)}
           </span>
         </div>
-        )}
 
         <div className="h-8 w-px bg-border/50" />
 
