@@ -56,9 +56,11 @@ export default function ChartBarMultiple() {
     const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
     const absoluteValue = formatCurrency(safeValue);
 
+    const label = chartConfig[name as keyof typeof chartConfig]?.label ?? name ?? "Valor";
+
     return (
       <div className="flex w-full items-center justify-between gap-3">
-        <span className="text-muted-foreground">{name || "Valor"}</span>
+        <span className="text-muted-foreground">{label}</span>
         <span className="font-mono font-semibold text-foreground tabular-nums">
           {absoluteValue}
         </span>
