@@ -4,7 +4,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
 export async function getAssetSystemData(): Promise<TAssetListResponse> {
     try {
-        const response = await fetch(`${API_URL}/assets`, {
+        const response = await fetch(`${API_URL}/portal/assets`, {
             method: "GET",
         });
 

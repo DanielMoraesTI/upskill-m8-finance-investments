@@ -21,6 +21,8 @@ import {
   Pencil,
   History,
   Undo2,
+  Check,
+  X,
 } from "lucide-react";
 import { formatDate } from "@/utils/dataTypeUtils";
 import { formatCurrency } from "@/utils/dataTypeUtils";
@@ -149,6 +151,38 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // 1. Mapeamento do ativo correspondente
+  const currentAsset = useMemo(() => {
+    return assetList.find((asset) => asset.id === walletItem.asset_id);
+  }, [assetList, walletItem.asset_id]);
+
+  // Estados locais para controlar a edição em tempo real
+  const [isEditing, setIsEditing] = useState(false);
+  const [localPrice, setLocalPrice] = useState<string>("");
+  const [localIncome, setLocalIncome] = useState<string>("");
+
+  // 2. Extração de variáveis base dadas de forma segura antes do useMemo de soma
+  const investedAmount = walletItem.total_invested;
+  const income = walletItem?.income || 0;
+  const quantity = walletItem.quantity;
+  const currentPrice = currentAsset && "current_price" in currentAsset ? (currentAsset.current_price || 0) : 0;
+
+  // Sincroniza os estados locais quando os dados originais mudarem
+  useEffect(() => {
+    setLocalPrice(currentPrice.toString());
+    setLocalIncome(income.toString());
+  }, [currentPrice, income]);
+
+  // 3. O useMemo modificado para escutar o estado local editável
+  const actualAmount = useMemo(() => {
+    if (assetType === "Renda Fixa") {
+      const parsedIncome = parseFloat(localIncome) || 0;
+      return investedAmount + parsedIncome;
+    }
+    const parsedPrice = parseFloat(localPrice) || 0;
+    return quantity * parsedPrice;
+  }, [assetType, investedAmount, localIncome, quantity, localPrice]);
+
   const openMenu = useCallback(() => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
@@ -175,34 +209,41 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
 
-  const currentAsset = assetList.find(
-    (asset) => asset.id === walletItem.asset_id,
-  );
-
-  if (!currentAsset) return null;
+  // 4. Se não encontrar o Ativo ou o Tipo dele, sai APÓS declarar os hooks obrigatórios
+  if (!currentAsset || !assetType) return null;
 
   const sigla = "ticker" in currentAsset ? currentAsset.ticker : "XPTO";
-  const quantity = walletItem.quantity;
-  const companyName =
-    "company" in currentAsset ? currentAsset.company : undefined;
-  const category =
-    "category" in currentAsset ? currentAsset.category : undefined;
+  const companyName = "company" in currentAsset ? currentAsset.company : undefined;
+  const category = "category" in currentAsset ? currentAsset.category : undefined;
   const initialDate = walletItem?.initial_date || "";
-  const investedAmount = walletItem.total_invested;
-  const actualAmount = (walletItem?.income || 0) + investedAmount;
+  const averagePrice = walletItem.average_price;
 
-  const assetLabel =
-    assetType === "Renda Fixa" ? (companyName ?? sigla) : sigla;
+  const assetLabel = assetType === "Renda Fixa" ? (companyName ?? sigla) : sigla;
 
   const handleMenuAction = (action: CardAction) => {
     setMenuOpen(false);
     setActiveSheet(action);
   };
 
-  const handleEditClick = () => {};
-  const handleHistoryClick = () => {};
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+  
+  // 5. Handlers de salvar e cancelar edição salvam os dados localmente e resetam para os valores originais se cancelar, devem ser conectados às Server Actions ou rotas de API para persistir as mudanças no backend parar serem a partir daquia soma ou diminuição de valores de renda fixa ou atualização do preço atual de ações e fundos imobiliários em compra ou vendas futuras
+  const handleSaveEdit = () => {
+    setIsEditing(false);
+    // Aqui você pode disparar sua Server Action ou rota de API passando os dados atualizados:
+    // Ex: updateWalletItem(walletItem.id, { income: parseFloat(localIncome), current_price: parseFloat(localPrice) })
+    console.log("Salvar alterações:", { localPrice, localIncome });
+  };
 
-  if (!assetType) return null;
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setLocalPrice(currentPrice.toString());
+    setLocalIncome(income.toString());
+  };
+
+  const handleHistoryClick = () => {};
 
   return (
     <Card className="w-full border-border/50 bg-card/80 backdrop-blur-sm shadow-sm card-hover group overflow-x-auto">
@@ -214,10 +255,7 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Sigla
               </span>
-              <span
-                className="mt-1 truncate text-sm font-bold text-primary"
-                title={sigla}
-              >
+              <span className="mt-1 truncate text-sm font-bold text-primary" title={sigla}>
                 {sigla}
               </span>
             </div>
@@ -270,10 +308,7 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Nome
               </span>
-              <span
-                className="mt-1 truncate text-sm font-semibold text-foreground"
-                title={companyName}
-              >
+              <span className="mt-1 truncate text-sm font-semibold text-foreground" title={companyName}>
                 {companyName}
               </span>
             </div>
@@ -288,10 +323,7 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Data Inicial
               </span>
-              <Badge
-                variant="secondary"
-                className="mt-1 w-fit text-xs bg-secondary/60 border-border/40"
-              >
+              <Badge variant="secondary" className="mt-1 w-fit text-xs bg-secondary/60 border-border/40">
                 {formatDate(initialDate || new Date().toISOString())}
               </Badge>
             </div>
@@ -314,7 +346,7 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
           </>
         )}
 
-        {/* Preço Médio — acoes e fundos-imobiliarios */}
+        {/* Preço Médio */}
         {(assetType === "Ação" || assetType === "FII") && (
           <>
             <div className="flex w-24 shrink-0 flex-col">
@@ -322,19 +354,45 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
                 Preço Médio
               </span>
               <span className="mt-1 text-sm font-semibold text-foreground">
-                {formatCurrency(investedAmount)}
+                {formatCurrency(averagePrice)}
               </span>
             </div>
             <div className="h-8 w-px bg-border/50" />
           </>
         )}
 
-        {/* Preço Atual — acoes e fundos-imobiliarios */}
+        {/* Preço Atual — Renderiza o input inline se estiver editando Ação ou FII */}
         {(assetType === "Ação" || assetType === "FII") && (
           <>
             <div className="flex w-24 shrink-0 flex-col">
               <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
                 Preço Atual
+              </span>
+              {isEditing ? (
+                <input
+                  type="number"
+                  step="0.01"
+                  className="mt-1 w-full text-sm font-semibold text-foreground bg-muted/60 border border-border rounded px-1 focus:outline-none focus:border-primary"
+                  value={localPrice}
+                  onChange={(e) => setLocalPrice(e.target.value)}
+                  autoFocus
+                />
+              ) : (
+                <span className="mt-1 text-sm font-semibold text-foreground">
+                  {formatCurrency(parseFloat(localPrice) || 0)}
+                </span>
+              )}
+            </div>
+            <div className="h-8 w-px bg-border/50" />
+          </>
+        )}
+
+        {/* Valor Investido — renda-fixa */}
+        {(assetType === "Renda Fixa") && (
+          <>
+            <div className="flex w-32 shrink-0 flex-col">
+              <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
+                Valor Investido
               </span>
               <span className="mt-1 text-sm font-semibold text-foreground">
                 {formatCurrency(investedAmount)}
@@ -344,22 +402,33 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
           </>
         )}
 
-        {/* Valor Investido — renda-fixa */}
+        {/* Rendimento — renda-fixa — Renderiza o input inline se estiver editando Renda Fixa */}
         {(assetType === "Renda Fixa") && (
-        <>
-        <div className="flex w-32 shrink-0 flex-col">
-          <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
-            Valor Investido
-          </span>
-          <span className="mt-1 text-sm font-semibold text-foreground">
-            {formatCurrency(investedAmount)}
-          </span>
-        </div>
-        <div className="h-8 w-px bg-border/50" />
-        </>
+          <>
+            <div className="flex w-32 shrink-0 flex-col">
+              <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
+                Rendimento
+              </span>
+              {isEditing ? (
+                <input
+                  type="number"
+                  step="0.01"
+                  className="mt-1 w-full text-sm font-semibold text-cyan-500 bg-muted/60 border border-border rounded px-1 focus:outline-none focus:border-cyan-500"
+                  value={localIncome}
+                  onChange={(e) => setLocalIncome(e.target.value)}
+                  autoFocus
+                />
+              ) : (
+                <span className="mt-1 text-sm font-semibold text-cyan-500">
+                  {formatCurrency(parseFloat(localIncome) || 0)}
+                </span>
+              )}
+            </div>
+            <div className="h-8 w-px bg-border/50" />
+          </>
         )}
 
-        {/* Valor Atual */}
+        {/* Valor Atualizado */}
         <div className="flex w-32 shrink-0 flex-col">
           <span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
             Valor Atualizado
@@ -383,22 +452,44 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
           </span>
         </div>
 
-        {/* Espaçamento */}
         <div className="flex-1" />
 
-        {/* Botão "..." */}
-        <Button
-          ref={buttonRef}
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 transition-all"
-          onClick={openMenu}
-          aria-label="Ações do ativo"
-        >
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
+        {/* Alterna entre o menu normal "..." ou botões de Confirmar/Cancelar se estiver editando */}
+        {isEditing ? (
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-emerald-500 hover:bg-emerald-500/10"
+              onClick={handleSaveEdit}
+              aria-label="Confirmar edição"
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-rose-500 hover:bg-rose-500/10"
+              onClick={handleCancelEdit}
+              aria-label="Cancelar edição"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <Button
+            ref={buttonRef}
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground/60 hover:text-foreground hover:bg-muted/40 transition-all"
+            onClick={openMenu}
+            aria-label="Ações do ativo"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        )}
 
-        {/* Dropdown via Portal — evita clipping do overflow-x-auto */}
+        {/* Dropdown via Portal */}
         {menuOpen &&
           typeof window !== "undefined" &&
           createPortal(
@@ -407,7 +498,6 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
               className="fixed z-9999 min-w-40 rounded-lg border border-border/50 bg-popover shadow-lg py-1"
               style={{ top: menuPos.top, right: menuPos.right }}
             >
-              {/* Comprar — apenas Ação e FII */}
               {(assetType === "Ação" || assetType === "FII") && (
                 <button
                   className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted/50 transition-colors"
@@ -418,7 +508,6 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
                 </button>
               )}
 
-              {/* Vender — Ação e FII */}
               {(assetType === "Ação" || assetType === "FII") && (
                 <button
                   className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted/50 transition-colors"
@@ -429,7 +518,6 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
                 </button>
               )}
 
-              {/* Resgatar — Renda Fixa */}
               {assetType === "Renda Fixa" && (
                 <button
                   className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted/50 transition-colors"
@@ -467,17 +555,11 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
             document.body,
           )}
 
-        {/* Sheet — Comprar */}
+        {/* Sheets */}
         {(assetType === "Ação" || assetType === "FII") && (
-          <Sheet
-            open={activeSheet === "comprar"}
-            onOpenChange={(open) => !open && setActiveSheet(null)}
-          >
+          <Sheet open={activeSheet === "comprar"} onOpenChange={(open) => !open && setActiveSheet(null)}>
             <SheetTrigger className="hidden" />
-            <SheetContent
-              side="right"
-              className="w-full sm:max-w-lg overflow-y-auto p-0"
-            >
+            <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto p-0">
               <SheetHeader className="sr-only">
                 <SheetTitle>Comprar {assetLabel}</SheetTitle>
               </SheetHeader>
@@ -486,17 +568,10 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
           </Sheet>
         )}
 
-        {/* Sheet — Vender */}
         {(assetType === "Ação" || assetType === "FII") && (
-          <Sheet
-            open={activeSheet === "vender"}
-            onOpenChange={(open) => !open && setActiveSheet(null)}
-          >
+          <Sheet open={activeSheet === "vender"} onOpenChange={(open) => !open && setActiveSheet(null)}>
             <SheetTrigger className="hidden" />
-            <SheetContent
-              side="right"
-              className="w-full sm:max-w-lg overflow-y-auto p-0"
-            >
+            <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto p-0">
               <SheetHeader className="sr-only">
                 <SheetTitle>Vender {assetLabel}</SheetTitle>
               </SheetHeader>
@@ -505,17 +580,10 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
           </Sheet>
         )}
 
-        {/* Sheet — Resgatar */}
         {assetType === "Renda Fixa" && (
-          <Sheet
-            open={activeSheet === "resgatar"}
-            onOpenChange={(open) => !open && setActiveSheet(null)}
-          >
+          <Sheet open={activeSheet === "resgatar"} onOpenChange={(open) => !open && setActiveSheet(null)}>
             <SheetTrigger className="hidden" />
-            <SheetContent
-              side="right"
-              className="w-full sm:max-w-lg overflow-y-auto p-0"
-            >
+            <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto p-0">
               <SheetHeader className="sr-only">
                 <SheetTitle>Resgatar {assetLabel}</SheetTitle>
               </SheetHeader>

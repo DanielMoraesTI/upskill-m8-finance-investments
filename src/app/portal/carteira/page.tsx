@@ -21,6 +21,7 @@ export default function Carteira() {
   const getPageTitle = () => {
     switch (assetType) {
       case "Ação":
+        return "Ações";
       case "Renda Fixa":
         return assetType;
       case "FII":

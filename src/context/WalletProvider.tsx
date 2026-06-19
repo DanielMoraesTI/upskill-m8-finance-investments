@@ -1,11 +1,12 @@
 "use client";
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { mockWalletList } from "@/utils/mockData";
-import type { TWallet } from "@/schemas/walletSchema";
+import type { TWalletList } from "@/schemas/walletSchema";
 import { useAsset } from "./AssetProvider";
+import { useQuery } from "@tanstack/react-query";
+import { getWalletList } from "@/services/walletService";
 
 interface WalletContextProps {
-  filteredWalletList: TWallet[];
+  filteredWalletList: TWalletList;
 }
 
 const initialWalletContext: WalletContextProps = {
@@ -19,19 +20,27 @@ export default function WalletProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [walletList, setWalletList] = useState<TWallet[]>(mockWalletList);
+
+const { data: walletList } = useQuery({
+  queryKey: ["walletList"],
+  queryFn: getWalletList,
+})
+
   const [filteredWalletList, setFilteredWalletList] =
-    useState<TWallet[]>(walletList);
+    useState<TWalletList>([]);
 
   const { currentAssetType, assetList } = useAsset();
 
   useEffect(() => {
     const handleFilterWallet = () => {
+      if (!walletList) {
+        return setFilteredWalletList([]) 
+      };
 
       if (!currentAssetType) {
         setFilteredWalletList(walletList);
       } else {
-        const filtered: TWallet[] = [];
+        const filtered: TWalletList = [];
         walletList.forEach((walletItem) => {
           const assetData = assetList.find(
             (asset) => asset.id === walletItem.asset_id,
