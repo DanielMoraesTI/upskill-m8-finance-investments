@@ -19,3 +19,7 @@ export const TransactionSchema = CreateTransactionSchema.extend({
 
 export type TTransaction = z.infer<typeof TransactionSchema>;
 export type TCreateTransaction = z.infer<typeof CreateTransactionSchema>;
+export type TTransactionEntryType = z.infer<typeof TransactionEntryTypeSchema>;
+
+export const TransactionListSchema = z.array(TransactionSchema);
+export type TTransactionList = z.infer<typeof TransactionListSchema>;

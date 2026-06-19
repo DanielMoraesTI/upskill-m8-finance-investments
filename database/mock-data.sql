@@ -186,3 +186,83 @@ VALUES
     (1, 7, 3, 3333.3333, 10000.00, 0, '2025-01-02'),
     -- Nubank Caixinha: 3 aportes (qty=3), 1 resgate (qty=1). Ficam 2.
     (1, 8, 2, 1000.0000, 2000.00, 0, '2025-01-15');
+
+-- const conversations = [
+--         {
+--             title: 'Análise de Gastos de Fevereiro',
+--             messages: [
+--                 { role: 'user', content: 'Quanto gastei em alimentação em fevereiro?' },
+--                 { role: 'assistant', content: 'Em fevereiro, você gastou um total de 345,50€ em alimentação. Isso representa 15% do seu orçamento total.' }
+--             ] },
+-- { title: 'Dicas de Planeamento Orçamental',
+-- messages: [
+--                 { role: 'user', content: 'Como posso economizar mais este mês?' },
+--                 { role: 'assistant', content: 'Com base nos seus padrões, sugerimos reduzir os gastos em "Lazer" e "Restaurantes", que aumentaram 20% no último mês. Tente estabelecer um limite semanal para estas categorias.' }
+--             ] },
+-- { title: 'Projeção de Saldo Mensal',
+-- messages: [
+--                 { role: 'user', content: 'Qual a projeção do meu saldo para o final de março?' },
+--                 { role: 'assistant', content: 'Considerando as suas despesas fixas e o histórico de gastos, prevemos que termine março com um saldo positivo de aproximadamente 450,00€.' }
+--             ] } ];
+-- CONVERSAS
+INSERT INTO
+    conversation (user_id, title)
+VALUES
+    (1, 'Resumo da carteira'),
+    (1, 'Renda Fixa e Aportes'),
+    (1, 'Ações e Estratégias');
+
+-- MENSAGENS PARA RESUMO DA CARTEIRA
+INSERT INTO
+    message (conversation_id, role, content)
+VALUES
+    (
+        1,
+        'user',
+        'Me mostre um resumo da minha carteira.'
+    ),
+    (
+        1,
+        'model',
+        'Claro! Aqui está o resumo da sua carteira: 
+        Ações: 3 ativos, total investido: R$ 8.100,00, quantidade total: 290 ações.
+        FIIs: 3 ativos, total investido: R$ 12.768,33, quantidade total: 120 cotas.
+        Renda Fixa: 2 ativos, total investido: R$ 12.000,00, quantidade total: 5 aportes.'
+    );
+
+-- MENSAGENS PARA RENDA FIXA E APORTES
+INSERT INTO
+    message (conversation_id, role, content)
+VALUES
+    (
+        2,
+        'user',
+        'Como foi a evolução dos aportes de renda fixa nos últimos meses?.'
+    ),
+    (
+        2,
+        'model',
+        'Nos últimos meses, você realizou os seguintes aportes em renda fixa:
+        - Janeiro: R$ 5.000,00 no Itaú Crédito Bancário Renda Fixa Crédito Privado e R$ 1.000,00 no Nubank Caixinha.
+        - Fevereiro: R$ 3.000,00 no Itaú Crédito Bancário Renda Fixa Crédito Privado e R$ 500,00 no Nubank Caixinha.
+        - Março: R$ 2.000,00 no Itaú Crédito Bancário Renda Fixa Crédito Privado e R$ 1.500,00 no Nubank Caixinha.
+        Isso totaliza R$ 12.000,00 investidos em renda fixa nos últimos três meses, com uma média de R$ 4.000,00 por mês.'
+    );
+
+-- MENSAGENS PARA AÇÕES E ESTRATÉGIAS
+INSERT INTO
+    message (conversation_id, role, content)
+VALUES
+    (
+        3,
+        'user',
+        'Quais foram as minhas principais estratégias de investimento em ações?'
+    ),
+    (
+        3,
+        'model',
+        'Suas principais estratégias de investimento em ações incluíram:
+        - Compra e venda de ações com base em análises de mercado, como visto com ITSA3, PETR4 e CMIG4.
+        - Diversificação do portfólio, investindo em diferentes setores e empresas.
+        - Monitoramento constante do desempenho das ações para ajustar suas posições conforme necessário.'
+    );

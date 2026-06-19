@@ -21,8 +21,8 @@ import ChatbotHelper from "@/components/chatbot/ChatbotHelper";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface ChatbotState {
-  conversationList: ConversationSummary[];
-  filteredConversations: ConversationSummary[];
+  conversationList: ConversationSummary;
+  filteredConversations: ConversationSummary;
   currentConversation: Conversation | null;
   showHelper: boolean;
   userPrompt: string;
@@ -44,7 +44,7 @@ const initialState: ChatbotState = {
 
 type ChatbotStateAction =
   | { type: "setInitialData" }
-  | { type: "setFilteredConversations"; value: ConversationSummary[] }
+  | { type: "setFilteredConversations"; value: ConversationSummary }
   | { type: "setCurrentConversation"; value: Conversation | null }
   | { type: "toggleHelper"; value: boolean }
   | { type: "setUserPrompt"; value: string }
@@ -54,7 +54,7 @@ type ChatbotStateAction =
   | { type: "appendStreamingMessage"; value: string };
 
 interface ChatbotContextProps extends Omit<ChatbotState, "conversationList"> {
-  conversationList: ConversationSummary[] | undefined;
+  conversationList: ConversationSummary | undefined;
   dispatch: Dispatch<ChatbotStateAction>;
   handleOpenConversation: (conversationId: number) => Promise<void>;
   handleSendMessage: () => Promise<void>;

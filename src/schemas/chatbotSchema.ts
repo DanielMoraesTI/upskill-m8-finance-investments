@@ -9,53 +9,50 @@ export const MessageSchema = z.object({
     conversationId: z.number(),
     role: RoleSchema,
     content: z.string(),
-    createdAt: z.date().or(z.string()),
+    createdAt: z.iso.date(),
 });
 
-export type Message = z.infer<typeof MessageSchema>;
+export type TMessage = z.infer<typeof MessageSchema>;
 
 export const ConversationSchema = z.object({
     id: z.number(),
     title: z.string(),
-    createdAt: z.date().or(z.string()),
-    updatedAt: z.date().or(z.string()),
+    createdAt: z.iso.date(),
+    updatedAt: z.iso.date(),
     messages: z.array(MessageSchema.omit({ conversationId: true })),
 });
 
-export type Conversation = z.infer<typeof ConversationSchema>;
+export type TConversation = z.infer<typeof ConversationSchema>;
 
-export const ConversationSummarySchema = z.object({
-    id: z.number(),
-    title: z.string(),
-    updatedAt: z.date().or(z.string()),
-});
-export type ConversationSummary = z.infer<typeof ConversationSummarySchema>;
+export const ConversationSummarySchema = z.array(ConversationSchema.pick({ id: true, title: true, updatedAt: true }));
+export type TConversationSummary = z.infer<typeof ConversationSummarySchema>;
+
 
 // ======================================================================================
 //                              Client x Server Streaming
 // ======================================================================================
-export type ChatbotEventType = "thought" | "text" | "error" | "function_call";
+export type TChatbotEventType = "thought" | "text" | "error" | "function_call";
 
-export interface ChatbotOngoingEvent {
+export interface IChatbotOngoingEvent {
     done: false;
     type: "thought" | "text" | "function_call";
     content: string; // Current chunk or thought
 }
 
-export interface ChatbotSuccessEvent {
+export interface IChatbotSuccessEvent {
     done: true;
     type: "text";
     content: string; // Full content
     conversationId: number;
 }
 
-export interface ChatbotErrorEvent {
+export interface IChatbotErrorEvent {
     done: true;
     type: "error";
     message: string;
 }
 
-export type ChatbotEvent =
-    | ChatbotOngoingEvent
-    | ChatbotSuccessEvent
-    | ChatbotErrorEvent;
+export type TChatbotEvent =
+    | IChatbotOngoingEvent
+    | IChatbotSuccessEvent
+    | IChatbotErrorEvent;
