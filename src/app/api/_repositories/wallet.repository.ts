@@ -1,5 +1,5 @@
 import db from "@/app/api/_lib/db";
-import { RowDataPacket } from 'mysql2';
+import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { TWalletList, WalletListSchema } from "@/schemas/walletSchema";
 
 export async function findAllWallets(): Promise<TWalletList | null> {
@@ -47,5 +47,20 @@ export async function updateWalletEntry(id: number, walletData: Partial<Omit<TWa
     } catch (error) {
         console.error("Error in updateWalletEntry:", error);
         throw new Error("An error occurred while updating wallet entry");
+    }
+}
+
+export async function updateWalletIncome(asset_id: number, income: number): Promise<void> {
+    try {
+        const [result] = await db.query<ResultSetHeader>(
+            `UPDATE wallet SET income = ? WHERE asset_id = ?`,
+            [income, asset_id]
+        );
+        if (result.affectedRows === 0) {
+            throw new Error("No wallet entry found for the given asset_id");
+        }
+    } catch (error) {
+        console.error("Error in updateWalletIncome:", error);
+        throw new Error("An error occurred while updating wallet income");
     }
 }

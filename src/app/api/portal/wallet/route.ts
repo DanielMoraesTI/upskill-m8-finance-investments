@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { WalletListResponseSchema } from "@/schemas/walletSchema";
 import { findAllWallets } from "@/app/api/_repositories/wallet.repository";
+
 
 export async function GET() {
     try {
@@ -30,19 +31,3 @@ export async function GET() {
      }
 }
 
-export async function PUT(request: NextRequest) {
-    try {
-        // validar o userID
-        // validar o body da requisição
-        // atualizar a entrada na carteira
-
-        return NextResponse.json({
-            message: "Entrada de carteira atualizada com sucesso"
-        }, { status: 200 });
-    } catch (error) {
-        console.error("Error in PUT /api/wallet:", error);
-        return NextResponse.json({
-            message: "Erro ao processar a solicitação"
-         }, { status: 500 });
-     }
-}

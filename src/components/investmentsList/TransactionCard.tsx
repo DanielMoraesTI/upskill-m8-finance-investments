@@ -9,6 +9,15 @@ import { formatDate } from "@/utils/dataTypeUtils";
 import { formatCurrency } from "@/utils/dataTypeUtils";
 import type { TFii, TRendaFixa, TStock } from "@/schemas/assetSchema";
 import type { TTransaction } from "@/schemas/transactionSchema";
+import { useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import EditTransactionForm from "@/components/investmentsList/EditTransactionForm";
 
 // --- Types ---
 export type TransactionType = "compra" | "venda";
@@ -40,6 +49,7 @@ export type TransactionCardData =
 
 interface TransactionCardProps {
   data: TransactionCardData;
+  transaction: TTransaction;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
 }
@@ -47,15 +57,18 @@ interface TransactionCardProps {
 // --- Component ---
 export function TransactionCard({
   data,
+  transaction,
   onEdit,
   onDelete,
 }: TransactionCardProps) {
   const isRendaFixa = data.asset === "renda-fixa";
   const isCompra = data.tipo === "compra";
+  const [ sheetOpen, setSheetOpen ] = useState(false);
   const ticker = "sigla" in data ? data.sigla : undefined;
   const quantity = "quantidade" in data ? data.quantidade : undefined;
   const unitValue = "valorUnitario" in data ? data.valorUnitario : undefined;
   const fixedIncomeName = "name" in data ? data.name : undefined;
+  const assetLabel = fixedIncomeName ?? ticker ?? "Ativo Desconecido";
 
   return (
     <Card className="w-full border-border/50 bg-card/80 backdrop-blur-sm shadow-sm card-hover group overflow-x-auto">
@@ -153,15 +166,29 @@ export function TransactionCard({
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit?.(data.id)}
-            className="flex items-center gap-1.5 border-border/50 hover:border-primary/40 hover:bg-primary/8 hover:text-primary transition-all"
-          >
-            <Pencil className="h-3.5 w-3.5" />
-            Editar
-          </Button>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1.5 border-border/50 hover:border-primary/40 hover:bg-primary/8 hover:text-primary transition-all"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Editar
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto p-0">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Editar Transação</SheetTitle>
+              </SheetHeader>
+              <EditTransactionForm
+                transaction={transaction}
+                assetLabel={assetLabel}
+                onSuccess={() => setSheetOpen(false)}
+              />
+            </SheetContent>
+          </Sheet>
+
           <Button
             variant="ghost"
             size="sm"

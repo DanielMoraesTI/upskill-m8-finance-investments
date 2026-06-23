@@ -46,3 +46,25 @@ export async function updateWalletEntry(id: number, walletData: Partial<Omit<TWa
     }
 }
 
+export interface IPatchWalletIncomeParams {
+    walletId: number;
+    newIncome: number;
+}
+
+export async function patchWalletIncome(args: IPatchWalletIncomeParams) {
+    try {
+        const response = await fetch(`${API_URL}/portal/wallet/${args.walletId}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ newIncome: args.newIncome }),
+        });
+        if (!response.ok) {
+            throw new Error("Failed to update wallet income");
+        }
+    } catch (error) {
+        console.error(error);
+        throw new Error("An error occurred while updating wallet income");
+    }
+};

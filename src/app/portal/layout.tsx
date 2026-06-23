@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
 import WalletProvider from "@/context/WalletProvider";
 import AssetProvider from "@/context/AssetProvider";
+import TransactionProvider from "@/context/TransactionProvider";
 import { Suspense } from "react";
 
 export default function PortalLayout({
@@ -14,27 +15,27 @@ export default function PortalLayout({
   return (
     <AssetProvider>
       <WalletProvider>
-        <SidebarProvider>
-          {/** Container para ocupar toda a tela com cara de "web app" */}
-          <div
-            className="min-w-screen max-w-screen min-h-screen max-h-screen overflow-hidden
-        flex flex-col md:flex-row bg-background
-      "
-          >
-            <Suspense>
-              <Navbar />
-            </Suspense>
-            <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full overflow-auto">
-              <Header />
-              <main className="flex flex-1 h-full overflow-hidden flex-col w-full items-center overflow-y-auto">
-                {children}
-              </main>
+        <TransactionProvider>
+          <SidebarProvider>
+            {/** Container para ocupar toda a tela com cara de "web app" */}
+            <div
+              className="min-w-screen max-w-screen min-h-screen max-h-screen overflow-hidden flex flex-col md:flex-row bg-background"
+            >
               <Suspense>
-                <Footer />
+                <Navbar />
               </Suspense>
+              <div className="grid grid-cols-1 grid-rows-[auto_1fr_auto] w-full h-full overflow-auto">
+                <Header />
+                <main className="flex flex-1 h-full overflow-hidden flex-col w-full items-center overflow-y-auto">
+                  {children}
+                </main>
+                <Suspense>
+                  <Footer />
+                </Suspense>
+              </div>
             </div>
-          </div>
-        </SidebarProvider>
+          </SidebarProvider>
+        </TransactionProvider>
       </WalletProvider>
     </AssetProvider>
   );

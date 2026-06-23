@@ -1,14 +1,15 @@
 "use client";
 import React, { createContext, useState, useContext } from "react";
 import type { TAssetType, TAssetList, TAssetTypeList } from "@/schemas/assetSchema";
-import { useQuery } from "@tanstack/react-query";
-import { getAssetSystemData } from "@/services/assetService";
+import { useQuery, useMutation, useQueryClient, UseMutationResult } from "@tanstack/react-query";
+import { getAssetSystemData, patchCurrentPrice, type IPatchCurrentPriceParams} from "@/services/assetService";
 
 interface AssetContextProps {
   currentAssetType: TAssetType | null;
   assetList: TAssetList;
   assetTypeList: TAssetTypeList;
   setCurrentAssetType: React.Dispatch<React.SetStateAction<TAssetType | null>>;
+  currentPriceMutation: UseMutationResult<void, Error, IPatchCurrentPriceParams, unknown>;
 }
 
 const initialAssetContext: AssetContextProps = {
@@ -16,6 +17,7 @@ const initialAssetContext: AssetContextProps = {
   assetList: [],
   assetTypeList: [],
   setCurrentAssetType: () => {},
+  currentPriceMutation: {} as UseMutationResult<void, Error, IPatchCurrentPriceParams, unknown>,
 };
 
 const AssetContext = createContext<AssetContextProps>(initialAssetContext);
@@ -34,6 +36,15 @@ export default function AssetProvider({
     queryFn: getAssetSystemData,
   });
 
+  const queryClient = useQueryClient();
+
+  const currentPriceMutation = useMutation({
+    mutationFn: (args: IPatchCurrentPriceParams) => patchCurrentPrice(args),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["assetList"] });
+    },
+  });
+
   return (
     <AssetContext.Provider
       value={{
@@ -41,6 +52,7 @@ export default function AssetProvider({
         assetList: data?.assetList || [],
         assetTypeList: data?.assetTypeList || [],
         setCurrentAssetType,
+        currentPriceMutation
       }}
     >
       {children}
