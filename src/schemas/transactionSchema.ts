@@ -25,7 +25,10 @@ export const TransactionSchema = CreateTransactionSchema.extend({
 // Estes tipos são inferidos a partir dos esquemas Zod definidos anteriormente, permitindo que sejam utilizados em todo o código para garantir a consistência dos dados relacionados às transações (transactions) e suas listas. O tipo TTransaction representa um objeto individual de transação, enquanto o tipo TCreateTransaction representa os dados necessários para criar uma nova transação, facilitando a tipagem e validação em funções e componentes que lidam com esses dados.
 export type TTransaction = z.infer<typeof TransactionSchema>;
 export type TCreateTransaction = z.infer<typeof CreateTransactionSchema>;
+export type TTransactionEntryType = z.infer<typeof TransactionEntryTypeSchema>;
 
+export const TransactionListSchema = z.array(TransactionSchema);
+export type TTransactionList = z.infer<typeof TransactionListSchema>;
 
 // ==============================================================================
 //                                  API SCHEMAS

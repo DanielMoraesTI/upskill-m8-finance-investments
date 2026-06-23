@@ -15,7 +15,7 @@ import Image from "next/image";
 import {
   BarChart3,
   Building2,
-  HandCoins,
+  Lightbulb,
   History,
   Wallet,
   LogIn,
@@ -72,6 +72,11 @@ const navItemOptions: NavItemProps[] = [
     href: "/portal/transaction",
     label: "Histórico de Transações",
     icon: History,
+  },
+  {
+    href: "/portal/insights",
+    label: "Insights",
+    icon: Lightbulb,
   },
 ] as const;
 // Esta função é um componente React que representa a barra de navegação lateral (Navbar) do portal de investimentos. Ela utiliza os hooks usePathname, useSearchParams e useRouter do Next.js para gerenciar a navegação e o estado da URL, e o hook useAsset para acessar o contexto de ativos. O Navbar renderiza uma estrutura de navegação usando os componentes do Sidebar, incluindo um logotipo, uma lista de itens de navegação gerados a partir das opções definidas em navItemOptions, e botões para sair da conta e alternar o tema. A função handleRouteChange é responsável por atualizar o tipo de ativo selecionado no contexto quando um item de navegação relacionado a um ativo é clicado, garantindo que as informações exibidas sejam consistentes com a seleção do usuário. O Navbar é essencial para fornecer uma interface de navegação intuitiva e eficiente para os usuários do portal de investimentos. Ele garante que os usuários possam acessar facilmente as diferentes seções do portal e personalizar a experiência de acordo com suas preferências de tema. O Navbar é um componente central para a usabilidade do aplicativo, facilitando a navegação e melhorando a experiência geral do usuário.
