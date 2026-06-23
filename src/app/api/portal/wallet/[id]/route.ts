@@ -1,32 +1,33 @@
-import { patchWalletIncome } from '@/services/walletService';
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import { updateWalletIncome } from "@/app/api/_repositories/wallet.repository";
 
-interface RouteParams {
-    id: string;
-}
+type RouteContext = { params: Promise<{ id: string }> };
 
-export async function PATCH(request: Request, { params }: { params: RouteParams }) {
-    try {
-        const { id } = params;
-        const body = await request.json();
-        const { newIncome } = body;
-        const walletId = Number(id);
+export async function PATCH(request: Request, { params }: RouteContext) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    const walletId = Number(id);
+    const newIncome = Number(body.newIncome);
 
-        if (isNaN(walletId)) {
-            return NextResponse.json({
-                message: "ID de carteira inválido"
-            }, { status: 400 });
-        }
+    if (isNaN(walletId) || isNaN(newIncome)) {
+      return NextResponse.json(
+        { message: "ID da carteira ou rendimento inválido" },
+        { status: 400 },
+      );
+    }
 
-        await patchWalletIncome({ walletId, newIncome });
+    await updateWalletIncome(walletId, newIncome);
 
-        return NextResponse.json({
-            message: "Renda da carteira atualizada com sucesso"
-        }, { status: 200 });
-    } catch (error) {
-        console.error("Error in PATCH /api/wallet/:id:", error);
-        return NextResponse.json({
-            message: "Erro ao processar a solicitação"
-         }, { status: 500 });
-     }
+    return NextResponse.json(
+      { message: "Rendimento atualizado com sucesso" },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("Error in PATCH /api/wallet/:id:", error);
+    return NextResponse.json(
+      { message: "Erro ao processar a solicitação" },
+      { status: 500 },
+    );
+  }
 }

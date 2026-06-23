@@ -18,12 +18,13 @@ export default function TransactionPage() {
 
   // Obter a função de atualização do ID do ativo selecionado a partir do TransactionProvider
   const seacrhParams = useSearchParams();
-  const { selectedAssetId, setSelectedAssetId } = useTransaction();
+  const { setSelectedAssetId, deleteMutation } = useTransaction();
   const asssetIdParam = seacrhParams.get("assetId");
 
   // Efeito para atualizar o ID do ativo selecionado com base no parâmetro da URL
   useEffect(() => {
     if (asssetIdParam) {
+      setFilter("all");
       setSelectedAssetId(Number(asssetIdParam));
     } else {
       // Se não houver parâmetro, limpar a seleção
@@ -47,7 +48,7 @@ export default function TransactionPage() {
   }
 
   function handleDelete(id: string) {
-    console.log("Deletar transação:", id);
+    deleteMutation.mutate(Number(id));
   }
 
   // Filtragem lógica baseada no tipo selecionado ("compra" ou "venda")

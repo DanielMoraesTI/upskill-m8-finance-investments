@@ -4,13 +4,13 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useApp } from "./AppProvider";
 import { usePathname, useRouter } from "next/navigation";
-
+// Esta interface define a estrutura do contexto de autenticação (AuthContextProps), que inclui uma propriedade booleana isAuthenticated para indicar se o usuário está autenticado ou não. Ela é utilizada para garantir a consistência dos dados relacionados à autenticação em todo o código, permitindo que os componentes que consomem esse contexto tenham acesso às informações necessárias sobre o estado de autenticação do usuário e possam tomar decisões com base nessa informação de forma segura e eficiente.
 interface AuthContextProps {
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<null | AuthContextProps>(null);
-
+// Este componente é o provedor de autenticação (AuthProvider), que envolve os componentes filhos e fornece o contexto de autenticação para eles. Ele utiliza o hook useState para gerenciar o estado de autenticação do usuário, o hook useEffect para monitorar as mudanças no estado de autenticação usando a função onAuthStateChanged do Firebase, e os hooks usePathname e useRouter para redirecionar os usuários não autenticados para a página de autenticação. O AuthProvider é responsável por fornecer as informações relacionadas à autenticação para os componentes filhos, permitindo que eles acessem o estado de autenticação do usuário e possam tomar decisões com base nessa informação de forma segura e eficiente. Ele também garante que os usuários não autenticados sejam redirecionados para a página de autenticação quando tentarem acessar rotas protegidas, garantindo a segurança e a integridade do aplicativo. O AuthProvider é essencial para garantir que as informações de autenticação sejam gerenciadas de forma eficiente e que os componentes filhos possam acessar essas informações de maneira segura e consistente em todo o aplicativo.
 export default function AuthProvider({
   children,
 }: {

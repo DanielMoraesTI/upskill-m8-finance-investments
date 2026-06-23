@@ -1,4 +1,5 @@
 "use client";
+import { useMemo, useState } from "react";
 import AssetCategoryTable from "@/components/chart-objects/AssetCategoryTable";
 import WalletCard from "@/components/investmentsList/WalletCard";
 import { useWallet } from "@/context/WalletProvider";
@@ -11,12 +12,53 @@ import {
 import { Vault, Building2, FileText, Shuffle } from "lucide-react";
 import CardValues from "@/components/chart-objects/CardValues";
 import { formatCurrency, calcPct } from "@/utils/dataTypeUtils";
+import {
+  buildPortfolioSummary,
+  getWalletUpdatedValue,
+} from "@/utils/portfolioMetrics";
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from "@/components/ui/native-select";
 
 export default function Carteira() {
   const { filteredWalletList } = useWallet();
-  const { currentAssetType } = useAsset();
+  const { currentAssetType, assetList } = useAsset();
+  const [sortOrder, setSortOrder] = useState<"none" | "asc" | "desc">("desc");
+
+  const summary = buildPortfolioSummary({
+    walletList: filteredWalletList,
+    assetList,
+  });
+
+  const fiiPapelValue =
+    summary.fiiByCategory.find((item) => item.label.includes("Papel"))?.value ||
+    0;
+  const fiiTijoloValue =
+    summary.fiiByCategory.find((item) => item.label.includes("Tijolo"))
+      ?.value || 0;
+  const fiiHibridoValue =
+    summary.fiiByCategory.find(
+      (item) =>
+        item.label.includes("Híbridos") || item.label.includes("Hibrido"),
+    )?.value || 0;
 
   const assetType = currentAssetType?.asset_type;
+
+  const sortedWalletList = useMemo(() => {
+    if (sortOrder === "none") return filteredWalletList;
+
+    return [...filteredWalletList].sort((a, b) => {
+      const assetA = assetList.find((asset) => asset.id === a.asset_id);
+      const assetB = assetList.find((asset) => asset.id === b.asset_id);
+
+      const updatedA = getWalletUpdatedValue(a, assetA);
+      const updatedB = getWalletUpdatedValue(b, assetB);
+
+      if (sortOrder === "asc") return updatedA - updatedB;
+      return updatedB - updatedA;
+    });
+  }, [assetList, filteredWalletList, sortOrder]);
 
   const getPageTitle = () => {
     switch (assetType) {
@@ -59,7 +101,28 @@ export default function Carteira() {
           </div>
 
           {/* Botões de ação — aparecem apenas quando há um tipo de ativo selecionado */}
-          <div className="flex items-center gap-2">{renderActionButtons()}</div>
+          <div className="flex items-center gap-2">
+            {assetType && (
+              <NativeSelect
+                className="h-9 w-58 bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+                value={sortOrder}
+                onChange={(event) =>
+                  setSortOrder(event.target.value as "none" | "asc" | "desc")
+                }
+              >
+                <NativeSelectOption value="none">
+                  Sem ordenação
+                </NativeSelectOption>
+                <NativeSelectOption value="asc">
+                  Valor atualizado: menor para maior
+                </NativeSelectOption>
+                <NativeSelectOption value="desc">
+                  Valor atualizado: maior para menor
+                </NativeSelectOption>
+              </NativeSelect>
+            )}
+            {renderActionButtons()}
+          </div>
         </div>
 
         {/* Linha divisória */}
@@ -69,35 +132,35 @@ export default function Carteira() {
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 w-full">
             <CardValues
               title="Total FIIs"
-              value={formatCurrency(20075.33 + 32080.14 + 15000.0)}
+              value={formatCurrency(summary.byTypeUpdated.fii)}
               percentage="100% do portfólio"
               icon={Vault}
               highlight
             />
             <CardValues
               title="Fundos de Papel"
-              value={formatCurrency(20075.33)}
-              percentage={calcPct(20075.33, 20075.33 + 32080.14 + 15000.0)}
+              value={formatCurrency(fiiPapelValue)}
+              percentage={calcPct(fiiPapelValue, summary.byTypeUpdated.fii)}
               icon={FileText}
             />
             <CardValues
               title="Fundos de Tijolo"
-              value={formatCurrency(32080.14)}
-              percentage={calcPct(32080.14, 20075.33 + 32080.14 + 15000.0)}
+              value={formatCurrency(fiiTijoloValue)}
+              percentage={calcPct(fiiTijoloValue, summary.byTypeUpdated.fii)}
               icon={Building2}
             />
             <CardValues
               title="Fundos Híbridos"
-              value={formatCurrency(15000.0)}
-              percentage={calcPct(15000.0, 20075.33 + 32080.14 + 15000.0)}
+              value={formatCurrency(fiiHibridoValue)}
+              percentage={calcPct(fiiHibridoValue, summary.byTypeUpdated.fii)}
               icon={Shuffle}
             />
           </div>
         )}
 
         <ul className="flex w-full flex-col gap-3">
-          {filteredWalletList.length > 0 &&
-            filteredWalletList.map((item) => (
+          {sortedWalletList.length > 0 &&
+            sortedWalletList.map((item) => (
               <li key={`wallet-list-item-${item.id}`}>
                 <WalletCard walletItem={item} />
               </li>

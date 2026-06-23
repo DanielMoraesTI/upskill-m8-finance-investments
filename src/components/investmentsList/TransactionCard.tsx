@@ -22,7 +22,7 @@ import EditTransactionForm from "@/components/investmentsList/EditTransactionFor
 // --- Types ---
 export type TransactionType = "compra" | "venda";
 export type TransactionAsset = "acoes" | "fundos-imobiliarios" | "renda-fixa";
-
+// Este componente é o cartão de transação (TransactionCard), que exibe as informações de uma transação específica, incluindo o tipo de transação (compra ou venda), o ativo envolvido, o valor total, a data e outras informações relevantes. Ele recebe os dados da transação como props e renderiza essas informações de forma clara e organizada, utilizando elementos visuais como badges para destacar o tipo de transação e cores para diferenciar entre compra e venda. O TransactionCard também inclui botões para editar ou deletar a transação, permitindo que os usuários gerenciem suas transações de forma eficiente. Ao clicar no botão de editar, um Sheet é aberto com um formulário pré-configurado para editar as informações da transação, enquanto o botão de deletar aciona uma função para remover a transação. O TransactionCard é essencial para fornecer uma visão clara e acessível das transações dos usuários, facilitando o acompanhamento e a gestão de suas operações financeiras dentro do portal de investimentos. Ele melhora a experiência do usuário ao permitir que eles visualizem facilmente os detalhes de cada transação e realizem ações de edição ou exclusão de forma rápida e intuitiva, contribuindo para uma gestão eficiente de suas transações financeiras. O TransactionCard é um componente fundamental para a interface do usuário do portal de investimentos, garantindo que as informações sejam apresentadas de maneira clara e que os usuários tenham controle total sobre suas transações, melhorando a usabilidade e a satisfação geral dos usuários ao interagir com o portal de investimentos. Ele é projetado para ser responsivo e se adaptar a diferentes tamanhos de tela, garantindo que os usuários possam acessar facilmente as informações de suas transações em dispositivos móveis e desktops.
 type BaseTransactionCardData = {
   id: string;
   tipo: TransactionType;
@@ -165,40 +165,39 @@ export function TransactionCard({
         <div className="flex-1" />
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
-          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1.5 border-border/50 hover:border-primary/40 hover:bg-primary/8 hover:text-primary transition-all"
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                Editar
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto p-0">
-              <SheetHeader className="sr-only">
-                <SheetTitle>Editar Transação</SheetTitle>
-              </SheetHeader>
-              <EditTransactionForm
-                transaction={transaction}
-                assetLabel={assetLabel}
-                onSuccess={() => setSheetOpen(false)}
-              />
-            </SheetContent>
-          </Sheet>
-
+      <div className="flex items-center gap-2">
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            onClick={() => onDelete?.(data.id)}
-            className="flex items-center gap-1.5 text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 transition-all"
+            onClick={() => setSheetOpen(true)}
+            className="flex items-center gap-1.5 border-border/50 hover:border-primary/40 hover:bg-primary/8 hover:text-primary transition-all"
           >
-            <Trash2 className="h-3.5 w-3.5" />
-            Deletar
+            <Pencil className="h-3.5 w-3.5" />
+            Editar
           </Button>
-        </div>
+          <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto p-0">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Editar Transação</SheetTitle>
+            </SheetHeader>
+            <EditTransactionForm
+              transaction={transaction}
+              assetLabel={assetLabel}
+              onSuccess={() => setSheetOpen(false)}
+            />
+          </SheetContent>
+        </Sheet>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onDelete?.(data.id)}
+          className="flex items-center gap-1.5 text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 transition-all"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          Deletar
+        </Button>
+      </div>
       </CardContent>
     </Card>
   );

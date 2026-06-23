@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { SidebarTrigger, useSidebar } from "./ui/sidebar";
-
+// Este componente é o cabeçalho (Header) do aplicativo, que é exibido na parte superior da interface do usuário. Ele inclui um logotipo, um gatilho para abrir a barra lateral de navegação e uma seção de perfil do usuário. O Header é projetado para ser responsivo e se adaptar a diferentes tamanhos de tela, garantindo que os elementos sejam exibidos de forma adequada em dispositivos móveis e desktops. Ele utiliza o hook useSidebar para controlar a abertura e fechamento da barra lateral, proporcionando uma experiência de navegação fluida para os usuários. O Header é essencial para fornecer uma identidade visual consistente para o aplicativo e facilitar a navegação dos usuários pelas diferentes seções do portal de investimentos. Ele é responsável por criar uma primeira impressão positiva para os usuários, transmitindo a marca do aplicativo e oferecendo acesso fácil às principais funcionalidades, como a navegação e o perfil do usuário. O Header é um componente fundamental para garantir que os usuários possam interagir com o aplicativo de forma intuitiva e eficiente, proporcionando uma experiência de usuário agradável e envolvente.
 export default function Header() {
   const { open } = useSidebar();
 

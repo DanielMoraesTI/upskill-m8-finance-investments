@@ -5,45 +5,58 @@ import type {
   TCreateTransaction,
 } from "@/schemas/transactionSchema";
 import { useAsset } from "./AssetProvider";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseMutationResult,
+} from "@tanstack/react-query";
+import {
+  createTransaction,
   getTransactionList,
   updateTransaction,
   deleteTransaction,
 } from "@/services/transactionService";
-
+// ==============================================================================
+//                                  CONTEXT
+// ==============================================================================
+// Esta interface define a estrutura do contexto de transações (TransactionContextProps), que inclui a lista completa de transações (transactionList), a lista filtrada de transações (filteredTransactionList), o ID do ativo selecionado (selectedAssetId), a função para atualizar o ID do ativo selecionado (setSelectedAssetId) e as mutações para criar, atualizar e deletar transações. Ela é utilizada para garantir a consistência dos dados relacionados às transações em todo o código, permitindo que os componentes que consomem esse contexto tenham acesso às informações necessárias e possam realizar as operações de criação, atualização e exclusão de forma segura e eficiente.
 interface TransactionContextProps {
+  transactionList: TTransaction[];
   filteredTransactionList: TTransaction[];
   selectedAssetId: number | null;
   setSelectedAssetId: (id: number | null) => void;
-  updateMutation: ReturnType<
-    typeof useMutation<
-      TTransaction,
-      Error,
-      { id: number; data: Partial<TTransaction> }
-    >
+  createMutation: UseMutationResult<TTransaction, Error, TCreateTransaction>;
+  deleteMutation: UseMutationResult<void, Error, number>;
+  updateMutation: UseMutationResult<
+    void,
+    Error,
+    { id: number; data: Partial<TCreateTransaction> }
   >;
-  deleteMutation: ReturnType<typeof useMutation<void, Error, number>>;
 }
-
+// Este objeto inicializa o contexto de transações (TransactionContext) com valores padrão, incluindo uma lista vazia de transações, uma lista filtrada vazia, um ID de ativo selecionado nulo e mutações de criação, atualização e exclusão de transações vazias. Ele é utilizado para garantir que o contexto tenha um estado inicial consistente, permitindo que os componentes que consomem esse contexto possam acessar os dados
 const initialTransactionContext: TransactionContextProps = {
+  transactionList: [],
   filteredTransactionList: [],
   selectedAssetId: null,
   setSelectedAssetId: () => {},
-  updateMutation: {} as ReturnType<
-    typeof useMutation<
-      TTransaction,
-      Error,
-      { id: number; data: Partial<TTransaction> }
-    >
+  createMutation: {} as UseMutationResult<
+    TTransaction,
+    Error,
+    TCreateTransaction
   >,
-  deleteMutation: {} as ReturnType<typeof useMutation<void, Error, number>>,
+  deleteMutation: {} as UseMutationResult<void, Error, number>,
+  updateMutation: {} as UseMutationResult<
+    void,
+    Error,
+    { id: number; data: Partial<TCreateTransaction> }
+  >,
 };
 
 const TransactionContext = createContext<TransactionContextProps>(
   initialTransactionContext,
 );
-
+// Este componente é o provedor do contexto de transações (TransactionProvider), que envolve os componentes filhos e fornece o contexto de transações para eles. Ele utiliza o hook useQuery para buscar a lista de transações da API, o hook useMutation para criar mutações que permitem criar, atualizar e deletar transações, e o hook useState para gerenciar a lista filtrada de transações e o ID do ativo selecionado. O useEffect é utilizado para filtrar a lista de transações com base no ID do ativo selecionado e no tipo de ativo selecionado, garantindo que os dados relacionados às transações sejam consistentes e sigam as regras definidas para cada tipo específico. O TransactionProvider é responsável por fornecer os dados relacionados às transações para os componentes filhos, permitindo que eles acessem as informações necessárias e possam realizar as operações de criação, atualização e exclusão de forma segura e eficiente.
 export default function TransactionProvider({
   children,
 }: {
@@ -68,20 +81,32 @@ export default function TransactionProvider({
   // Configura as mutações para atualizar e deletar transações
   const queryClient = useQueryClient(); // ✅
 
+  const createMutation = useMutation<TTransaction, Error, TCreateTransaction>({
+    mutationFn: (payload) => createTransaction(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactionList"] });
+      queryClient.invalidateQueries({ queryKey: ["walletList"] });
+    },
+  });
+
   const deleteMutation = useMutation<void, Error, number>({
     mutationFn: (id) => deleteTransaction(id),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["transactionList"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactionList"] });
+      queryClient.invalidateQueries({ queryKey: ["walletList"] });
+    },
   });
 
   const updateMutation = useMutation<
-    TTransaction,
+    void,
     Error,
     { id: number; data: Partial<TCreateTransaction> }
   >({
     mutationFn: ({ id, data }) => updateTransaction(id, data),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["transactionList"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactionList"] });
+      queryClient.invalidateQueries({ queryKey: ["walletList"] });
+    },
   });
 
   // Efeito colateral unificado para filtrar a lista de transações
@@ -119,9 +144,11 @@ export default function TransactionProvider({
   return (
     <TransactionContext.Provider
       value={{
+        transactionList: transactionList || [],
         filteredTransactionList,
         selectedAssetId,
         setSelectedAssetId,
+        createMutation,
         updateMutation,
         deleteMutation,
       }}

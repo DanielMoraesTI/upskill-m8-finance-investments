@@ -27,14 +27,14 @@ import ThemeToggleButton from "@/components/ThemeToggleButton";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { TAssetType } from "@/schemas/assetSchema";
 import { useAsset } from "@/context/AssetProvider";
-
+// Este componente é a barra de navegação lateral (Navbar) do aplicativo, que fornece links para as principais seções do portal de investimentos. Ele utiliza os componentes de layout e estilo do Sidebar para criar uma estrutura de navegação consistente e responsiva. O Navbar inclui um logotipo no topo, seguido por uma lista de itens de navegação que levam a diferentes páginas do portal, como o dashboard, as carteiras de ativos e o histórico de transações. Cada item de navegação é destacado quando ativo, proporcionando uma experiência visual clara para os usuários. Na parte inferior da barra lateral, há um botão para sair da conta e um botão para alternar entre os modos claro e escuro do aplicativo. O Navbar é essencial para garantir que os usuários possam navegar facilmente pelas diferentes seções do portal de investimentos, proporcionando uma experiência de usuário intuitiva e eficiente.
 interface NavItemProps {
   href: string;
   label: string;
   assetType?: TAssetType;
   icon: LucideIcon;
 }
-
+// Esta constante define as opções de itens de navegação (navItemOptions) para a barra lateral, incluindo o link de destino (href), o rótulo exibido (label), o tipo de ativo associado (assetType) e o ícone correspondente (icon) para cada item. Ela é utilizada para gerar dinamicamente os itens de navegação na barra lateral, permitindo que os usuários acessem facilmente as diferentes seções do portal de investimentos. Cada item de navegação é configurado com um link específico, um rótulo descritivo, um tipo de ativo opcional para filtrar as informações exibidas e um ícone visual para melhorar a experiência do usuário. O navItemOptions é essencial para garantir que a barra lateral seja flexível e fácil de manter, permitindo que novos itens de navegação sejam adicionados ou modificados de forma eficiente conforme necessário.
 const navItemOptions: NavItemProps[] = [
   {
     href: "/portal",
@@ -74,7 +74,7 @@ const navItemOptions: NavItemProps[] = [
     icon: History,
   },
 ] as const;
-
+// Esta função é um componente React que representa a barra de navegação lateral (Navbar) do portal de investimentos. Ela utiliza os hooks usePathname, useSearchParams e useRouter do Next.js para gerenciar a navegação e o estado da URL, e o hook useAsset para acessar o contexto de ativos. O Navbar renderiza uma estrutura de navegação usando os componentes do Sidebar, incluindo um logotipo, uma lista de itens de navegação gerados a partir das opções definidas em navItemOptions, e botões para sair da conta e alternar o tema. A função handleRouteChange é responsável por atualizar o tipo de ativo selecionado no contexto quando um item de navegação relacionado a um ativo é clicado, garantindo que as informações exibidas sejam consistentes com a seleção do usuário. O Navbar é essencial para fornecer uma interface de navegação intuitiva e eficiente para os usuários do portal de investimentos. Ele garante que os usuários possam acessar facilmente as diferentes seções do portal e personalizar a experiência de acordo com suas preferências de tema. O Navbar é um componente central para a usabilidade do aplicativo, facilitando a navegação e melhorando a experiência geral do usuário.
 export default function Navbar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -90,6 +90,8 @@ export default function Navbar() {
   const handleRouteChange = (navItem: NavItemProps) => {
     if (navItem.href.includes("carteira") && navItem.assetType) {
       setCurrentAssetType(navItem.assetType);
+    } else {
+      setCurrentAssetType(null);
     }
     router.push(navItem.href);
   };

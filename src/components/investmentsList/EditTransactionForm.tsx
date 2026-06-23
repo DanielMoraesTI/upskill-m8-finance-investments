@@ -6,7 +6,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useTransaction } from "@/context/TransactionProvider";
 import type { TTransaction } from "@/schemas/transactionSchema";
-
+// Este componente é o formulário de edição de transação (EditTransactionForm), que permite aos usuários editar as informações de uma transação existente. Ele recebe os dados da transação como props e pré-configura os campos do formulário com essas informações, permitindo que os usuários façam alterações conforme necessário. O formulário inclui campos para o tipo de transação (compra ou venda), a data, a quantidade, o valor unitário e o valor total, que é calculado automaticamente com base na quantidade e no valor unitário. O EditTransactionForm utiliza o hook useTransaction para acessar a função de atualização de transação (updateMutation) e gerenciar o estado de feedback para o usuário, exibindo mensagens de sucesso ou erro com base no resultado da operação de atualização. O formulário é projetado para ser fácil de usar e acessível, garantindo que os usuários possam editar suas transações sem dificuldades, melhorando a eficiência e a satisfação do usuário ao interagir com o portal de investimentos.
 interface EditTransactionFormProps {
   transaction: TTransaction;
   assetLabel: string;
@@ -23,8 +23,14 @@ export default function EditTransactionForm({
   onSuccess,
 }: EditTransactionFormProps) {
   const { updateMutation } = useTransaction();
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
-  const [entryType, setEntryType] = useState<"buy" | "sell">(transaction.entry_type);
+  const [entryType, setEntryType] = useState<"buy" | "sell">(
+    transaction.entry_type,
+  );
   const [date, setDate] = useState(transaction.date);
   const [quantidade, setQuantidade] = useState(String(transaction.quantity));
   const [valor, setValor] = useState(String(transaction.unit_price));
@@ -38,6 +44,8 @@ export default function EditTransactionForm({
   const canConfirm = quantidade !== "" && valor !== "" && date !== "";
 
   function handleSubmit() {
+    setFeedback(null);
+
     updateMutation.mutate(
       {
         id: transaction.id,
@@ -49,7 +57,21 @@ export default function EditTransactionForm({
           total_value: total(),
         },
       },
-      { onSuccess },
+      {
+        onSuccess: () => {
+          setFeedback({
+            type: "success",
+            message: "Transacao atualizada com sucesso.",
+          });
+          onSuccess?.();
+        },
+        onError: (error) => {
+          setFeedback({
+            type: "error",
+            message: error.message || "Nao foi possivel atualizar a transacao.",
+          });
+        },
+      },
     );
   }
 
@@ -57,7 +79,9 @@ export default function EditTransactionForm({
     <div className="flex flex-col gap-6 px-6 py-6">
       <div className="flex flex-col gap-1">
         <h2 className="text-xl font-bold text-foreground">Editar Transação</h2>
-        <p className="text-sm text-muted-foreground/60">Atualize os dados da transação</p>
+        <p className="text-sm text-muted-foreground/60">
+          Atualize os dados da transação
+        </p>
         <span className="mt-1 inline-flex w-fit px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
           {assetLabel}
         </span>
@@ -178,6 +202,18 @@ export default function EditTransactionForm({
       >
         {updateMutation.isPending ? "Salvando..." : "Salvar Alterações"}
       </Button>
+
+      {feedback && (
+        <div
+          className={`rounded-md border px-3 py-2 text-sm ${
+            feedback.type === "success"
+              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600"
+              : "border-rose-500/40 bg-rose-500/10 text-rose-600"
+          }`}
+        >
+          {feedback.message}
+        </div>
+      )}
     </div>
   );
 }

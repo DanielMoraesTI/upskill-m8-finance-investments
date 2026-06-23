@@ -3,9 +3,20 @@
 import { GitFork } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; // Importa o hook
-
+import { useAsset } from "@/context/AssetProvider";
+import { useWallet } from "@/context/WalletProvider";
+import { buildPortfolioSummary } from "@/utils/portfolioMetrics";
+import { formatCurrency } from "@/utils/dataTypeUtils";
+// Este componente é o rodapé (Footer) do aplicativo, que exibe informações relevantes para os usuários, como o total investido, a distribuição dos investimentos por tipo de ativo e os créditos dos desenvolvedores. Ele utiliza o hook usePathname para determinar a rota atual e renderizar o conteúdo apropriado com base nessa rota. Se o usuário estiver na rota "/portal", o Footer exibe os créditos dos desenvolvedores, incluindo links para seus perfis no GitHub. Em outras rotas, o Footer exibe um resumo dos investimentos do usuário, incluindo o total investido e a distribuição por tipo de ativo (ações, fundos imobiliários e renda fixa). O Footer é essencial para fornecer informações importantes aos usuários e reconhecer os desenvolvedores que contribuíram para a criação do aplicativo, melhorando a experiência do usuário e promovendo a transparência sobre os criadores do aplicativo.
 export default function Footer() {
   const pathname = usePathname();
+  const { assetList } = useAsset();
+  const { walletList } = useWallet();
+
+  const summary = buildPortfolioSummary({
+    walletList,
+    assetList,
+  });
 
   // Condição para verificar se o usuário está exatamente na rota "/portal"
   const isPortal = pathname === "/portal";
@@ -63,7 +74,7 @@ export default function Footer() {
             Total Investido
           </span>
           <span className="text-xs font-bold tabular-nums text-foreground/80">
-            R$ 0,00
+            {formatCurrency(summary.totalUpdated)}
           </span>
         </div>
 
@@ -72,7 +83,7 @@ export default function Footer() {
             Ações
           </span>
           <span className="text-xs font-bold tabular-nums text-foreground/80">
-            R$ 0,00
+            {formatCurrency(summary.byTypeUpdated.stock)}
           </span>
         </div>
 
@@ -81,7 +92,7 @@ export default function Footer() {
             Fundos Imobiliários
           </span>
           <span className="text-xs font-bold tabular-nums text-foreground/80">
-            R$ 0,00
+            {formatCurrency(summary.byTypeUpdated.fii)}
           </span>
         </div>
 
@@ -90,7 +101,7 @@ export default function Footer() {
             Renda Fixa
           </span>
           <span className="text-xs font-bold tabular-nums text-foreground/80">
-            R$ 0,00
+            {formatCurrency(summary.byTypeUpdated.fixedIncome)}
           </span>
         </div>
       </div>

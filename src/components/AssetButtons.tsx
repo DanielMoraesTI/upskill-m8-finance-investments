@@ -30,8 +30,9 @@ import { AssetOperationButton } from "./AssetOperationButton";
 type OperationType = "compra" | "venda";
 
 // ─────────────────────────────────────────
-// Ações
+// Configuração de rótulos por tipo de ativo
 // ─────────────────────────────────────────
+// Esta constante define a configuração para cada tipo de ativo, incluindo o rótulo correspondente para cada tipo. Ela é utilizada para gerar dinamicamente o rótulo do botão com base no tipo de ativo selecionado, garantindo que o texto exibido seja consistente e informativo para os usuários. O ASSET_CONFIG é essencial para manter a flexibilidade e a escalabilidade do componente AssetOperationButton, permitindo que novos tipos de ativos sejam adicionados facilmente no futuro, bastando adicionar uma nova entrada na configuração com o rótulo apropriado. Ele também melhora a experiência do usuário ao fornecer rótulos claros e específicos para cada tipo de ativo, facilitando a compreensão das operações que estão sendo realizadas. O ASSET_CONFIG é uma parte fundamental do componente AssetOperationButton, garantindo que as informações exibidas sejam relevantes e personalizadas para cada tipo de ativo, melhorando a usabilidade e a eficiência do processo de compra e venda de ativos para os usuários.
 
 interface StockOperationButtonProps {
   operacao?: OperationType;
@@ -118,7 +119,9 @@ export function FixedIncomeOperationButton({
     <AssetOperationButton
       assetType="renda-fixa"
       defaultOperacao={operacao}
-      label={label ?? (operacao === "compra" ? "Novo Investimento" : "Resgatar")}
+      label={
+        label ?? (operacao === "compra" ? "Novo Investimento" : "Resgatar")
+      }
       size={size}
       className={className}
     />
