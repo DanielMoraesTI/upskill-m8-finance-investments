@@ -9,7 +9,7 @@ export const MessageSchema = z.object({
     conversationId: z.number(),
     role: RoleSchema,
     content: z.string(),
-    createdAt: z.iso.date(),
+    createdAt: z.iso.datetime(),
 });
 
 export type TMessage = z.infer<typeof MessageSchema>;
@@ -17,8 +17,8 @@ export type TMessage = z.infer<typeof MessageSchema>;
 export const ConversationSchema = z.object({
     id: z.number(),
     title: z.string(),
-    createdAt: z.iso.date(),
-    updatedAt: z.iso.date(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
     messages: z.array(MessageSchema.omit({ conversationId: true })),
 });
 

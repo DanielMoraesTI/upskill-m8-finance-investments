@@ -39,12 +39,16 @@ export async function POST(req: NextRequest) {
 
         let conversation;
         if (conversationId && conversationId > 0) {
-            conversation = await chatbotRepository.findMessagesByConversationId(Number(conversationId));
+            const currentConversation = await chatbotRepository.findMessagesByConversationId(Number(conversationId));
+            if (currentConversation) {
+                conversation = currentConversation;
+            }
         }
 
         // If no conversation, create one
         if (!conversation) {
             let formattedTitle = prompt.length > 30 ? prompt.slice(0, 30) + '...' : prompt;
+            formattedTitle = formattedTitle.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
             formattedTitle = formattedTitle.charAt(0).toUpperCase() + formattedTitle.slice(1);
 
             conversation = await chatbotRepository.createConversation(formattedTitle);

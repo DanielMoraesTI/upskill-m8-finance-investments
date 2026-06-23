@@ -65,21 +65,26 @@ export default function ConversationMessages() {
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth"
       >
-        {currentConversation?.messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex items-start ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            {msg.role === "model" && (
-              <Bot size={20} className="text-primary mr-2" />
-            )}
+        {currentConversation?.messages
+          .sort(
+            (a, b) =>
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+          )
+          .map((msg, i) => (
             <div
-              className={`max-w-[70%] p-4 rounded-lg ${msg.role === "user" ? "bg-neutral text-info" : "bg-base-200 text-base-content"}`}
+              key={i}
+              className={`flex items-start ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              {msg.content}
+              {msg.role === "model" && (
+                <Bot size={20} className="text-primary mr-2" />
+              )}
+              <div
+                className={`max-w-[70%] p-4 rounded-lg ${msg.role === "user" ? "bg-accent text-info" : "bg-base-200 text-base-content"}`}
+              >
+                {msg.content}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
         {streamingMessage && (
           <div className="flex items-start justify-start">

@@ -19,6 +19,7 @@ export default function ChatHistory() {
           filteredConversations.map((conversation) => (
             <Button
               key={conversation.id}
+              className="w-full justify-start"
               variant={
                 currentConversation?.id === conversation.id
                   ? "secondary"

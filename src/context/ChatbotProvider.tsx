@@ -8,8 +8,8 @@ import {
   useState,
 } from "react";
 import type {
-  ConversationSummary,
-  Conversation,
+  TConversationSummary,
+  TConversation,
 } from "@/schemas/chatbotSchema";
 import type { Dispatch } from "react";
 import {
@@ -21,9 +21,9 @@ import ChatbotHelper from "@/components/chatbot/ChatbotHelper";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface ChatbotState {
-  conversationList: ConversationSummary;
-  filteredConversations: ConversationSummary;
-  currentConversation: Conversation | null;
+  conversationList: TConversationSummary;
+  filteredConversations: TConversationSummary;
+  currentConversation: TConversation | null;
   showHelper: boolean;
   userPrompt: string;
   thinking: boolean;
@@ -44,8 +44,8 @@ const initialState: ChatbotState = {
 
 type ChatbotStateAction =
   | { type: "setInitialData" }
-  | { type: "setFilteredConversations"; value: ConversationSummary }
-  | { type: "setCurrentConversation"; value: Conversation | null }
+  | { type: "setFilteredConversations"; value: TConversationSummary }
+  | { type: "setCurrentConversation"; value: TConversation | null }
   | { type: "toggleHelper"; value: boolean }
   | { type: "setUserPrompt"; value: string }
   | { type: "setThinking"; value: boolean }
@@ -54,7 +54,7 @@ type ChatbotStateAction =
   | { type: "appendStreamingMessage"; value: string };
 
 interface ChatbotContextProps extends Omit<ChatbotState, "conversationList"> {
-  conversationList: ConversationSummary | undefined;
+  conversationList: TConversationSummary | undefined;
   dispatch: Dispatch<ChatbotStateAction>;
   handleOpenConversation: (conversationId: number) => Promise<void>;
   handleSendMessage: () => Promise<void>;

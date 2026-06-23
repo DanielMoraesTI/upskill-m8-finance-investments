@@ -14,9 +14,7 @@ async function findAllTransactions(args: IfindAllTransactions): Promise<TTransac
         const { query, params } = buildfindAllTransactionsQuery(args);
 
         const [rows] = await db.query<RowDataPacket[]>(query, params);
-        if (rows.length === 0) {
-            throw new Error("Transaction not found");
-        }
+        if (rows.length === 0) return [];
 
         const transactionList: TTransactionList = rows.map((row) => ({
             id: row.id,
@@ -53,35 +51,42 @@ export default transactionRepository;
 // ===================================================================================
 function buildfindAllTransactionsQuery(args: IfindAllTransactions): { query: string; params: string[] } {
     const { startDate, endDate, entryType, assetTypeId } = args;
-    
-    // Base query
-    let query = `SELECT *
-            FROM transaction t`;
+
+    // Seleciona apenas colunas de transaction para evitar conflito de nomes com o JOIN
+    let query = "SELECT t.* FROM transaction t";
+
     const params: string[] = [];
+    const whereClauses: string[] = [];
+
+    // Se filtrar por tipo de ativo, precisa JOIN com asset
+    if (assetTypeId) {
+        query += " INNER JOIN asset a ON a.id = t.asset_id";
+        whereClauses.push("a.asset_type_id = ?");
+        params.push(assetTypeId);
+    }
 
     // buy / sell filter
     if (entryType) {
-        query += ` WHERE t.entry_type = ?`;
+        whereClauses.push("t.entry_type = ?");
         params.push(entryType);
-    }
-
-    // assetTypeId filter (1 = Ação, 2 = FII, 3 = Renda Fixa)
-    if (assetTypeId) {
-        query += entryType ? ` AND t.asset_type_id = ?` : ` WHERE t.asset_type_id = ?`;
-        params.push(assetTypeId);
     }
 
     // date range filter
     if (startDate) {
-        query += entryType || assetTypeId ? ` AND t.date >= ?` : ` WHERE t.date >= ?`;
+        whereClauses.push(`t.date >= ?`);
         params.push(startDate.toISOString().slice(0, 10));
     }
+
     if (endDate) {
-        query += entryType || assetTypeId || startDate ? ` AND t.date <= ?` : ` WHERE t.date <= ?`;
+        whereClauses.push(`t.date <= ?`);
         params.push(endDate.toISOString().slice(0, 10));
     }
 
-    // Order by updated_at descending
+    if (whereClauses.length > 0) {
+        query += ` WHERE ${whereClauses.join(" AND ")}`;
+    }
+
     query += ` ORDER BY t.updated_at DESC`;
+
     return { query, params };
 }

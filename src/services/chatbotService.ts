@@ -32,19 +32,19 @@ export const getChatHistory = async (conversationId: number): Promise<TConversat
 
 export const chatbotApi = {
     async getConversations(): Promise<TConversation[]> {
-        const response = await fetch('/api/chatbot');
+        const response = await fetch(url);
         if (!response.ok) throw new Error('Failed to fetch conversations');
         return response.json();
     },
 
     async getChatHistory(conversationId: number): Promise<TConversation> {
-        const response = await fetch(`/api/chatbot?id=${conversationId}`);
+        const response = await fetch(`${url}?id=${conversationId}`);
         if (!response.ok) throw new Error('Failed to fetch chat history');
         return response.json();
     },
 
     async startChat(prompt: string, onEvent: (event: TChatbotEvent) => void): Promise<void> {
-        const response = await fetch('/api/chatbot', {
+        const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify({ prompt }),
             headers: { 'Content-Type': 'application/json' },
@@ -57,7 +57,7 @@ export const chatbotApi = {
     },
 
     async sendMessage(conversationId: number, prompt: string, onEvent: (event: TChatbotEvent) => void): Promise<void> {
-        const response = await fetch('/api/chatbot', {
+        const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify({ conversationId, prompt }),
             headers: { 'Content-Type': 'application/json' },
