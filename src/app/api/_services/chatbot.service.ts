@@ -163,7 +163,7 @@ async function getInvestmentSummary(args: unknown): Promise<TTransactionList> {
         case "year": startDate = startOfDay(subYears(now, 1)); break;
     }
 
-    const transactions = await transactionRepository.findAllTransactions({
+    const transactions = await transactionRepository.findAllTransactionsWithArgs({
         entryType: type === "all" ? null : type,
         assetTypeId: assetType === "all" ? null : assetType,
         startDate,
