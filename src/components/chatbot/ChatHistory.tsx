@@ -1,7 +1,8 @@
 import React from "react";
 import { useChatbot } from "@/context/ChatbotProvider";
-import { HelpCircle, MessageSquare, Trash2 } from "lucide-react";
+import { MessageSquare, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ChatbotHelper from "@/components/chatbot/ChatbotHelper";
 
 export default function ChatHistory() {
   const { filteredConversations, currentConversation, handleOpenConversation, dispatch } =
@@ -58,16 +59,7 @@ export default function ChatHistory() {
           </div>
         )}
       </div>
-
-      {/* Help Indicator Button */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="w-fit self-center"
-        onClick={() => dispatch({ type: "toggleHelper", value: true })}
-      >
-        Ajuda <HelpCircle size={16} />
-      </Button>
+      <ChatbotHelper />
     </div>
   );
 }

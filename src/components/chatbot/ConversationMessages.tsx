@@ -3,6 +3,7 @@ import { useChatbot } from "@/context/ChatbotProvider";
 import { Bot, HelpCircle, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import ChatbotHelper from "@/components/chatbot/ChatbotHelper";
 
 const promptSuggestions = [
   "Quais ativos valorizaram mais nos últimos 6 meses?",
@@ -43,12 +44,7 @@ export default function ConversationMessages() {
             ))}
           </div>
         )}
-        <Button
-          variant="outline"
-          onClick={() => dispatch({ type: "toggleHelper", value: true })}
-        >
-          Ajuda <HelpCircle size={16} />
-        </Button>
+        <ChatbotHelper />
       </div>
     );
   }
