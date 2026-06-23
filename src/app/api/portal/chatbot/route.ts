@@ -5,14 +5,12 @@ import type { Content, ApiError, GenerateContentConfig, FunctionCall } from "@go
 import { errorResponse } from "@/app/api/_utils/serverUtils";
 import { chatbotSystemInstruction } from "@/app/api/_utils/geminiPrompts";
 import { chatbotTools, ChatbotFunctionSchema } from "@/app/api/_utils/chatbot.functions";
-import handleFunctionCall from "@/app/api/_services/chatbot.service";
-import chatbotRepository from "@/app/api/_repositories/chatbot.repository";
+import chatbotService from "@/app/api/_services/chatbot.service";
 
 const MODEL_NAME = process.env.GEMINI_MODEL_NAME || "gemini-3.1-flash-lite-preview";
 
 const functionStepMap: Record<string, string> = {
     "get_investment_summary": "Consultando resumo financeiro...",
-    // adicionar mais se necessário aqui
 };
 
 export async function GET(req: NextRequest) {
@@ -21,11 +19,11 @@ export async function GET(req: NextRequest) {
         const id = searchParams.get('id');
 
         if (id) {
-            const chatHistory = await chatbotRepository.findMessagesByConversationId(Number(id));
+            const chatHistory = await chatbotService.getConversationMessages(Number(id));
             return NextResponse.json(chatHistory);
         }
 
-        const conversations = await chatbotRepository.findAllConversationSummary();
+        const conversations = await chatbotService.getAllConversationSummary();
         return NextResponse.json(conversations);
     } catch (error) {
         console.error("Error fetching conversations:", error);
@@ -42,7 +40,7 @@ export async function DELETE(req: NextRequest) {
             return errorResponse("Missing conversation ID", 400);
         }
 
-        const deleted = await chatbotRepository.deleteConversation(Number(id));
+        const deleted = await chatbotService.deleteConversation(Number(id));
         if (deleted) {
             return NextResponse.json({ success: true });
         } else {
@@ -60,7 +58,7 @@ export async function POST(req: NextRequest) {
 
         let conversation;
         if (conversationId && conversationId > 0) {
-            const currentConversation = await chatbotRepository.findMessagesByConversationId(Number(conversationId));
+            const currentConversation = await chatbotService.getConversationMessages(Number(conversationId));
             if (currentConversation) {
                 conversation = currentConversation;
             }
@@ -68,15 +66,11 @@ export async function POST(req: NextRequest) {
 
         // If no conversation, create one
         if (!conversation) {
-            let formattedTitle = prompt.length > 30 ? prompt.slice(0, 30) + '...' : prompt;
-            formattedTitle = formattedTitle.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-            formattedTitle = formattedTitle.charAt(0).toUpperCase() + formattedTitle.slice(1);
-
-            conversation = await chatbotRepository.createConversation(formattedTitle);
+            conversation = await chatbotService.createConversation(String(prompt));
         }
 
         // Save user message
-        await chatbotRepository.createMessage({
+        await chatbotService.createMessage({
             conversationId: conversation.id,
             role: 'user',
             content: prompt
@@ -158,7 +152,7 @@ export async function POST(req: NextRequest) {
                                 if (parsedFnName.success) {
                                     sendEvent({ done: false, type: 'function_call', content: functionStepMap[parsedFnName.data] || `Executando ${fc}...` });
 
-                                    const result = await handleFunctionCall(parsedFnName.data, fc.args);
+                                    const result = await chatbotService.handleFunctionCall(parsedFnName.data, fc.args);
 
                                     // Push result to history
                                     currentContents.push({
@@ -183,14 +177,11 @@ export async function POST(req: NextRequest) {
                     }
 
                     // Save assistant message
-                    await chatbotRepository.createMessage({
+                    await chatbotService.createMessage({
                         conversationId: conversation.id,
                         role: 'model',
                         content: fullText,
                     });
-
-                    // Update updatedAt
-                    await chatbotRepository.updateConversationTimestamp(conversation.id);
 
                     sendEvent({ done: true, type: 'text', content: fullText, conversationId: conversation.id });
                     controller.close();
