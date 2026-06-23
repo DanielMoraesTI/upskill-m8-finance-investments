@@ -1,7 +1,7 @@
-import { AssetListResponseSchema, TAssetListResponse } from "@/schemas/assetSchema";
+import { AssetListResponseSchema, TAssetListResponse, type TAsset } from "@/schemas/assetSchema";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
-
+// Esta função assíncrona busca a lista de ativos do sistema, fazendo uma requisição GET para o endpoint "/portal/assets". Ela trata erros de rede e valida a resposta usando o esquema AssetListResponseSchema, retornando a lista de ativos se a resposta for válida.
 export async function getAssetSystemData(): Promise<TAssetListResponse> {
     try {
         const response = await fetch(`${API_URL}/portal/assets`, {
@@ -26,3 +26,26 @@ export async function getAssetSystemData(): Promise<TAssetListResponse> {
         throw new Error("An error occurred while fetching asset system data");
     }
 }
+// Esta Interface define os parâmetros necessários para atualizar o preço atual de um ativo, incluindo o ID do ativo e o novo valor de preço a ser atualizado.
+export interface IPatchCurrentPriceParams {
+    assetId: number;
+    newPrice: number;
+}
+// Esta função assíncrona atualiza o valor do preço atual de um ativo específico, identificado pelo ID, enviando uma requisição PATCH para o endpoint "/portal/assets/{id}" com o novo valor de preço. Ela trata erros de rede e valida a resposta, lançando erros apropriados em caso de falha.
+export async function patchCurrentPrice(args: IPatchCurrentPriceParams) {
+    try {
+        const response = await fetch(`${API_URL}/portal/assets/${args.assetId}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ current_price: args.newPrice }),
+        });
+        if (!response.ok) {
+            throw new Error("Failed to update current price");
+        }
+    } catch (error) {
+        console.error(error);
+        throw new Error("An error occurred while updating current price");
+    }
+};

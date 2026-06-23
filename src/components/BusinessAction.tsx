@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { TrendingUp, TrendingDown, Search } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Search, TrendingDown, TrendingUp } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -11,843 +12,267 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-const ACOES_DISPONIVEIS = [
-  "ABEV3",
-  "ALOS3",
-  "ALPA3",
-  "ALPK3",
-  "AMBP3",
-  "AMER3",
-  "ANIM3",
-  "ARML3",
-  "ASAI3",
-  "AUAU3",
-  "AXIA7",
-  "AZZA3",
-  "B3SA3",
-  "BBDC3",
-  "BBDC4",
-  "BEEF3",
-  "BEES4",
-  "BLAU3",
-  "BMOB3",
-  "BOBR4",
-  "BRAP4",
-  "CEAB3",
-  "CEPE5",
-  "CESP3",
-  "CGRA4",
-  "CLSC3",
-  "CMIN3",
-  "CPLE3",
-  "CRPG5",
-  "CSMG3",
-  "CSNA3",
-  "CXSE3",
-  "DASA3",
-  "EGIE3",
-  "ELEK4",
-  "EMBJ3",
-  "ENEV3",
-  "ENGI3",
-  "ENGI4",
-  "ENMT3",
-  "EQPA3",
-  "EVEN3",
-  "EZTC3",
-  "FBMC3",
-  "FESA4",
-  "FIQE3",
-  "GMAT3",
-  "GOAU3",
-  "HBOR3",
-  "HYPE3",
-  "INEP4",
-  "IRBR3",
-  "ITUB3",
-  "JHSF3",
-  "KLBN11",
-  "KLBN4",
-  "LJQQ3",
-  "LREN3",
-  "MGLU3",
-  "MLAS3",
-  "MTSA4",
-  "OFSA3",
-  "OIBR3",
-  "OIBR4",
-  "OSXB3",
-  "PCAR3",
-  "PETR3",
-  "PINE14",
-  "PLPL3",
-  "POMO4",
-  "PRIO3",
-  "PRNR3",
-  "RADL3",
-  "RANI3",
-  "RECV3",
-  "RENT3",
-  "RIAA3",
-  "ROMI3",
-  "SBFG3",
-  "SHUL4",
-  "SIMH3",
-  "SMFT3",
-  "SMTO3",
-  "SUZB3",
-  "SYNE3",
-  "TAEE11",
-  "TASA4",
-  "TECN3",
-  "TELB3",
-  "TIMS3",
-  "TOTS3",
-  "TPIS3",
-  "TUPY3",
-  "USIM3",
-  "USIM5",
-  "VALE3",
-  "VAMO3",
-  "VIVA3",
-  "WDCN3",
-  "WLMM4",
-  "YDUQ3",
-];
-
-const FIIS_DISPONIVEIS = [
-  "ABCP11",
-  "ADSH11",
-  "AFHF11",
-  "AFHI11",
-  "AIEC11",
-  "AJFI11",
-  "ALMI11",
-  "ALZC11",
-  "ALZM11",
-  "ALZR11",
-  "ANCR11B",
-  "APTO11",
-  "APXM11",
-  "APXR11",
-  "APXU11",
-  "AQLL11",
-  "ARFI11B",
-  "AROA11",
-  "ARRI11",
-  "ARTE11",
-  "ARXD11",
-  "ASRF11",
-  "ATCR11",
-  "ATSA11",
-  "ATWN11",
-  "AURB11",
-  "AZPE11",
-  "AZPL11",
-  "BARI11",
-  "BBFI11",
-  "BBFO11",
-  "BBIG11",
-  "BBIM11",
-  "BBRC11",
-  "BCFF11",
-  "BCIA11",
-  "BCRI11",
-  "BETW11",
-  "BGRB11",
-  "BICE11",
-  "BICR11",
-  "BIME11",
-  "BINR11",
-  "BIPD11",
-  "BIPE11",
-  "BLCA11",
-  "BLCP11",
-  "BLMC11",
-  "BLMG11",
-  "BLMO11",
-  "BLMR11",
-  "BLOG11",
-  "BLUR11",
-  "BMII11",
-  "BMLC11",
-  "BNFS11",
-  "BPFF11",
-  "BPLC11",
-  "BPML11",
-  "BPRP11",
-  "BRCO11",
-  "BRCR11",
-  "BREV11",
-  "BRHT11B",
-  "BRIM11",
-  "BRIP11",
-  "BROF11",
-  "BROL11",
-  "BRSE11",
-  "BSLT11",
-  "BTAL11",
-  "BTCI11",
-  "BTCR11",
-  "BTHF11",
-  "BTHI11",
-  "BTHI12",
-  "BTHR11",
-  "BTLG11",
-  "BTML11",
-  "BTRA11",
-  "BTSG11",
-  "BTSI11",
-  "BTWR11",
-  "BTYU11",
-  "BVAR11",
-  "BZEL11",
-  "BZLI11",
-  "CACR11",
-  "CARE11",
-  "CBOP11",
-  "CCLB11",
-  "CCME11",
-  "CCRF11",
-  "CCVA11",
-  "CENU11",
-  "CEOC11",
-  "CFHI11",
-  "CFII11",
-  "CIXM11",
-  "CIXR11",
-  "CJCT11",
-  "CJFI11",
-  "CLIN11",
-  "CNES11",
-  "COPP11",
-  "CPFF11",
-  "CPFO11",
-  "CPHH11",
-  "CPLG11",
-  "CPOF11",
-  "CPSH11",
-  "CPTS11",
-  "CPUR11",
-  "CRFF11",
-  "CSMC11",
-  "CTEM11",
-  "CTNP11",
-  "CTXT11",
-  "CVPR11",
-  "CXAG11",
-  "CXCE11",
-  "CXCI11",
-  "CXCO11",
-  "CXRI11",
-  "CXTL11",
-  "CYCR11",
-  "CYLD11",
-  "DAMA11",
-  "DAMT11B",
-  "DAYM11",
-  "DEVA11",
-  "DLMT11",
-  "DMAC11",
-  "DOMC11",
-  "DOVL11B",
-  "DPRO11",
-  "DRIT11",
-  "DVFF11",
-  "DVLP11",
-  "DVLT11",
-  "EAGL11",
-  "EDFO11",
-  "EDGA11",
-  "EDGE11",
-  "EGDB11",
-  "EGYR11",
-  "EIRA11",
-  "ELDO11",
-  "EMET11",
-  "EQIR11",
-  "ERCR11",
-  "ERPA11",
-  "ESTQ11",
-  "EURO11",
-  "EXES11",
-  "FAED11",
-  "FAGL11",
-  "FAMB11",
-  "FAOE11",
-  "FARU11",
-  "FATN11",
-  "FCAS11",
-  "FCFL11",
-  "FGPM11",
-  "FIGS11",
-  "FIIB11",
-  "FIIC11",
-  "FIIP11",
-  "FINF11",
-  "FISC11",
-  "FISD11",
-  "FIVN11",
-  "FLCR11",
-  "FLFL11",
-  "FLMA11",
-  "FLNR11",
-  "FLRP11",
-  "FMOF11",
-  "FOFT11",
-  "FPAB11",
-  "FPNG11",
-  "FRHY11",
-  "FTCE11B",
-  "FVBI11",
-  "FVPQ11",
-  "FYTO11",
-  "GAME11",
-  "GARE11",
-  "GCDL11",
-  "GCFF11",
-  "GCOI11",
-  "GCRI11",
-  "GESE11B",
-  "GFDL11",
-  "GGRC11",
-  "GLCR11",
-  "GLOG11",
-  "GLPF11",
-  "GLPL11",
-  "GRLV11",
-  "GRUL11",
-  "GSFI11",
-  "GTLG11",
-  "GTWR11",
-  "GURB11",
-  "GVBI11",
-  "GZIT11",
-  "HAAA11",
-  "HABT11",
-  "HBCR11",
-  "HBTT11",
-  "HCHG11",
-  "HCPR11",
-  "HCRI11",
-  "HCST11",
-  "HCTR11",
-  "HDEL11",
-  "HDOF11",
-  "HFOF11",
-  "HGBL11",
-  "HGBS11",
-  "HGCR11",
-  "HGFF11",
-  "HGIC11",
-  "HGLG11",
-  "HGPO11",
-  "HGRE11",
-  "HGRS11",
-  "HGRU11",
-  "HILG11",
-  "HIRE11",
-  "HLMB11",
-  "HLOG11",
-  "HMOC11",
-  "HOFC11",
-  "HOMS11",
-  "HOSI11",
-  "HPDP11",
-  "HPDR11",
-  "HRDF11",
-  "HREC11",
-  "HRES11",
-  "HSAF11",
-  "HSLG11",
-  "HSML11",
-  "HSRE11",
-  "HTMX11",
-  "HUCG11",
-  "HUSC11",
-  "HUSI11",
-  "HYPI11",
-  "IBBP11",
-  "IBCR11",
-  "IBFF11",
-  "ICNE11",
-  "ICRI11",
-  "IDFI11",
-  "IDGR11",
-  "IDUA11",
-  "IMOV11",
-  "INDE11",
-  "INLG11",
-  "INRD11",
-  "IRDM11",
-  "IRIM11",
-  "ISCJ11",
-  "ITIP11",
-  "ITIT11",
-  "ITRI11",
-  "IVCI11",
-  "JASC11",
-  "JBFO11",
-  "JCCJ11",
-  "JCDA11",
-  "JCDB11",
-  "JCIN11",
-  "JFLL11",
-  "JPPA11",
-  "JPPC11",
-  "JRDM11",
-  "JSAF11",
-  "JSCR11",
-  "JSRE11",
-  "JTPR11",
-  "KCRE11",
-  "KEVE11",
-  "KFEN11",
-  "KFOF11",
-  "KINP11",
-  "KISU11",
-  "KIVO11",
-  "KLOG11",
-  "KNCR11",
-  "KNHF11",
-  "KNHY11",
-  "KNIP11",
-  "KNPR11",
-  "KNRE11",
-  "KNRI11",
-  "KNSC11",
-  "KNUQ11",
-  "KOPI11",
-  "KORE11",
-  "KRES11",
-  "LASC11",
-  "LATR11B",
-  "LAVF11",
-  "LFTT11",
-  "LIFE11",
-  "LKDV11",
-  "LLAO11",
-  "LMAI11",
-  "LOFT11B",
-  "LPLP11",
-  "LRDI11",
-  "LRED11",
-  "LSOI11",
-  "LSPA11",
-  "LTMT11",
-  "LVBI11",
-  "MADS11",
-  "MANA11",
-  "MATV11",
-  "MAXR11",
-  "MCCI11",
-  "MCEM11",
-  "MCHF11",
-  "MCLO11",
-  "MCRE11",
-  "MFAI11",
-  "MFCR11",
-  "MFII11",
-  "MGCR11",
-  "MGFF11",
-  "MGHT11",
-  "MGIM11",
-  "MGLC11",
-  "MGRI11",
-  "MINT11",
-  "MMPD11",
-  "MMVE11",
-  "MOFF11",
-  "MORC11",
-  "MORE11",
-  "MOSO11",
-  "MTOF11",
-  "MTRS11",
-  "MVFI11",
-  "MXRF11",
-  "N4V1",
-  "N4V111",
-  "NAUI11",
-  "NAVT11",
-  "NCRI11",
-  "NEWL11",
-  "NEWU11",
-  "NIVT11",
-  "NPAR11",
-  "NSLU11",
-  "NVHO11",
-  "NVIF11",
-  "OBAL11",
-  "OCRE11",
-  "OGHY11",
-  "ONDA11",
-  "ONEF11",
-  "OPTM11",
-  "ORPD11",
-  "OUFF11",
-  "OUJP11",
-  "OURE11",
-  "PABY11",
-  "PATA11",
-  "PATB11",
-  "PATC11",
-  "PATL11",
-  "PBLV11",
-  "PCAS11",
-  "PCIP11",
-  "PDBM11",
-  "PEMA11",
-  "PLAG11",
-  "PLCR11",
-  "PLRI11",
-  "PMFO11",
-  "PMIS11",
-  "PMLL11",
-  "PMRL11",
-  "PNCR11",
-  "PNDL11",
-  "PNLN11",
-  "PNPR11",
-  "PNRC11",
-  "PORD11",
-  "PQAG11",
-  "PQDP11",
-  "PRSN11B",
-  "PRSV11",
-  "PRTS11",
-  "PRZS11",
-  "PSEC11",
-  "PULV11",
-  "PVBI11",
-  "QAMI11",
-  "QIRI11",
-  "QNTS11",
-  "QTZD11",
-  "RBBV11",
-  "RBCB11",
-  "RBDS11",
-  "RBED11",
-  "RBFM11",
-  "RBFY11",
-  "RBGS11",
-  "RBHG11",
-  "RBHY11",
-  "RBIR11",
-  "RBLG11",
-  "RBOP11",
-  "RBRD11",
-  "RBRF11",
-  "RBRI11",
-  "RBRK11",
-  "RBRL11",
-  "RBRM11",
-  "RBRP11",
-  "RBRR11",
-  "RBRS11",
-  "RBRU11",
-  "RBRX11",
-  "RBRY11",
-  "RBTS11",
-  "RBVA11",
-  "RBVO11",
-  "RCFA11",
-  "RCFF11",
-  "RCKF11",
-  "RCRB11",
-  "RCRI11",
-  "RCRI11B",
-  "RDCI11",
-  "RDIV11",
-  "RDLI11",
-  "RDLS11",
-  "RECD11",
-  "RECH11",
-  "RECM11",
-  "RECR11",
-  "RECT11",
-  "RECX11",
-  "REIT11",
-  "RELG11",
-  "RENV11",
-  "RFOF11",
-  "RINV11",
-  "RJDA11",
-  "RMBS11",
-  "RNDP11",
-  "RNGO11",
-  "ROOF11",
-  "RPRI11",
-  "RSPD11",
-  "RTEL11",
-  "RZAK11",
-  "RZAT11",
-  "RZDM11",
-  "RZLC11",
-  "RZTR11",
-  "RZZI11",
-  "RZZR11",
-  "RZZV11",
-  "SACL11",
-  "SADI11",
-  "SAIC11B",
-  "SALI11",
-  "SAPI11",
-  "SARE11",
-  "SBCL11",
-  "SCPF11",
-  "SEED11",
-  "SEQR11",
-  "SFND11",
-  "SFRO11",
-  "SHDP11B",
-  "SHOP11",
-  "SHPH11",
-  "SHPP11",
-  "SHSO11",
-  "SIGR11",
-  "SJAU11",
-  "SLDZ11",
-  "SMRE11",
-  "SNCI11",
-  "SNEL11",
-  "SNFF11",
-  "SNLG11",
-  "SNME11",
-  "SOFF11",
-  "SOLR11",
-  "SPAF11",
-  "SPDE11",
-  "SPGM11",
-  "SPMO11",
-  "SPTW11",
-  "SPVJ11",
-  "SPXC11",
-  "SPXG11",
-  "SPXL11",
-  "SPXS11",
-  "SRVD11",
-  "STRX11",
-  "SURE11",
-  "TBOF11",
-  "TCIN11",
-  "TCPF11",
-  "TELD11",
-  "TELF11",
-  "TELM11",
-  "TEPP11",
-  "TFOF11",
-  "TGAR11",
-  "THRA11",
-  "TJKB11",
-  "TMPS11",
-  "TOPP11",
-  "TORD11",
-  "TORM13",
-  "TOUR11",
-  "TRBL11",
-  "TRNT11",
-  "TRPL11",
-  "TRUE11",
-  "TRXB11",
-  "TRXF11",
-  "TRXY11",
-  "TSER11",
-  "TSNC11",
-  "TSNM11",
-  "TVRI11",
-  "URHF11",
-  "URPR11",
-  "VCHG11",
-  "VCJR11",
-  "VCRI11",
-  "VCRR11",
-  "VCTH11",
-  "VDSV11",
-  "VERE11",
-  "VGHF11",
-  "VGII11",
-  "VGIP11",
-  "VGIR11",
-  "VGRI11",
-  "VIDS11",
-  "VIFI11",
-  "VILG11",
-  "VINO11",
-  "VISC11",
-  "VIUR11",
-  "VJFD11",
-  "VLIQ11",
-  "VLJS11",
-  "VLOL11",
-  "VOTS11",
-  "VPPR11",
-  "VPSI11",
-  "VRTA11",
-  "VRTM11",
-  "VSEC11",
-  "VSHO11",
-  "VSLH11",
-  "VTBL11",
-  "VTLT11",
-  "VTPA11",
-  "VTPL11",
-  "VTRT11",
-  "VTVI11",
-  "VTXI11",
-  "VVCO11",
-  "VVCR11",
-  "VVMR11",
-  "VVPR11",
-  "VVRI11",
-  "VXXV11",
-  "WHGR11",
-  "WPLZ11",
-  "WSEC11",
-  "WTSP11",
-  "XBXO11",
-  "XLPR11",
-  "XPCI11",
-  "XPCM11",
-  "XPIN11",
-  "XPLG11",
-  "XPML11",
-  "XPRE11",
-  "XPSF11",
-  "YEES11",
-  "YUFI11",
-  "ZAGH11",
-  "ZAVC11",
-  "ZAVI11",
-  "ZIFI11",
-];
-
-const CARTEIRA_ACOES: string[] = ["PETR3", "VALE3", "ITUB3", "BBDC4", "ABEV3"];
-const CARTEIRA_FIIS: string[] = ["MXRF11", "HGLG11", "KNRI11", "XPLG11"];
-const CARTEIRA_RENDA_FIXA: string[] = [
-  "Tesouro Selic 2029",
-  "CDB Banco Inter 115% CDI",
-  "LCI Bradesco 2026",
-];
+import { useAsset } from "@/context/AssetProvider";
+import { useWallet } from "@/context/WalletProvider";
+import { ACOES_DISPONIVEIS, FIIS_DISPONIVEIS } from "@/utils/assetOptions";
 
 type OperationType = "compra" | "venda";
 export type InvestmentType = "acoes" | "fiis" | "renda-fixa" | "";
-
-function formatBRL(value: number): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
+// Este componente é responsável por renderizar a interface de registro de operações de compra e venda de investimentos. Ele permite que os usuários selecionem o tipo de investimento (ações, fundos imobiliários ou renda fixa), a operação (compra ou venda), o ativo específico, a quantidade, o valor unitário e o valor total para operações de renda fixa. O componente utiliza o hook useState para gerenciar os estados relacionados à operação, investimento, código do ativo selecionado, texto de busca, quantidade, valor e feedback para o usuário. Ele também utiliza o hook useMemo para calcular as opções disponíveis de ativos com base no tipo de investimento e operação selecionados, bem como para calcular o valor total da operação. O BusinessAction é essencial para permitir que os usuários registrem suas operações de investimento de forma fácil e eficiente, garantindo que as informações sejam validadas corretamente antes do envio e fornecendo feedback claro sobre o sucesso ou falha da operação. Ele se integra com o contexto de ativos e carteiras para garantir que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O BusinessAction é um componente central para a funcionalidade de registro de operações de investimento no aplicativo, proporcionando uma experiência de usuário intuitiva e eficiente para gerenciar suas operações financeiras.
 interface BusinessActionProps {
-  /** Pré-seleciona o tipo de investimento e bloqueia a troca */
   defaultInvestimento?: InvestmentType;
-  /** Pré-seleciona a operação (compra/venda) */
   defaultOperacao?: OperationType;
-  /** Se true, o seletor de tipo de investimento fica oculto/bloqueado */
   lockInvestimento?: boolean;
-  /** Se true, oculta a aba da operação oposta (ex.: abrindo via botão Comprar esconde a aba Vender) */
   lockOperacao?: boolean;
+  onSuccess?: () => void;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+// Esta função é uma função auxiliar que converte o tipo de investimento selecionado pelo usuário (ações, fundos imobiliários ou renda fixa) em um ID numérico correspondente, que é utilizado para filtrar os ativos disponíveis e registrar as operações de investimento corretamente. Ela recebe como parâmetro o tipo de investimento e retorna o ID correspondente (1 para ações, 2 para fundos imobiliários, 3 para renda fixa) ou null se o tipo de investimento não for reconhecido. A função toAssetTypeId é essencial para garantir que as operações de investimento sejam registradas com o tipo de ativo correto, permitindo que as consultas e filtros relacionados aos ativos funcionem corretamente em todo o aplicativo.
+function toAssetTypeId(investimento: InvestmentType): 1 | 2 | 3 | null {
+  if (investimento === "acoes") return 1;
+  if (investimento === "fiis") return 2;
+  if (investimento === "renda-fixa") return 3;
+  return null;
+}
+// Este componente é o componente principal para registrar operações de compra e venda de investimentos (BusinessAction). Ele renderiza uma interface de usuário que permite aos usuários selecionar o tipo de investimento, a operação, o ativo específico, a quantidade, o valor unitário e o valor total para operações de renda fixa. O componente gerencia os estados relacionados à operação, investimento, código do ativo selecionado, texto de busca, quantidade, valor e feedback para o usuário. Ele utiliza funções auxiliares para converter o tipo de investimento em um ID numérico correspondente e para calcular as opções disponíveis de ativos com base no tipo de investimento e operação selecionados. O BusinessAction é essencial para permitir que os usuários registrem suas operações de investimento de forma fácil e eficiente, garantindo que as informações sejam validadas corretamente antes do envio e fornecendo feedback claro sobre o sucesso ou falha da operação. Ele se integra com o contexto de ativos e carteiras para garantir que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O BusinessAction é um componente central para a funcionalidade de registro de operações de investimento no aplicativo, proporcionando uma experiência de usuário intuitiva e eficiente para gerenciar suas operações financeiras.
 export default function BusinessAction({
   defaultInvestimento = "",
   defaultOperacao = "compra",
   lockInvestimento = false,
   lockOperacao = false,
+  onSuccess,
 }: BusinessActionProps) {
+  const queryClient = useQueryClient();
+  const { assetList } = useAsset();
+  const { walletList } = useWallet();
+
   const [operacao, setOperacao] = useState<OperationType>(defaultOperacao);
   const [investimento, setInvestimento] =
     useState<InvestmentType>(defaultInvestimento);
+  const [selectedCode, setSelectedCode] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const [quantidade, setQuantidade] = useState("");
+  const [valor, setValor] = useState("");
+  const [totalRendaFixa, setTotalRendaFixa] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
-  const [ticker, setTicker] = useState("");
-  const [tickerSearch, setTickerSearch] = useState("");
-  const [quantidade, setQuantidade] = useState<string>("");
-  const [valor, setValor] = useState<string>("");
+  const isRendaFixa = investimento === "renda-fixa";
+  // Este hook useMemo é utilizado para criar um conjunto de IDs de ativos presentes na carteira do usuário, com base na lista de carteiras (walletList) obtida do contexto de carteiras. Ele mapeia a lista de carteiras para extrair os IDs dos ativos e os armazena em um Set para permitir uma busca eficiente. O walletAssetIds é essencial para filtrar as opções de ativos disponíveis para compra ou venda, garantindo que apenas os ativos que o usuário possui em sua carteira sejam exibidos como opções válidas para venda, e que as opções de compra sejam limitadas aos ativos disponíveis no sistema. Ele é utilizado posteriormente para calcular as opções disponíveis de ativos com base no tipo de investimento e operação selecionados, garantindo que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema.
+  const walletAssetIds = useMemo(
+    () => new Set(walletList.map((walletItem) => walletItem.asset_id)),
+    [walletList],
+  );
+  // Este hook useMemo é utilizado para calcular as opções disponíveis de ativos com base no tipo de investimento e operação selecionados pelo usuário. Ele verifica o tipo de investimento e a operação para determinar quais ativos devem ser exibidos como opções válidas para compra ou venda. Para operações de compra, ele filtra os ativos disponíveis no sistema com base no tipo de investimento (ações ou fundos imobiliários) e os mapeia para um formato adequado para exibição. Para operações de venda, ele filtra os ativos que o usuário possui em sua carteira com base no tipo de investimento e os mapeia para exibição, utilizando o ticker ou o nome da empresa quando disponível. O availableAssetOptions é essencial para garantir que os usuários possam selecionar apenas os ativos relevantes para a operação que estão realizando, proporcionando uma experiência de usuário intuitiva e eficiente ao registrar suas operações de investimento. Ele também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos.
+  const availableAssetOptions = useMemo(() => {
+    if (investimento === "acoes" && operacao === "compra") {
+      return ACOES_DISPONIVEIS.map((ticker) => ({
+        value: ticker,
+        label: ticker,
+      }));
+    }
 
-  const [nomeRendaFixa, setNomeRendaFixa] = useState("");
-  const [totalRendaFixa, setTotalRendaFixa] = useState<string>("");
+    if (investimento === "fiis" && operacao === "compra") {
+      return FIIS_DISPONIVEIS.map((ticker) => ({
+        value: ticker,
+        label: ticker,
+      }));
+    }
 
-  const [empresa, setEmpresa] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const CATEGORIAS_FII = ["Fundo de Papel", "Fundo de Tijolo", "Fundo Híbrido"];
+    const assetTypeId = toAssetTypeId(investimento);
+    if (!assetTypeId) return [];
 
-  const total = useMemo(() => {
+    return assetList
+      .filter((asset) => asset.asset_type_id === assetTypeId)
+      .filter((asset) => walletAssetIds.has(asset.id))
+      .map((asset) => {
+        if (assetTypeId === 3) {
+          return {
+            value: String(asset.id),
+            label: "company" in asset ? asset.company : `Ativo ${asset.id}`,
+          };
+        }
+
+        return {
+          value: String(asset.id),
+          label: "ticker" in asset ? asset.ticker : `Ativo ${asset.id}`,
+        };
+      });
+  }, [assetList, investimento, operacao, walletAssetIds]);
+  // Este hook useMemo é utilizado para filtrar as opções de ativos disponíveis com base no texto de busca digitado pelo usuário. Ele verifica se o texto de busca está vazio ou contém apenas espaços em branco e, nesse caso, retorna todas as opções disponíveis. Caso contrário, ele converte o texto de busca para minúsculas e filtra as opções disponíveis para incluir apenas aquelas cujo rótulo (label) contém o texto de busca, também convertido para minúsculas. O filteredAssetOptions é essencial para proporcionar uma experiência de usuário eficiente ao permitir que os usuários encontrem rapidamente o ativo desejado digitando parte do nome ou ticker, melhorando a usabilidade do componente de registro de operações de investimento. Ele garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O filtro de opções de ativos com base no texto de busca é uma funcionalidade importante para facilitar a navegação e seleção de ativos em um cenário onde o usuário pode ter uma grande variedade de opções disponíveis.
+  const filteredAssetOptions = useMemo(() => {
+    if (!searchText.trim()) return availableAssetOptions;
+
+    const query = searchText.toLowerCase();
+    return availableAssetOptions.filter((option) =>
+      option.label.toLowerCase().includes(query),
+    );
+  }, [availableAssetOptions, searchText]);
+  // Este hook useMemo é utilizado para calcular o valor total da operação de compra ou venda de investimentos, com base na quantidade e no valor unitário digitados pelo usuário. Ele converte a quantidade e o valor unitário para números de ponto flutuante, substituindo vírgulas por pontos para garantir a formatação correta. Em seguida, ele verifica se ambos os valores são números válidos e, se forem, calcula o valor total multiplicando a quantidade pelo valor unitário. Caso contrário, ele retorna 0 como valor total. O totalVariavel é essencial para fornecer feedback em tempo real ao usuário sobre o valor total da operação que está registrando, permitindo que ele veja imediatamente o impacto financeiro da operação antes de confirmá-la. Ele também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O cálculo do valor total com base na quantidade e no valor unitário é uma funcionalidade importante para facilitar a compreensão do usuário sobre o impacto financeiro de suas operações de investimento, melhorando a experiência geral ao registrar suas operações financeiras.
+  const totalVariavel = useMemo(() => {
     const q = parseFloat(quantidade);
     const v = parseFloat(valor.replace(",", "."));
     return !isNaN(q) && !isNaN(v) ? q * v : 0;
   }, [quantidade, valor]);
+  // Este hook useMemo é utilizado para determinar se o botão de confirmação da operação deve estar habilitado ou desabilitado, com base na validação dos campos obrigatórios para a operação de compra ou venda de investimentos. Ele verifica se um código de ativo foi selecionado e, em seguida, valida os campos específicos para operações de renda fixa ou variáveis. Para operações de renda fixa, ele verifica se o campo de valor total não está vazio e é um número maior que zero. Para operações variáveis (ações ou fundos imobiliários), ele verifica se os campos de quantidade e valor unitário não estão vazios e se o valor total calculado é maior que zero. O canConfirm é essencial para garantir que os usuários só possam confirmar a operação quando todas as informações necessárias forem fornecidas e válidas, evitando erros no registro das operações de investimento e melhorando a experiência do usuário ao fornecer feedback claro sobre o estado da operação que estão registrando. Ele também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O estado de habilitação do botão de confirmação é uma funcionalidade importante para facilitar a compreensão do usuário sobre o que é necessário para concluir o registro de suas operações de investimento, melhorando a experiência geral ao gerenciar suas operações financeiras.
+  const canConfirm = useMemo(() => {
+    if (!selectedCode) return false;
 
-  const listaDisponivel = useMemo(() => {
-    if (investimento === "acoes")
-      return operacao === "compra" ? ACOES_DISPONIVEIS : CARTEIRA_ACOES;
-    if (investimento === "fiis")
-      return operacao === "compra" ? FIIS_DISPONIVEIS : CARTEIRA_FIIS;
-    return [];
-  }, [investimento, operacao]);
+    if (isRendaFixa) {
+      return totalRendaFixa !== "" && parseFloat(totalRendaFixa) > 0;
+    }
 
-  const listaFiltrada = useMemo(() => {
-    if (!tickerSearch) return listaDisponivel;
-    return listaDisponivel.filter((t) =>
-      t.toLowerCase().includes(tickerSearch.toLowerCase()),
-    );
-  }, [listaDisponivel, tickerSearch]);
-
+    return quantidade !== "" && valor !== "" && totalVariavel > 0;
+  }, [
+    isRendaFixa,
+    quantidade,
+    selectedCode,
+    totalRendaFixa,
+    totalVariavel,
+    valor,
+  ]);
+  // Esta função é responsável por resetar os campos do formulário de registro de operações de investimento para seus valores iniciais. Ela é chamada sempre que o tipo de operação ou o tipo de investimento é alterado, garantindo que os campos sejam limpos e prontos para receber novas informações relacionadas à nova seleção do usuário. A função resetFields é essencial para melhorar a experiência do usuário ao registrar suas operações de investimento, evitando que informações anteriores sejam mantidas nos campos quando o usuário muda o contexto da operação que está registrando. Ela também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O reset dos campos do formulário é uma funcionalidade importante para facilitar a compreensão do usuário sobre o estado atual da operação que estão registrando, melhorando a experiência geral ao gerenciar suas operações financeiras.
+  function resetFields() {
+    setSelectedCode("");
+    setSearchText("");
+    setQuantidade("");
+    setValor("");
+    setTotalRendaFixa("");
+  }
+  // Esta função é responsável por lidar com a mudança do tipo de operação (compra ou venda) selecionado pelo usuário. Ela atualiza o estado da operação com o novo valor selecionado e chama a função resetFields para limpar os campos do formulário, garantindo que as informações exibidas sejam consistentes com a nova seleção do usuário. A função handleOperacaoChange é essencial para melhorar a experiência do usuário ao registrar suas operações de investimento, permitindo que eles mudem facilmente entre os tipos de operação e garantindo que os campos do formulário sejam atualizados de acordo com a nova seleção, evitando confusão e erros no registro das operações. Ela também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O gerenciamento da mudança de tipo de operação é uma funcionalidade importante para facilitar a compreensão do usuário sobre o estado atual da operação que estão registrando, melhorando a experiência geral ao gerenciar suas operações financeiras.
   function handleOperacaoChange(value: string) {
     setOperacao(value as OperationType);
     resetFields();
   }
-
-  function handleInvestimentoChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  // Esta função é responsável por lidar com a mudança do tipo de investimento (ações, fundos imobiliários ou renda fixa) selecionado pelo usuário. Ela verifica se o campo de investimento está bloqueado (lockInvestimento) e, se estiver, impede a mudança. Caso contrário, ela atualiza o estado do investimento com o novo valor selecionado e chama a função resetFields para limpar os campos do formulário, garantindo que as informações exibidas sejam consistentes com a nova seleção do usuário. A função handleInvestimentoChange é essencial para melhorar a experiência do usuário ao registrar suas operações de investimento, permitindo que eles mudem facilmente entre os tipos de investimento e garantindo que os campos do formulário sejam atualizados de acordo com a nova seleção, evitando confusão e erros no registro das operações. Ela também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O gerenciamento da mudança de tipo de investimento é uma funcionalidade importante para facilitar a compreensão do usuário sobre o estado atual da operação que estão registrando, melhorando a experiência geral ao gerenciar suas operações financeiras.
+  function handleInvestimentoChange(
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) {
     if (lockInvestimento) return;
-    setInvestimento(e.target.value as InvestmentType);
+    setInvestimento(event.target.value as InvestmentType);
     resetFields();
   }
+  // Esta função é responsável por enviar a transação de compra ou venda de investimento para a API. Ela recebe um payload contendo as informações da transação, como o ID do ativo, o tipo de entrada (compra ou venda), a data, a quantidade, o valor unitário e o valor total. A função submitTransaction gerencia o estado de submissão para fornecer feedback ao usuário sobre o processo de envio. Ela faz uma requisição POST para a API com o payload da transação e lida com a resposta para determinar se a operação foi registrada com sucesso ou se ocorreu um erro. Em caso de sucesso, ela exibe uma mensagem de sucesso, reseta os campos do formulário e invalida as consultas relevantes para atualizar os dados exibidos no aplicativo. Em caso de erro, ela exibe uma mensagem de erro apropriada. A função submitTransaction é essencial para garantir que as operações de investimento sejam registradas corretamente no sistema, proporcionando uma experiência de usuário eficiente e confiável ao gerenciar suas operações financeiras. Ela também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O envio da transação para a API é uma funcionalidade central para o registro de operações de investimento, permitindo que os usuários gerenciem suas operações financeiras de forma eficiente e confiável.
+  async function submitTransaction(payload: Record<string, unknown>) {
+    setIsSubmitting(true);
+    setFeedback(null);
 
-  function resetFields() {
-    setTicker("");
-    setTickerSearch("");
-    setQuantidade("");
-    setValor("");
-    setNomeRendaFixa("");
-    setTotalRendaFixa("");
-    setEmpresa("");
-    setCategoria("");
+    try {
+      const response = await fetch(`${API_URL}/portal/transactions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response
+          .json()
+          .catch(() => ({ message: "Erro ao salvar operação" }));
+        throw new Error(errorBody.message || "Erro ao salvar operação");
+      }
+
+      setFeedback({
+        type: "success",
+        message: "Operacao registrada com sucesso.",
+      });
+      resetFields();
+      queryClient.invalidateQueries({ queryKey: ["transactionList"] });
+      queryClient.invalidateQueries({ queryKey: ["walletList"] });
+      queryClient.invalidateQueries({ queryKey: ["assetList"] });
+      onSuccess?.();
+    } catch (error) {
+      setFeedback({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Nao foi possivel salvar a operacao.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
+  // Esta função é responsável por lidar com a confirmação da operação de compra ou venda de investimento. Ela valida as informações fornecidas pelo usuário, constrói o payload da transação com base no tipo de investimento e operação selecionados, e chama a função submitTransaction para enviar a transação para a API. A função handleConfirmar é essencial para garantir que as operações de investimento sejam registradas corretamente no sistema, proporcionando uma experiência de usuário eficiente e confiável ao gerenciar suas operações financeiras. Ela também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O processo de confirmação da operação é uma funcionalidade central para o registro de operações de investimento, permitindo que os usuários gerenciem suas operações financeiras de forma eficiente e confiável.
+  async function handleConfirmar() {
+    const assetTypeId = toAssetTypeId(investimento);
+    if (!assetTypeId) return;
 
-  function handleConfirmar() {
-    console.log({
-      operacao,
-      investimento,
-      ticker: investimento !== "renda-fixa" ? ticker : undefined,
-      nome: investimento === "renda-fixa" ? nomeRendaFixa : undefined,
-      quantidade: investimento !== "renda-fixa" ? quantidade : undefined,
-      valor: investimento !== "renda-fixa" ? valor : undefined,
-      total: investimento !== "renda-fixa" ? total : totalRendaFixa,
-      empresa:
-        investimento === "acoes" && operacao === "compra" ? empresa : undefined,
-      categoria:
-        investimento === "fiis" && operacao === "compra"
-          ? categoria
-          : undefined,
+    const entryType = operacao === "compra" ? "buy" : "sell";
+    const date = new Date().toISOString().slice(0, 10);
+
+    if (isRendaFixa) {
+      const total = parseFloat(totalRendaFixa);
+      const assetId = Number(selectedCode);
+      if (!assetId) return;
+
+      await submitTransaction({
+        asset_id: assetId,
+        entry_type: entryType,
+        date,
+        quantity: 1,
+        unit_price: total,
+        total_value: total,
+      });
+      return;
+    }
+
+    const quantity = parseFloat(quantidade);
+    const unitPrice = parseFloat(valor.replace(",", "."));
+
+    if (operacao === "venda") {
+      const assetId = Number(selectedCode);
+      if (!assetId) return;
+
+      await submitTransaction({
+        asset_id: assetId,
+        entry_type: entryType,
+        date,
+        quantity,
+        unit_price: unitPrice,
+        total_value: totalVariavel,
+      });
+      return;
+    }
+
+    const selectedTicker = selectedCode;
+    const existingAsset = assetList.find(
+      (asset) =>
+        asset.asset_type_id === assetTypeId &&
+        "ticker" in asset &&
+        asset.ticker === selectedTicker,
+    );
+
+    if (existingAsset) {
+      await submitTransaction({
+        asset_id: existingAsset.id,
+        entry_type: entryType,
+        date,
+        quantity,
+        unit_price: unitPrice,
+        total_value: totalVariavel,
+      });
+      return;
+    }
+    // Se o ativo não existe, registra a transação usando o ticker e o tipo de ativo, e a API deve lidar com a criação do ativo se necessário. Isso é importante para permitir que os usuários registrem operações de compra para ativos que ainda não possuem em sua carteira, garantindo que o processo seja fluido e sem obstáculos, mesmo quando o ativo ainda não foi registrado no sistema. A função submitTransaction é chamada com as informações necessárias para registrar a operação, e a API deve ser projetada para lidar com esse cenário, criando o ativo se ele não existir e associando a transação corretamente. Essa abordagem melhora a experiência do usuário ao permitir que eles registrem suas operações de investimento de forma eficiente, mesmo quando estão lidando com novos ativos, e garante que as informações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos.
+    await submitTransaction({
+      asset_type_id: assetTypeId,
+      ticker: selectedTicker,
+      company: assetTypeId === 1 ? selectedTicker : undefined,
+      category: assetTypeId === 2 ? "Fundo Híbrido" : undefined,
+      current_price: unitPrice,
+      entry_type: entryType,
+      date,
+      quantity,
+      unit_price: unitPrice,
+      total_value: totalVariavel,
     });
   }
-
-  const isRendaFixa = investimento === "renda-fixa";
-  const isAcoesOuFiis = investimento === "acoes" || investimento === "fiis";
-  const labelTicker = investimento === "fiis" ? "Fundo Imobiliário" : "Ação";
-
-  const canConfirm =
-    investimento !== "" &&
-    (isRendaFixa
-      ? nomeRendaFixa.trim() !== "" && totalRendaFixa !== ""
-      : ticker !== "" &&
-        quantidade !== "" &&
-        valor !== "" &&
-        (investimento === "acoes" && operacao === "compra"
-          ? empresa.trim() !== ""
-          : true) &&
-        (investimento === "fiis" && operacao === "compra"
-          ? categoria !== ""
-          : true));
 
   return (
     <div className="flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6 items-center">
@@ -856,7 +281,9 @@ export default function BusinessAction({
           {operacao === "compra" ? "Comprar" : "Vender"}
         </h1>
         <p className="text-sm text-muted-foreground/60">
-          {operacao === "compra" ? "Registre suas operações de compra" : "Registre suas operações de venda"}
+          {operacao === "compra"
+            ? "Registre suas operacoes de compra"
+            : "Registre suas operacoes de venda"}
         </p>
       </div>
       <div className="w-full h-px bg-linear-to-r from-transparent via-border/60 to-transparent" />
@@ -864,11 +291,10 @@ export default function BusinessAction({
       <Card className="w-full max-w-xl border-border/50 bg-card/80 backdrop-blur-sm shadow-xl">
         <CardHeader className="items-center text-center px-6 pt-6 pb-4">
           <CardTitle className="text-lg font-bold text-foreground">
-            Operação de Investimento
+            Operacao de Investimento
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-5 px-6 pb-6">
-          {/* Tabs Compra / Venda */}
           <Tabs
             value={operacao}
             onValueChange={handleOperacaoChange}
@@ -882,8 +308,7 @@ export default function BusinessAction({
                   value="compra"
                   className="data-[state=active]:bg-emerald-950/60 data-[state=active]:text-emerald-400 data-[state=active]:border data-[state=active]:border-emerald-800/50"
                 >
-                  <TrendingUp className="mr-1.5 h-4 w-4" />
-                  Compra
+                  <TrendingUp className="mr-1.5 h-4 w-4" /> Compra
                 </TabsTrigger>
               )}
               {(!lockOperacao || operacao === "venda") && (
@@ -891,14 +316,12 @@ export default function BusinessAction({
                   value="venda"
                   className="data-[state=active]:bg-rose-950/60 data-[state=active]:text-rose-400 data-[state=active]:border data-[state=active]:border-rose-800/50"
                 >
-                  <TrendingDown className="mr-1.5 h-4 w-4" />
-                  Venda
+                  <TrendingDown className="mr-1.5 h-4 w-4" /> Venda
                 </TabsTrigger>
               )}
             </TabsList>
           </Tabs>
 
-          {/* Tipo de investimento — oculto se lockInvestimento=true */}
           {!lockInvestimento && (
             <Field>
               <FieldLabel
@@ -916,9 +339,9 @@ export default function BusinessAction({
                 <NativeSelectOption value="">
                   Selecione o investimento
                 </NativeSelectOption>
-                <NativeSelectOption value="acoes">Ações</NativeSelectOption>
+                <NativeSelectOption value="acoes">Acoes</NativeSelectOption>
                 <NativeSelectOption value="fiis">
-                  Fundos Imobiliários
+                  Fundos Imobiliarios
                 </NativeSelectOption>
                 <NativeSelectOption value="renda-fixa">
                   Renda Fixa
@@ -927,164 +350,58 @@ export default function BusinessAction({
             </Field>
           )}
 
-          {/* Badge indicando o tipo bloqueado */}
           {lockInvestimento && investimento !== "" && (
             <div className="flex items-center justify-center">
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                {investimento === "acoes" && "Ações"}
-                {investimento === "fiis" && "Fundos Imobiliários"}
+                {investimento === "acoes" && "Acoes"}
+                {investimento === "fiis" && "Fundos Imobiliarios"}
                 {investimento === "renda-fixa" && "Renda Fixa"}
               </span>
             </div>
           )}
 
-          {/* Ações ou FIIs */}
-          {isAcoesOuFiis && (
+          {investimento !== "" && (
             <Field>
               <FieldLabel
-                htmlFor="ticker"
+                htmlFor="asset-code"
                 className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
               >
-                {operacao === "compra"
-                  ? `Selecionar ${labelTicker}`
-                  : `${labelTicker} da Carteira`}
+                {isRendaFixa ? "Ativo de Renda Fixa" : "Ativo"}
               </FieldLabel>
 
-              {operacao === "compra" && (
-                <div className="relative mb-1">
+              {!isRendaFixa && operacao === "compra" && (
+                <div className="relative mb-2">
                   <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
                   <Input
-                    placeholder={`Buscar ${labelTicker.toLowerCase()}...`}
+                    placeholder="Buscar ativo na lista..."
                     className="pl-8 bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-                    value={tickerSearch}
-                    onChange={(e) => setTickerSearch(e.target.value)}
+                    value={searchText}
+                    onChange={(event) => setSearchText(event.target.value)}
                   />
                 </div>
               )}
 
               <NativeSelect
-                id="ticker"
+                id="asset-code"
                 className="w-full bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-                value={ticker}
-                onChange={(e) => setTicker(e.target.value)}
+                value={selectedCode}
+                onChange={(event) => setSelectedCode(event.target.value)}
               >
                 <NativeSelectOption value="">
-                  {listaFiltrada.length === 0
-                    ? "Nenhum ativo na carteira"
-                    : `Escolha ${investimento === "fiis" ? "o fundo" : "a ação"}`}
+                  {filteredAssetOptions.length === 0
+                    ? "Nenhum ativo encontrado"
+                    : "Selecione o ativo"}
                 </NativeSelectOption>
-                {listaFiltrada.map((t) => (
-                  <NativeSelectOption key={t} value={t}>
-                    {t}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-
-              {operacao === "compra" && tickerSearch && (
-                <p className="mt-1 text-xs text-muted-foreground/50">
-                  {listaFiltrada.length} resultado
-                  {listaFiltrada.length !== 1 ? "s" : ""}
-                </p>
-              )}
-            </Field>
-          )}
-
-          {/* Empresa — Ações compra */}
-          {investimento === "acoes" && operacao === "compra" && (
-            <Field>
-              <FieldLabel
-                htmlFor="empresa"
-                className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
-              >
-                Empresa
-              </FieldLabel>
-              <Input
-                id="empresa"
-                placeholder="Ex: Petróleo Brasileiro S.A."
-                value={empresa}
-                onChange={(e) => setEmpresa(e.target.value)}
-                className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-              />
-            </Field>
-          )}
-
-          {/* Categoria — FIIs compra */}
-          {investimento === "fiis" && operacao === "compra" && (
-            <Field>
-              <FieldLabel
-                htmlFor="categoria"
-                className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
-              >
-                Categoria
-              </FieldLabel>
-              <NativeSelect
-                id="categoria"
-                className="w-full bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-                value={categoria}
-                onChange={(e) => setCategoria(e.target.value)}
-              >
-                <NativeSelectOption value="">
-                  Escolha a categoria
-                </NativeSelectOption>
-                {CATEGORIAS_FII.map((c) => (
-                  <NativeSelectOption key={c} value={c}>
-                    {c}
+                {filteredAssetOptions.map((option) => (
+                  <NativeSelectOption key={option.value} value={option.value}>
+                    {option.label}
                   </NativeSelectOption>
                 ))}
               </NativeSelect>
             </Field>
           )}
 
-          {/* Renda Fixa — Compra: nome livre */}
-          {isRendaFixa && operacao === "compra" && (
-            <Field>
-              <FieldLabel
-                htmlFor="nome-rf"
-                className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
-              >
-                Nome do Investimento
-              </FieldLabel>
-              <Input
-                id="nome-rf"
-                placeholder="Ex: CDB Banco Inter 115% CDI"
-                value={nomeRendaFixa}
-                onChange={(e) => setNomeRendaFixa(e.target.value)}
-                className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-              />
-            </Field>
-          )}
-
-          {/* Renda Fixa — Venda: lista da carteira */}
-          {isRendaFixa && operacao === "venda" && (
-            <Field>
-              <FieldLabel
-                htmlFor="rf-carteira"
-                className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
-              >
-                Renda Fixa da Carteira
-              </FieldLabel>
-              <NativeSelect
-                id="rf-carteira"
-                className="w-full bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-                value={nomeRendaFixa}
-                onChange={(e) => setNomeRendaFixa(e.target.value)}
-              >
-                <NativeSelectOption value="">
-                  {CARTEIRA_RENDA_FIXA.length === 0
-                    ? "Nenhum ativo na carteira"
-                    : "Escolha o investimento"}
-                </NativeSelectOption>
-                {CARTEIRA_RENDA_FIXA.map((item) => (
-                  <NativeSelectOption key={item} value={item}>
-                    {item}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            </Field>
-          )}
-
-          {/* Campos de valor: Ações / FIIs */}
-          {isAcoesOuFiis && (
+          {investimento !== "" && !isRendaFixa && (
             <FieldGroup className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
               <Field>
                 <FieldLabel
@@ -1099,7 +416,7 @@ export default function BusinessAction({
                   min={1}
                   placeholder="0"
                   value={quantidade}
-                  onChange={(e) => setQuantidade(e.target.value)}
+                  onChange={(event) => setQuantidade(event.target.value)}
                   className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
                 />
               </Field>
@@ -1108,7 +425,7 @@ export default function BusinessAction({
                   htmlFor="valor"
                   className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
                 >
-                  Valor Unitário (R$)
+                  Valor Unitario (R$)
                 </FieldLabel>
                 <Input
                   id="valor"
@@ -1117,30 +434,14 @@ export default function BusinessAction({
                   step={0.01}
                   placeholder="0,00"
                   value={valor}
-                  onChange={(e) => setValor(e.target.value)}
+                  onChange={(event) => setValor(event.target.value)}
                   className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-                />
-              </Field>
-              <Field className="md:col-span-2">
-                <FieldLabel
-                  htmlFor="total"
-                  className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
-                >
-                  Total
-                </FieldLabel>
-                <Input
-                  id="total"
-                  readOnly
-                  value={total > 0 ? formatBRL(total) : ""}
-                  placeholder="R$ 0,00"
-                  className="bg-muted/20 border-border/30 text-chart-1 font-bold cursor-default"
                 />
               </Field>
             </FieldGroup>
           )}
 
-          {/* Campos de valor: Renda Fixa */}
-          {isRendaFixa && (
+          {investimento !== "" && isRendaFixa && (
             <Field>
               <FieldLabel
                 htmlFor="total-rf"
@@ -1155,24 +456,37 @@ export default function BusinessAction({
                 step={0.01}
                 placeholder="0,00"
                 value={totalRendaFixa}
-                onChange={(e) => setTotalRendaFixa(e.target.value)}
+                onChange={(event) => setTotalRendaFixa(event.target.value)}
                 className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
               />
             </Field>
           )}
 
-          {/* Botão */}
           <Button
             className={`w-full font-semibold shadow-lg transition-all duration-200 ${
               operacao === "compra"
                 ? "bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-40"
                 : "bg-rose-600 hover:bg-rose-500 text-white disabled:opacity-40"
             }`}
-            disabled={!canConfirm}
+            disabled={!canConfirm || isSubmitting}
             onClick={handleConfirmar}
           >
-            Confirmar {operacao === "compra" ? "Compra" : "Venda"}
+            {isSubmitting
+              ? "Salvando..."
+              : `Confirmar ${operacao === "compra" ? "Compra" : "Venda"}`}
           </Button>
+
+          {feedback && (
+            <div
+              className={`rounded-md border px-3 py-2 text-sm ${
+                feedback.type === "success"
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600"
+                  : "border-rose-500/40 bg-rose-500/10 text-rose-600"
+              }`}
+            >
+              {feedback.message}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

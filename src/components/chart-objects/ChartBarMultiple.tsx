@@ -21,14 +21,12 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-const chartData = [
-  { month: "January", acoes: 186, fiis: 80, rendaFixa: 120 },
-  { month: "February", acoes: 145, fiis: 90, rendaFixa: 100 },
-  { month: "March", acoes: 200, fiis: 120, rendaFixa: 150 },
-  { month: "April", acoes: 170, fiis: 110, rendaFixa: 130 },
-  { month: "May", acoes: 220, fiis: 140, rendaFixa: 160 },
-  { month: "June", acoes: 190, fiis: 130, rendaFixa: 140 },
-];
+type TChartBarPoint = {
+  month: string;
+  acoes: number;
+  fiis: number;
+  rendaFixa: number;
+};
 
 const chartConfig = {
   acoes: {
@@ -45,7 +43,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export default function ChartBarMultiple() {
+interface ChartBarMultipleProps {
+  data: TChartBarPoint[];
+}
+
+export default function ChartBarMultiple({ data }: ChartBarMultipleProps) {
   const handleTooltipFormatter = (
     value: number | string | readonly (number | string)[] | undefined,
     name?: string | number | any,
@@ -56,7 +58,8 @@ export default function ChartBarMultiple() {
     const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
     const absoluteValue = formatCurrency(safeValue);
 
-    const label = chartConfig[name as keyof typeof chartConfig]?.label ?? name ?? "Valor";
+    const label =
+      chartConfig[name as keyof typeof chartConfig]?.label ?? name ?? "Valor";
 
     return (
       <div className="flex w-full items-center justify-between gap-3">
@@ -69,8 +72,8 @@ export default function ChartBarMultiple() {
   };
 
   return (
-    <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-lg">
-      <CardHeader className="px-6 pt-5 pb-3">
+    <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-lg h-full">
+      <CardHeader className="px-5 pt-4 pb-2">
         <CardTitle className="text-base font-semibold text-foreground">
           Comparativo por Classe de Ativo
         </CardTitle>
@@ -78,9 +81,12 @@ export default function ChartBarMultiple() {
           Evolução mensal consolidada por classe: Ações, FIIs e Renda Fixa
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
-        <ChartContainer config={chartConfig} className="min-h-55 w-full">
-          <BarChart accessibilityLayer data={chartData} barCategoryGap="30%">
+      <CardContent className="px-4 pb-2">
+        <ChartContainer
+          config={chartConfig}
+          className="h-48 sm:h-56 lg:h-60 xl:h-65 w-full"
+        >
+          <BarChart accessibilityLayer data={data} barCategoryGap="30%">
             <CartesianGrid
               vertical={false}
               stroke="currentColor"
@@ -122,7 +128,7 @@ export default function ChartBarMultiple() {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-1.5 text-sm px-6 pb-5">
+      <CardFooter className="flex-col items-start gap-1 text-sm px-5 pb-4 pt-1">
         <div className="flex gap-2 leading-none font-semibold text-foreground">
           Desempenho consolidado dos 3 tipos{" "}
           <TrendingUp className="h-4 w-4 text-chart-1" />

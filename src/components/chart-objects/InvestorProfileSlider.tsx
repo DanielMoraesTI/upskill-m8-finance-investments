@@ -1,6 +1,9 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { ShieldCheck, TrendingUp, Zap } from "lucide-react";
+import { useAsset } from "@/context/AssetProvider";
+import { useWallet } from "@/context/WalletProvider";
+import { buildPortfolioSummary } from "@/utils/portfolioMetrics";
 // Importações do Shadcn UI Tooltip
 import {
   Tooltip,
@@ -15,7 +18,7 @@ type InvestorProfile = {
   color: string;
   bg: string;
   border: string;
-  description: string; // Nova propriedade para explicar o parâmetro
+  description: string;
 };
 
 type TInvestorProfileOptions = "conservador" | "moderado" | "arrojado";
@@ -56,10 +59,22 @@ function getProfile(rendaFixa: number): TInvestorProfileOptions {
   return "arrojado";
 }
 
-const rendaFixaInicial = 85;
-
 export default function InvestorProfileSlider() {
-  const rendaFixa = rendaFixaInicial;
+  const { assetList } = useAsset();
+  const { walletList } = useWallet();
+
+  const portfolioSummary = buildPortfolioSummary({
+    walletList,
+    assetList,
+  });
+
+  const totalUpdated = portfolioSummary.totalUpdated;
+  const rendaFixa =
+    totalUpdated > 0
+      ? Math.round(
+          (portfolioSummary.byTypeUpdated.fixedIncome / totalUpdated) * 100,
+        )
+      : 0;
   const rendaVariavel = 100 - rendaFixa;
   const profile = profiles[getProfile(rendaFixa)];
   const Icon = profile.icon;
@@ -135,7 +150,9 @@ export default function InvestorProfileSlider() {
           </div>
 
           <div className="flex text-[9px] font-semibold tracking-wide leading-none">
-            <span className="w-[25%] text-left text-emerald-500">Conservador</span>
+            <span className="w-[25%] text-left text-emerald-500">
+              Conservador
+            </span>
             <span className="w-[35%] text-center text-amber-500">Moderado</span>
             <span className="w-[40%] text-right text-rose-500">Arrojado</span>
           </div>
