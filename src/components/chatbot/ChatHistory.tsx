@@ -1,6 +1,6 @@
 import React from "react";
 import { useChatbot } from "@/context/ChatbotProvider";
-import { HelpCircle, MessageSquare } from "lucide-react";
+import { HelpCircle, MessageSquare, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function ChatHistory() {
@@ -8,7 +8,7 @@ export default function ChatHistory() {
     useChatbot();
 
   return (
-    <div className="w-full md:w-80 h-full flex flex-col bg-base-200 border-r border-base-300 py-2">
+    <div className="w-full md:w-60 h-full flex flex-col bg-base-200 border-r border-base-300 py-2">
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
         <div className="flex flex-row items-center justify-between px-3 py-2 text-xs font-semibold text-base-content/50 uppercase">
           Chats Recentes
@@ -17,19 +17,40 @@ export default function ChatHistory() {
         {Array.isArray(filteredConversations) &&
         filteredConversations.length > 0 ? (
           filteredConversations.map((conversation) => (
-            <Button
+            <div
               key={conversation.id}
-              className="w-full justify-start"
-              variant={
-                currentConversation?.id === conversation.id
-                  ? "secondary"
-                  : "ghost"
-              }
-              onClick={() => handleOpenConversation(conversation.id)}
+              className="group grid grid-cols-[minmax(0,1fr)_auto] items-center rounded-md w-full"
             >
-              <MessageSquare size={16} />
-              <span className="truncate">{conversation.title}</span>
-            </Button>
+              <Button
+                className="w-full min-w-0 shrink justify-start overflow-hidden"
+                variant={
+                  currentConversation?.id === conversation.id
+                    ? "secondary"
+                    : "ghost"
+                }
+                onClick={() => {
+                  dispatch({ type: "setDeletingConversation", value: false });
+                  handleOpenConversation(conversation.id);
+                }}
+              >
+                <MessageSquare size={16} className="shrink-0" />
+                <span className="min-w-0 flex-1 truncate text-left">
+                  {conversation.title}
+                </span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => {
+                  dispatch({ type: "setDeletingConversation", value: true });
+                  handleOpenConversation(conversation.id);
+                }}
+              >
+                <Trash2 size={12} />
+              </Button>
+            </div>
           ))
         ) : (
           <div className="text-sm text-base-content/50 px-3 py-2">

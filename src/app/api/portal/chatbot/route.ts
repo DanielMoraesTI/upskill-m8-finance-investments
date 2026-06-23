@@ -16,10 +16,10 @@ const functionStepMap: Record<string, string> = {
 };
 
 export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-
     try {
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get('id');
+
         if (id) {
             const chatHistory = await chatbotRepository.findMessagesByConversationId(Number(id));
             return NextResponse.json(chatHistory);
@@ -32,6 +32,27 @@ export async function GET(req: NextRequest) {
         return errorResponse("Internal Server Error", 500);
     }
 }
+
+export async function DELETE(req: NextRequest) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get('id');
+
+        if (!id) {
+            return errorResponse("Missing conversation ID", 400);
+        }
+
+        const deleted = await chatbotRepository.deleteConversation(Number(id));
+        if (deleted) {
+            return NextResponse.json({ success: true });
+        } else {
+            return errorResponse("Conversation not found", 404);
+        }
+    } catch (error) {
+        console.error("Error deleting conversation:", error);
+        return errorResponse("Internal Server Error", 500);
+    }
+};
 
 export async function POST(req: NextRequest) {
     try {

@@ -2,6 +2,7 @@
 import ChatHistory from "@/components/chatbot/ChatHistory";
 import ConversationMessages from "@/components/chatbot/ConversationMessages";
 import PromptArea from "@/components/chatbot/PromptArea";
+import DeleteConversation from "@/components/chatbot/DeleteConversation";
 import { useChatbot } from "@/context/ChatbotProvider";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ export default function Insights() {
         <div className="flex-1 flex flex-col h-full min-h-0 relative gap-4 overflow-x-hidden">
           <ConversationMessages />
           <PromptArea />
+          <DeleteConversation />
         </div>
       </div>
     </div>

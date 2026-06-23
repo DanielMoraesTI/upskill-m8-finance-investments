@@ -1,5 +1,5 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   createContext,
   useContext,
@@ -29,6 +29,8 @@ interface ChatbotState {
   thinking: boolean;
   thinkingMessage: string;
   streamingMessage: string;
+  deletingConversation: boolean;
+  handleDeleteConversation: (conversationId: number) => Promise<void>;
 }
 
 const initialState: ChatbotState = {
@@ -40,6 +42,8 @@ const initialState: ChatbotState = {
   thinking: false,
   thinkingMessage: "",
   streamingMessage: "",
+  deletingConversation: false,
+  handleDeleteConversation: async () => {},
 };
 
 type ChatbotStateAction =
@@ -51,7 +55,8 @@ type ChatbotStateAction =
   | { type: "setThinking"; value: boolean }
   | { type: "setThinkingMessage"; value: string }
   | { type: "setStreamingMessage"; value: string }
-  | { type: "appendStreamingMessage"; value: string };
+  | { type: "appendStreamingMessage"; value: string }
+  | { type: "setDeletingConversation"; value: boolean };
 
 interface ChatbotContextProps extends Omit<ChatbotState, "conversationList"> {
   conversationList: TConversationSummary | undefined;
@@ -73,6 +78,8 @@ function chatbotReducer(
       return { ...state, filteredConversations: action.value };
     case "setCurrentConversation":
       return { ...state, currentConversation: action.value };
+    case "setDeletingConversation":
+      return { ...state, deletingConversation: action.value };
     case "toggleHelper":
       return { ...state, showHelper: action.value };
     case "setUserPrompt":
@@ -142,6 +149,27 @@ export default function ChatbotProvider({
     setOpenConversationId(conversationId);
   };
 
+  const deleteConversationMutation = useMutation({
+    mutationFn: (conversationId: number) =>
+      chatbotApi.deleteConversation(conversationId),
+    onSuccess: (_, conversationId) => {
+      queryClient.invalidateQueries({ queryKey: ["conversationsList"] });
+      queryClient.invalidateQueries({
+        queryKey: ["chatHistory", conversationId],
+      });
+    },
+  });
+
+  const handleDeleteConversation = async (conversationId: number) => {
+    try {
+      await deleteConversationMutation.mutateAsync(conversationId);
+      dispatch({ type: "setDeletingConversation", value: false });
+      dispatch({ type: "setCurrentConversation", value: null });
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!state.userPrompt.trim()) return;
 
@@ -202,6 +230,7 @@ export default function ChatbotProvider({
         dispatch,
         handleOpenConversation,
         handleSendMessage,
+        handleDeleteConversation,
       }}
     >
       {children}

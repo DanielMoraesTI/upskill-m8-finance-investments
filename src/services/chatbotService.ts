@@ -43,6 +43,14 @@ export const chatbotApi = {
         return response.json();
     },
 
+    async deleteConversation(conversationId: number): Promise<boolean> {
+        const response = await fetch(`${url}?id=${conversationId}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Failed to delete conversation');
+        return response.json();
+    },
+
     async startChat(prompt: string, onEvent: (event: TChatbotEvent) => void): Promise<void> {
         const response = await fetch(url, {
             method: 'POST',

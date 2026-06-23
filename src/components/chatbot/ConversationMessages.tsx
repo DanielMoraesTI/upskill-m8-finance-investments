@@ -79,7 +79,7 @@ export default function ConversationMessages() {
                 <Bot size={20} className="text-primary mr-2" />
               )}
               <div
-                className={`max-w-[70%] p-4 rounded-lg ${msg.role === "user" ? "bg-accent text-info" : "bg-base-200 text-base-content"}`}
+                className={`max-w-[70%] ${msg.role === "user" ? "bg-accent text-info text-sm rounded-lg p-2" : "bg-base-200 text-base-content text-sm rounded-lg p-0"}`}
               >
                 {msg.content}
               </div>

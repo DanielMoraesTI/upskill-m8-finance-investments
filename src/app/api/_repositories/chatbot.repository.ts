@@ -146,11 +146,24 @@ async function updateConversationTimestamp(conversationId: number): Promise<void
     }
 }
 
+async function deleteConversation(conversationId: number): Promise<boolean> {
+    try {
+        const [result] = await db.query<ResultSetHeader>(
+            `DELETE FROM conversation WHERE id = ?`, [conversationId]
+        );
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error("Error deleting conversation:", error);
+        throw error;
+    }
+}
+
 const chatbotRepository = {
     findMessagesByConversationId,
     findAllConversationSummary,
     createConversation,
     createMessage,
-    updateConversationTimestamp
+    updateConversationTimestamp,
+    deleteConversation,
 };
 export default chatbotRepository;
