@@ -1,4 +1,12 @@
 import { z } from 'zod';
+
+export interface IfindAllTransactions {
+    startDate?: Date;
+    endDate?: Date;
+    entryType: TTransactionEntryType | null;
+    assetTypeId: string | null;
+}
+
 // ==============================================================================
 //                                  FRONTEND SCHEMAS
 // ==============================================================================
@@ -37,5 +45,9 @@ export type TTransactionList = z.infer<typeof TransactionListSchema>;
 export const TransactionListResponseSchema = z.object({
     transactionList: z.array(TransactionSchema),
 });
-
 export type TTransactionListResponse = z.infer<typeof TransactionListResponseSchema>;
+
+export const UpdateTransactionRequestSchema = z.object({
+    transaction: TransactionSchema,
+});
+export type TUpdateTransactionRequest = z.infer<typeof UpdateTransactionRequestSchema>;

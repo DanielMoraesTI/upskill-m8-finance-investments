@@ -1,6 +1,9 @@
 "use client";
 import React, { createContext, useState, useContext, useEffect } from "react";
-import type { TWalletList } from "@/schemas/walletSchema";
+import type {
+  TWalletList,
+  TUpdateWalletIncomeRequest,
+} from "@/schemas/walletSchema";
 import { useAsset } from "./AssetProvider";
 import {
   useMutation,
@@ -10,8 +13,7 @@ import {
 } from "@tanstack/react-query";
 import {
   getWalletList,
-  patchWalletIncome,
-  type IPatchWalletIncomeParams,
+  patchWalletIncome
 } from "@/services/walletService";
 // ==============================================================================
 //                                  CONTEXT
@@ -23,7 +25,7 @@ interface WalletContextProps {
   walletIncomeMutation: UseMutationResult<
     void,
     Error,
-    IPatchWalletIncomeParams
+    TUpdateWalletIncomeRequest
   >;
 }
 // Este objeto inicializa o contexto de carteiras (WalletContext) com valores padrão, incluindo uma lista vazia de carteiras, uma lista filtrada vazia e uma mutação de renda de carteira vazia. Ele é utilizado para garantir que o contexto tenha um estado inicial consistente, permitindo que os componentes que consomem esse contexto possam acessar os dados relacionados às carteiras mesmo antes de serem carregados ou atualizados.
@@ -33,7 +35,7 @@ const initialWalletContext: WalletContextProps = {
   walletIncomeMutation: {} as UseMutationResult<
     void,
     Error,
-    IPatchWalletIncomeParams
+    TUpdateWalletIncomeRequest
   >,
 };
 
@@ -54,7 +56,7 @@ export default function WalletProvider({
   const walletIncomeMutation = useMutation<
     void,
     Error,
-    IPatchWalletIncomeParams
+    TUpdateWalletIncomeRequest
   >({
     mutationFn: (args) => patchWalletIncome(args),
     onSuccess: () => {

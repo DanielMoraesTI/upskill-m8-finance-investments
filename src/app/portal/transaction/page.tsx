@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTransaction } from "@/context/TransactionProvider";
 import { useAsset } from "@/context/AssetProvider";
@@ -13,23 +13,26 @@ import {
   FilterType,
 } from "@/components/investmentsList/TransactionFilter";
 
-export default function TransactionPage() {
+function TransactionPageContent() {
   const [filter, setFilter] = useState<FilterType>("all");
 
   // Obter a função de atualização do ID do ativo selecionado a partir do TransactionProvider
-  const seacrhParams = useSearchParams();
+  const search = useSearchParams();
   const { setSelectedAssetId, deleteMutation } = useTransaction();
-  const asssetIdParam = seacrhParams.get("assetId");
+  const asssetIdParam = search.get("assetId");
 
   // Efeito para atualizar o ID do ativo selecionado com base no parâmetro da URL
   useEffect(() => {
-    if (asssetIdParam) {
-      setFilter("all");
-      setSelectedAssetId(Number(asssetIdParam));
-    } else {
-      // Se não houver parâmetro, limpar a seleção
-      setSelectedAssetId(null);
-    }
+    const handleParam = () => {
+      if (asssetIdParam) {
+        setFilter("all");
+        setSelectedAssetId(Number(asssetIdParam));
+      } else {
+        // Se não houver parâmetro, limpar a seleção
+        setSelectedAssetId(null);
+      }
+    };
+    handleParam();
   }, [asssetIdParam, setSelectedAssetId]);
 
   // Ao mudar o filtro manualmente, limpa o assetId da URL
@@ -201,5 +204,17 @@ export default function TransactionPage() {
         </ul>
       </section>
     </div>
+  );
+}
+
+export default function TransactionPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-6 text-sm text-muted-foreground">Carregando...</div>
+      }
+    >
+      <TransactionPageContent />
+    </Suspense>
   );
 }

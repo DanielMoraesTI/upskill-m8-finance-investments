@@ -1,111 +1,60 @@
-import { NextResponse } from "next/server";
-import {
-  updateTransactionEntry,
-  deleteTransaction,
-  findTransactionById,
-} from "@/app/api/_repositories/transaction.repository";
-import { recalculateWalletByAsset } from "@/app/api/_repositories/wallet.repository";
+import { NextRequest, NextResponse } from "next/server";
+import transactionService from "@/app/api/_services/transaction.service";
+import { UpdateTransactionRequestSchema } from "@/schemas/transactionSchema";
+import { errorResponse } from "@/app/api/_utils/serverUtils";
+import walletService from "@/app/api/_services/wallet.service";
 
-type RouteContext = { params: Promise<{ id: string }> };
-// Esta função assíncrona lida com requisições PUT para o endpoint "/api/portal/transactions/:id". Ela atualiza os dados de uma transação específica, identificada pelo ID, e recalcula a carteira associada ao ativo da transação. Em caso de erros, ela captura e registra o erro, retornando uma resposta JSON com uma mensagem de erro apropriada e um status HTTP 400 ou 500, dependendo do tipo de erro.
-export async function PUT(request: Request, { params }: RouteContext) {
+export async function PUT(request: NextRequest, ctx: RouteContext<'/api/portal/transactions/[id]'>) {
   try {
-    const { id } = await params;
+    const { id } = await ctx.params;
     const body = await request.json();
-    const { entry_type, quantity, unit_price, total_value, date } = body;
-    const transactionId = Number(id);
 
-    if (isNaN(transactionId)) {
-      return NextResponse.json(
-        { message: "ID de transação inválido" },
-        { status: 400 },
+    // Validar os dados da transação atual
+    if (String(id) !== String(body.id)) {
+      return errorResponse(
+        "ID de transação no corpo da requisição não corresponde ao ID na URL",
+        400
       );
     }
 
-    const oldTransaction = await findTransactionById(transactionId);
-    if (!oldTransaction) {
-      return NextResponse.json(
-        { message: "Transação não encontrada" },
-        { status: 404 },
-      );
+    const currentParsed = UpdateTransactionRequestSchema.safeParse(body);
+    if (!currentParsed.success) {
+      return errorResponse
+        ("Dados de transação inválidos", 400);
     }
 
-    await updateTransactionEntry(transactionId, {
-      entry_type,
-      quantity,
-      unit_price,
-      total_value,
-      date,
-    });
+    // Chamar o serviço para atualizar os dados da transação no DB
+    const updatedTransaction = await transactionService.updateTransaction(currentParsed.data.transaction);
 
-    try {
-      await recalculateWalletByAsset(
-        oldTransaction.user_id,
-        oldTransaction.asset_id,
-      );
-    } catch (error) {
-      // Restaura o estado antigo da transação se o recálculo violar regra de negócio.
-      await updateTransactionEntry(transactionId, {
-        entry_type: oldTransaction.entry_type,
-        quantity: oldTransaction.quantity,
-        unit_price: oldTransaction.unit_price,
-        total_value: oldTransaction.total_value,
-        date: oldTransaction.date,
-      });
-      await recalculateWalletByAsset(
-        oldTransaction.user_id,
-        oldTransaction.asset_id,
-      );
+    // Recalcular o saldo da carteira associada ao ativo da transação
+    const updatedWalletData = await walletService.recalculateWalletByAsset(currentParsed.data.transaction.asset_id);
+    await walletService.updateWalletData(updatedWalletData);
 
-      return NextResponse.json(
-        {
-          message:
-            error instanceof Error
-              ? error.message
-              : "Não foi possível atualizar a transação",
-        },
-        { status: 400 },
-      );
-    }
+
 
     return NextResponse.json(
-      { message: "Transação atualizada com sucesso" },
+      { transaction: updatedTransaction },
       { status: 200 },
     );
   } catch (error) {
     console.error("Error in PUT /api/transactions/:id:", error);
-    return NextResponse.json(
-      { message: "Erro ao processar a solicitação" },
-      { status: 500 },
-    );
+    return errorResponse("Erro ao processar a solicitação", 500);
   }
 }
-// Esta função assíncrona lida com requisições DELETE para o endpoint "/api/portal/transactions/:id". Ela deleta uma transação específica, identificada pelo ID, e recalcula a carteira associada ao ativo da transação. Em caso de erros, ela captura e registra o erro, retornando uma resposta JSON com uma mensagem de erro apropriada e um status HTTP 400 ou 500, dependendo do tipo de erro.
-export async function DELETE(request: Request, { params }: RouteContext) {
+
+export async function DELETE(request: NextRequest, ctx: RouteContext<'/api/portal/transactions/[id]'>) {
   try {
-    const { id } = await params;
-    const transactionId = Number(id);
+    const { id } = await ctx.params;
 
-    if (isNaN(transactionId)) {
-      return NextResponse.json(
-        { message: "ID de transação inválido" },
-        { status: 400 },
-      );
-    }
+    const currentTransaction = await transactionService.getTransactionById(Number(id));
+    if (!currentTransaction) return errorResponse("Transação não encontrada", 404);
 
-    const currentTransaction = await findTransactionById(transactionId);
-    if (!currentTransaction) {
-      return NextResponse.json(
-        { message: "Transação não encontrada" },
-        { status: 404 },
-      );
-    }
-
-    await deleteTransaction(transactionId);
-    await recalculateWalletByAsset(
-      currentTransaction.user_id,
-      currentTransaction.asset_id,
-    );
+    const deleted = await transactionService.deleteTransaction(currentTransaction.id);
+    if (!deleted) return errorResponse("Transação não encontrada", 404);
+ 
+    // Recalcular o saldo da carteira associada ao ativo da transação
+    const updatedWalletData = await walletService.recalculateWalletByAsset(currentTransaction.asset_id);
+    await walletService.updateWalletData(updatedWalletData);
 
     return NextResponse.json(
       { message: "Transação deletada com sucesso" },
@@ -113,9 +62,6 @@ export async function DELETE(request: Request, { params }: RouteContext) {
     );
   } catch (error) {
     console.error("Error in DELETE /api/transactions/:id:", error);
-    return NextResponse.json(
-      { message: "Erro ao processar a solicitação" },
-      { status: 500 },
-    );
+    return errorResponse("Erro ao processar a solicitação", 500);
   }
 }

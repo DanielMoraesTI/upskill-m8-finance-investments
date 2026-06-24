@@ -50,7 +50,7 @@ interface ChartBarMultipleProps {
 export default function ChartBarMultiple({ data }: ChartBarMultipleProps) {
   const handleTooltipFormatter = (
     value: number | string | readonly (number | string)[] | undefined,
-    name?: string | number | any,
+    name?: string | number | unknown,
   ) => {
     if (value === undefined || Array.isArray(value)) return "";
     const numericValue =

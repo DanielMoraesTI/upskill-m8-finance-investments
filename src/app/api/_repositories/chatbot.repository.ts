@@ -4,6 +4,9 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 const MOCK_USER_ID = 1;
 
+// ==================================================================================
+//                                        SELECTS
+// ==================================================================================
 async function findMessagesByConversationId(conversationId: number): Promise<RowDataPacket[]> {
     try {
         const [rows] = await db.query<RowDataPacket[]>(
@@ -33,6 +36,9 @@ async function findAllConversationSummary(): Promise<RowDataPacket[]> {
     }
 }
 
+// ==================================================================================
+//                                        INSERTS
+// ==================================================================================
 async function createConversation(title: string): Promise<ResultSetHeader> {
     try {
         const [result] = await db.query<ResultSetHeader>(
@@ -57,6 +63,9 @@ async function createMessage(args: Omit<TMessage, "id" | "createdAt">): Promise<
     }
 }
 
+// ==================================================================================
+//                                        UPDATES
+// ==================================================================================
 async function updateConversationTimestamp(conversationId: number): Promise<void> {
     try {
         const [result] = await db.query<ResultSetHeader>(
@@ -71,6 +80,9 @@ async function updateConversationTimestamp(conversationId: number): Promise<void
     }
 }
 
+// ==================================================================================
+//                                        DELETES
+// ==================================================================================
 async function deleteConversation(conversationId: number): Promise<boolean> {
     try {
         const [result] = await db.query<ResultSetHeader>(

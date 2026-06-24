@@ -73,3 +73,9 @@ export const AssetListResponseSchema = z.object({
 });
 
 export type TAssetListResponse = z.infer<typeof AssetListResponseSchema>;
+
+export const PatchCurrentPriceRequestSchema = z.object({
+    assetId: z.number().int().positive("O ID do ativo deve ser um número inteiro positivo"),
+    current_price: z.coerce.number().positive("O novo preço deve ser um número positivo"),
+});
+export type TPatchCurrentPriceRequest = z.infer<typeof PatchCurrentPriceRequestSchema>;

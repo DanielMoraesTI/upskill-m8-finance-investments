@@ -3,9 +3,10 @@ import type { TConversation, TMessage, TConversationSummary } from "@/schemas/ch
 import { ConversationSchema, ConversationSummarySchema, MessageSchema } from "@/schemas/chatbotSchema";
 import { z } from "zod";
 import { startOfDay, endOfDay, subWeeks, subMonths, subQuarters, subYears } from "date-fns";
-import transactionRepository from "@/app/api/_repositories/transaction.repository";
+import transactionService from "@/app/api/_services/transaction.service";
 import { TTransactionList } from "@/schemas/transactionSchema";
 import chatbotRepository from "@/app/api/_repositories/chatbot.repository";
+
 
 // ==================================================================================
 //                              GET SERVICES
@@ -163,7 +164,7 @@ async function getInvestmentSummary(args: unknown): Promise<TTransactionList> {
         case "year": startDate = startOfDay(subYears(now, 1)); break;
     }
 
-    const transactions = await transactionRepository.findAllTransactionsWithArgs({
+    const transactions = await transactionService.getAllTransactionsWithArgs({
         entryType: type === "all" ? null : type,
         assetTypeId: assetType === "all" ? null : assetType,
         startDate,

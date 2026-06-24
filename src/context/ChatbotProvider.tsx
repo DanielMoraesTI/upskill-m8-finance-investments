@@ -12,19 +12,13 @@ import type {
   TConversation,
 } from "@/schemas/chatbotSchema";
 import type { Dispatch } from "react";
-import {
-  getConversationSummary,
-  getChatHistory,
-  chatbotApi,
-} from "@/services/chatbotService";
-import ChatbotHelper from "@/components/chatbot/ChatbotHelper";
+import chatbotService from "@/services/chatbotService";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface ChatbotState {
   conversationList: TConversationSummary;
   filteredConversations: TConversationSummary;
   currentConversation: TConversation | null;
-  showHelper: boolean;
   userPrompt: string;
   thinking: boolean;
   thinkingMessage: string;
@@ -37,7 +31,6 @@ const initialState: ChatbotState = {
   conversationList: [],
   filteredConversations: [],
   currentConversation: null,
-  showHelper: false,
   userPrompt: "",
   thinking: false,
   thinkingMessage: "",
@@ -50,7 +43,6 @@ type ChatbotStateAction =
   | { type: "setInitialData" }
   | { type: "setFilteredConversations"; value: TConversationSummary }
   | { type: "setCurrentConversation"; value: TConversation | null }
-  | { type: "toggleHelper"; value: boolean }
   | { type: "setUserPrompt"; value: string }
   | { type: "setThinking"; value: boolean }
   | { type: "setThinkingMessage"; value: string }
@@ -80,8 +72,6 @@ function chatbotReducer(
       return { ...state, currentConversation: action.value };
     case "setDeletingConversation":
       return { ...state, deletingConversation: action.value };
-    case "toggleHelper":
-      return { ...state, showHelper: action.value };
     case "setUserPrompt":
       return { ...state, userPrompt: action.value };
     case "setThinking":
@@ -114,13 +104,13 @@ export default function ChatbotProvider({
   // fetch conversations with react-query
   const { data: conversationList } = useQuery({
     queryKey: ["conversationsList"],
-    queryFn: getConversationSummary,
+    queryFn: chatbotService.getConversationSummary,
   });
 
   // fetch chat history with react-query
   const { data: chatHistory } = useQuery({
     queryKey: ["chatHistory", openConversationId],
-    queryFn: () => getChatHistory(openConversationId!),
+    queryFn: () => chatbotService.getChatHistory(openConversationId!),
     enabled: openConversationId !== null,
     staleTime: 60_000,
   });
@@ -151,7 +141,7 @@ export default function ChatbotProvider({
 
   const deleteConversationMutation = useMutation({
     mutationFn: (conversationId: number) =>
-      chatbotApi.deleteConversation(conversationId),
+      chatbotService.deleteConversation(conversationId),
     onSuccess: (_, conversationId) => {
       queryClient.invalidateQueries({ queryKey: ["conversationsList"] });
       queryClient.invalidateQueries({
@@ -180,7 +170,7 @@ export default function ChatbotProvider({
     dispatch({ type: "setStreamingMessage", value: "" });
 
     try {
-      await chatbotApi.sendMessage(
+      await chatbotService.sendMessage(
         state.currentConversation?.id || 0,
         prompt,
         (event) => {
@@ -234,10 +224,6 @@ export default function ChatbotProvider({
       }}
     >
       {children}
-      <ChatbotHelper
-        showHelp={state.showHelper}
-        setShowHelp={() => dispatch({ type: "toggleHelper", value: false })}
-      />
     </ChatbotContext.Provider>
   );
 }
