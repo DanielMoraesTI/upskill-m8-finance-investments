@@ -1,23 +1,29 @@
-import { NextResponse } from "next/server";
-import { updateWalletIncome } from "@/app/api/_repositories/wallet.repository";
+import { NextRequest, NextResponse } from "next/server";
+import walletService from "@/app/api/_services/wallet.service";
+import { UpdateWalletIncomeRequestSchema, WalletSchema } from "@/schemas/walletSchema";
+import { errorResponse } from "@/app/api/_utils/serverUtils";
+import userService from "@/app/api/_services/user.service";
 
-type RouteContext = { params: Promise<{ id: string }> };
-
-export async function PATCH(request: Request, { params }: RouteContext) {
+export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/portal/wallet/[id]'>) {
   try {
-    const { id } = await params;
+    const { id } = await ctx.params;
     const body = await request.json();
-    const walletId = Number(id);
-    const newIncome = Number(body.newIncome);
-
-    if (isNaN(walletId) || isNaN(newIncome)) {
-      return NextResponse.json(
-        { message: "ID da carteira ou rendimento inválido" },
-        { status: 400 },
-      );
+    
+    // validar o userID
+    const authorizedUser = await userService.requireAuth(request);
+    if (!authorizedUser) {
+      return errorResponse("Não autorizado", 401);
     }
 
-    await updateWalletIncome(walletId, newIncome);
+    const walletId = Number(id);
+
+    const parsedIncome = UpdateWalletIncomeRequestSchema.safeParse(body);
+
+    if (!parsedIncome.success) {
+      return errorResponse("Rendimento inválido", 400);
+    }
+
+    await walletService.updateWalletIncome(authorizedUser.id, walletId, parsedIncome.data.income);
 
     return NextResponse.json(
       { message: "Rendimento atualizado com sucesso" },
@@ -25,9 +31,41 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     );
   } catch (error) {
     console.error("Error in PATCH /api/wallet/:id:", error);
+    return errorResponse("Erro ao processar a solicitação", 500);
+  }
+}
+
+export async function PUT(request: NextRequest, ctx: RouteContext<'/api/portal/wallet/[id]'>) {
+  try {
+    const { id } = await ctx.params;
+    const body = await request.json();
+
+    // validar o userID
+    const authorizedUser = await userService.requireAuth(request);
+    if (!authorizedUser) {
+      return errorResponse("Não autorizado", 401);
+    }
+
+    const walletId = Number(id);
+
+    if (id === undefined || isNaN(walletId)) {
+      return errorResponse("ID da carteira inválido", 400);
+    }
+
+    const parsedWallet = WalletSchema.safeParse(body);
+
+    if (!parsedWallet.success) {
+      return errorResponse("Dados da carteira inválidos", 400);
+    }
+
+    const updatedWallet = await walletService.updateWalletData(authorizedUser.id, parsedWallet.data);
+
     return NextResponse.json(
-      { message: "Erro ao processar a solicitação" },
-      { status: 500 },
+      { updatedWallet },
+      { status: 200 },
     );
+  } catch (error) {
+    console.error("Error in PUT /api/wallet/:id:", error);
+    return errorResponse("Erro ao processar a solicitação", 500);
   }
 }

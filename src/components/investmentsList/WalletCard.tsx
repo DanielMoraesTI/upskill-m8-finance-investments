@@ -61,17 +61,23 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
 
   // Sincroniza os estados de edição com os dados originais quando o componente é montado ou quando o walletItem é atualizado
   useEffect(() => {
-    setNewPrice(currentPrice.toString());
-    setNewIncome(income.toString());
+    const handlepriceChanges = () => {
+      setNewPrice(currentPrice.toString());
+      setNewIncome(income.toString());
+    };
+    handlepriceChanges();
   }, [currentPrice, income]);
 
   // Recalcula o actualAmount sempre que os valores editáveis mudarem
   useEffect(() => {
-    if (assetType === "Renda Fixa") {
-      setActualAmount(investedAmount + (parseFloat(newIncome) || 0));
-    } else {
-      setActualAmount(quantity * (parseFloat(newPrice) || 0));
-    }
+    const handleActualAmountChanges = () => {
+      if (assetType === "Renda Fixa") {
+        setActualAmount(investedAmount + (parseFloat(newIncome) || 0));
+      } else {
+        setActualAmount(quantity * (parseFloat(newPrice) || 0));
+      }
+    };
+    handleActualAmountChanges();
   }, [assetType, investedAmount, newIncome, quantity, newPrice]);
   // Este efeito é responsável por fechar o menu de ações quando o usuário clica fora do menu ou do botão que o abre. Ele adiciona um event listener para o evento "mousedown" quando o menu está aberto, e remove esse listener quando o menu é fechado ou quando o componente é desmontado. A função handleClickOutside verifica se o clique ocorreu fora do menu e do botão, e se for o caso, fecha o menu definindo menuOpen como false. Esse comportamento é essencial para garantir uma experiência de usuário intuitiva e eficiente, permitindo que os usuários fechem facilmente o menu de ações clicando fora dele, sem a necessidade de clicar em um botão específico para fechar, melhorando a usabilidade do componente WalletCard.
   useEffect(() => {
@@ -113,7 +119,7 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
     if (assetType === "Ação" || assetType === "FII") {
       currentPriceMutation.mutate({
         assetId: walletItem.asset_id,
-        newPrice: parseFloat(newPrice) || 0,
+        current_price: parseFloat(newPrice) || 0,
       });
     }
 
@@ -121,7 +127,7 @@ export default function WalletCard({ walletItem }: { walletItem: TWallet }) {
       // Se for renda fixa, mudar o rendimento/income pelo WalletProvider
       walletIncomeMutation.mutate({
         walletId: walletItem.id,
-        newIncome: parseFloat(newIncome) || 0,
+        income: parseFloat(newIncome) || 0,
       });
     }
 

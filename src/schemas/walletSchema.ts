@@ -9,7 +9,7 @@ export const WalletSchema = z.object({
     quantity: z.coerce.number().positive("A quantidade deve ser um número positivo"),
     average_price: z.coerce.number().positive("O preço médio deve ser um número positivo"),
     total_invested: z.coerce.number().positive("O valor total investido deve ser um número positivo"),
-    income: z.coerce.number().optional(),
+    income: z.coerce.number().default(0).optional(),
     initial_date: z.iso.date().optional(),
     created_at: z.iso.date(),
     updated_at: z.iso.date(),
@@ -32,3 +32,9 @@ export const WalletListResponseSchema = z.object({
 });
 // Este tipo é inferido a partir do esquema Zod WalletListResponseSchema, representando a estrutura da resposta da API que contém a lista de carteiras. Ele pode ser utilizado em funções e componentes que lidam com os dados retornados pela API, garantindo a consistência e segurança na manipulação desses dados.
 export type TWalletListResponse = z.infer<typeof WalletListResponseSchema>;
+
+export const UpdateWalletIncomeRequestSchema = z.object({
+    walletId: z.number(),
+    income: z.coerce.number().positive("O novo rendimento deve ser um número positivo"),
+});
+export type TUpdateWalletIncomeRequest = z.infer<typeof UpdateWalletIncomeRequestSchema>;

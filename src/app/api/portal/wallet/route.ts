@@ -1,33 +1,28 @@
-import { NextResponse } from "next/server";
-import { WalletListResponseSchema } from "@/schemas/walletSchema";
-import { findAllWallets } from "@/app/api/_repositories/wallet.repository";
+import { NextRequest, NextResponse } from "next/server";
+import { TWalletListResponse } from "@/schemas/walletSchema";
+import walletService from "@/app/api/_services/wallet.service";
+import { errorResponse } from "@/app/api/_utils/serverUtils";
+import userService from "@/app/api/_services/user.service";
 
-
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
         // validar o userID
-
-        // fazer a query
-        const walletList = await findAllWallets();
-
-        // fazer o parse da response
-        const walletListResponse = WalletListResponseSchema.safeParse({
-            walletList: walletList || [],
-        });
-
-        if (!walletListResponse.success) {
-            return NextResponse.json({
-                message: "Erro ao processar a resposta do sistema de carteira"
-            }, { status: 500 });
+        const authorizedUser = await userService.requireAuth(request);
+        if (!authorizedUser) {
+            return errorResponse("Não autorizado", 401);
         }
 
-        return NextResponse.json(walletListResponse.data, { status: 200 });
+        const walletList = await walletService.getAllWallets(authorizedUser.id);
+
+        const response: TWalletListResponse = {
+            walletList: walletList,
+        }
+    
+        return NextResponse.json(response, { status: 200 });
 
     } catch (error) {
         console.error("Error in GET /api/wallet:", error);
-        return NextResponse.json({
-            message: "Erro ao processar a solicitação"
-         }, { status: 500 });
+        return errorResponse("Erro ao processar a solicitação", 500);
      }
 }
 

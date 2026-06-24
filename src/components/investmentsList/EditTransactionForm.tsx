@@ -46,16 +46,19 @@ export default function EditTransactionForm({
   function handleSubmit() {
     setFeedback(null);
 
+    const updatedTransaction: TTransaction = {
+      ...transaction,
+      entry_type: entryType,
+      date,
+      quantity: parseFloat(quantidade),
+      unit_price: parseFloat(valor.replace(",", ".")),
+      total_value: total(),
+    };
+
     updateMutation.mutate(
       {
         id: transaction.id,
-        data: {
-          entry_type: entryType,
-          date,
-          quantity: parseFloat(quantidade),
-          unit_price: parseFloat(valor.replace(",", ".")),
-          total_value: total(),
-        },
+        data: updatedTransaction,
       },
       {
         onSuccess: () => {

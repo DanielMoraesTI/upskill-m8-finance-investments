@@ -3,58 +3,70 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import {
   TCreateTransaction,
   TTransaction,
-  TransactionSchema,
+  type IfindAllTransactions
 } from "@/schemas/transactionSchema";
-import { z } from "zod";
-import { TransactionListSchema, type TTransactionList, TTransactionEntryType } from "@/schemas/transactionSchema";
 
-
-type TTransactionDBRow = TTransaction & { user_id: number };
-// Esta função assíncrona busca os dados de uma transação específica, identificada pelo ID, fazendo uma requisição ao banco de dados para obter os dados da tabela "transaction". Ela trata erros de rede e valida a resposta usando o esquema TransactionSchema, retornando os dados da transação se a resposta for válida ou null se a transação não for encontrada ou em caso de erro.
-function mapRowToTransaction(row: RowDataPacket): TTransaction {
-  return {
-    id: row.id,
-    asset_id: row.asset_id,
-    entry_type: row.entry_type,
-    date: new Date(row.date).toISOString().slice(0, 10),
-    quantity: Number(row.quantity),
-    unit_price: Number(row.unit_price),
-    total_value: Number(row.total_value),
-    created_at: new Date(row.created_at).toISOString().slice(0, 10),
-    updated_at: new Date(row.updated_at).toISOString().slice(0, 10),
-  };
-}
-// Esta função assíncrona busca os dados de uma transação específica, identificada pelo ID, fazendo uma requisição ao banco de dados para obter os dados da tabela "transaction". Ela trata erros de rede e valida a resposta usando o esquema TransactionSchema, retornando os dados da transação se a resposta for válida ou null se a transação não for encontrada ou em caso de erro.
-export async function findAllTransactions(): Promise<TTransaction[] | null> {
+// ==================================================================================
+//                                       SELECTS
+// ==================================================================================
+async function findAllTransactions(userId: number): Promise<RowDataPacket[]> {
   try {
-    const [rows] = await db.query<RowDataPacket[]>("SELECT * FROM transaction");
-
-    if (rows.length === 0) return null;
-
-    const transactionList: TTransaction[] = rows.map((row) =>
-      mapRowToTransaction(row),
-    );
-
-    const parsed = z.array(TransactionSchema).safeParse(transactionList);
-    if (!parsed.success) {
-      console.log(
-        "Erros detalhados:",
-        JSON.stringify(parsed.error.issues, null, 2),
-      );
-      console.log("Transaction List parsing error:", parsed.error);
-      throw new Error("Invalid transaction data");
-    }
-    return parsed.data;
+    const [rows] = await db.query<RowDataPacket[]>("SELECT * FROM transaction WHERE user_id = ?", [userId]);
+    return rows;
   } catch (error) {
     console.error("Error in findAllTransactions:", error);
-    return null;
+    throw new Error("An error occurred while fetching transactions");
   }
 }
-// Esta função assíncrona cria uma nova transação no banco de dados com base nos dados fornecidos. Ela insere os dados da transação na tabela "transaction" e retorna o ID da transação criada. Em caso de erros, ela captura e registra o erro, lançando um erro apropriado.
-export async function createTransactionEntry(
+
+async function findTransactionById(
+  userId: number,
+  id: number,
+): Promise<RowDataPacket[]> {
+  try {
+    const [rows] = await db.query<RowDataPacket[]>(
+      "SELECT * FROM transaction WHERE id = ? AND user_id = ? LIMIT 1",
+      [id, userId],
+    );
+    return rows;
+  } catch (error) {
+    console.error("Error in findTransactionById:", error);
+    throw new Error("An error occurred while fetching transaction by ID");
+  }
+}
+
+async function findAllTransactionsWithArgs(args: IfindAllTransactions): Promise<RowDataPacket[]> {
+  try {
+    const { query, params } = buildfindAllTransactionsQuery(args);
+
+    const [rows] = await db.query<RowDataPacket[]>(query, params);
+    return rows;
+  } catch (error) {
+    console.error("Error fetching transaction list:", error);
+    throw error;
+  }
+}
+
+async function findAllTransactionsByAssetId(userId: number, assetId: number): Promise<RowDataPacket[]> {
+  try {
+    const [rows] = await db.query<RowDataPacket[]>(
+      "SELECT * FROM transaction WHERE asset_id = ? AND user_id = ? ORDER BY date ASC",
+      [assetId, userId],
+    );
+    return rows;
+  } catch (error) {
+    console.error("Error in findAllTransactionsByAssetId:", error);
+    throw new Error("An error occurred while fetching transactions by asset ID");
+  }
+}
+
+// ==================================================================================
+//                                      INSERTS
+// ==================================================================================
+async function createTransactionEntry(
   userId: number,
   transactionData: TCreateTransaction,
-): Promise<number> {
+): Promise<ResultSetHeader> {
   try {
     const [result] = await db.query<ResultSetHeader>(
       `INSERT INTO transaction (user_id, asset_id, entry_type, date, quantity, unit_price, total_value)
@@ -70,119 +82,69 @@ export async function createTransactionEntry(
       ],
     );
 
-    return result.insertId;
+    return result;
   } catch (error) {
     console.error("Error in createTransactionEntry:", error);
     throw new Error("An error occurred while creating transaction entry");
   }
 }
-// Esta função assíncrona busca os dados de uma transação específica, identificada pelo ID, fazendo uma requisição ao banco de dados para obter os dados da tabela "transaction". Ela trata erros de rede e valida a resposta usando o esquema TransactionSchema, retornando os dados da transação se a resposta for válida ou null se a transação não for encontrada ou em caso de erro.
-export async function findTransactionById(
-  id: number,
-): Promise<TTransactionDBRow | null> {
+
+// ==================================================================================
+//                                        UPDATES
+// ==================================================================================
+async function updateTransaction(
+  userId: number,
+  transactionData: TTransaction,
+): Promise<ResultSetHeader> {
   try {
-    const [rows] = await db.query<RowDataPacket[]>(
-      "SELECT * FROM transaction WHERE id = ? LIMIT 1",
-      [id],
-    );
-
-    if (rows.length === 0) return null;
-
-    const row = rows[0];
-    const mapped = {
-      ...mapRowToTransaction(row),
-      user_id: Number(row.user_id),
-    };
-
-    const parsed = TransactionSchema.safeParse(mapped);
-    if (!parsed.success) {
-      throw new Error("Invalid transaction data");
-    }
-
-    return {
-      ...parsed.data,
-      user_id: mapped.user_id,
-    };
+    const [result] = await db.query<ResultSetHeader>(
+      `UPDATE transaction SET
+        asset_id = ?,
+        entry_type = ?,
+        date = ?,
+        quantity = ?,
+        unit_price = ?,
+        total_value = ?,
+        updated_at = CURRENT_TIMESTAMP
+        WHERE id = ? AND user_id = ?`, [
+      transactionData.asset_id,
+      transactionData.entry_type,
+      transactionData.date,
+      transactionData.quantity,
+      transactionData.unit_price,
+      transactionData.total_value,
+      transactionData.id,
+      userId
+    ]);
+    return result;
   } catch (error) {
-    console.error("Error in findTransactionById:", error);
-    throw new Error("An error occurred while finding transaction entry");
-  }
-}
-// Esta função assíncrona atualiza os dados de uma transação específica, identificada pelo ID, com base nos dados fornecidos. Ela constrói dinamicamente a consulta SQL para atualizar apenas os campos fornecidos e trata erros de rede, lançando erros apropriados em caso de falha.
-export async function updateTransactionEntry(
-  id: number,
-  transactionData: Partial<
-    Omit<TTransaction, "id" | "created_at" | "updated_at">
-  >,
-): Promise<void> {
-  try {
-    const fields = [];
-    const values = [];
-    for (const [key, value] of Object.entries(transactionData)) {
-      fields.push(`${key} = ?`);
-      values.push(value);
-    }
-    values.push(id);
-    await db.query(
-      `UPDATE transaction SET ${fields.join(", ")} WHERE id = ?`,
-      values,
-    );
-  } catch (error) {
-    console.error("Error in updateTransactionEntry:", error);
+    console.error("Error in updateTransaction:", error);
     throw new Error("An error occurred while updating transaction entry");
   }
 }
-// Esta função assíncrona deleta uma transação específica, identificada pelo ID, enviando uma requisição DELETE para o endpoint "/portal/transactions/{id}". Ela trata erros de rede e valida a resposta, lançando erros apropriados em caso de falha.
-export async function deleteTransaction(id: number): Promise<void> {
+
+// ==================================================================================
+//                                        DELETES
+// ==================================================================================
+async function deleteTransaction(userId: number, id: number): Promise<ResultSetHeader> {
   try {
-    await db.query(`DELETE FROM transaction WHERE id = ?`, [id]);
+    const [result] = await db.query<ResultSetHeader>(`DELETE FROM transaction WHERE id = ? AND user_id = ?`, [id, userId]);
+    return result;
   } catch (error) {
     console.error("Error in deleteTransaction:", error);
     throw new Error("An error occurred while deleting transaction");
   }
 }
 
-interface IfindAllTransactions {
-    startDate?: Date;
-    endDate?: Date;
-    entryType: TTransactionEntryType | null;
-    assetTypeId: string | null;
-}
-
-async function findAllTransactionsWithArgs(args: IfindAllTransactions): Promise<TTransactionList> {
-    try {
-        const { query, params } = buildfindAllTransactionsQuery(args);
-
-        const [rows] = await db.query<RowDataPacket[]>(query, params);
-        if (rows.length === 0) return [];
-
-        const transactionList: TTransactionList = rows.map((row) => ({
-            id: row.id,
-            asset_id: row.asset_id,
-            entry_type: row.entry_type,
-            date: new Date(row.date).toISOString().slice(0, 10),
-            quantity: row.quantity,
-            unit_price: row.unit_price,
-            total_value: row.total_value,
-            created_at: new Date(row.created_at).toISOString().slice(0, 10),
-            updated_at: new Date(row.updated_at).toISOString().slice(0, 10),
-        }));
-
-        const parsed = TransactionListSchema.safeParse(transactionList);
-        if (!parsed.success) {
-            console.log("Transaction List parsing error:", parsed.error);
-            throw new Error("Invalid transaction list data");
-        }
-
-        return parsed.data;
-    } catch (error) {
-        console.error("Error fetching transaction list:", error);
-        throw error;
-    }
-}
 
 const transactionRepository = {
+  findAllTransactions,
+  findTransactionById,
   findAllTransactionsWithArgs,
+  findAllTransactionsByAssetId,
+  createTransactionEntry,
+  updateTransaction,
+  deleteTransaction
 };
 export default transactionRepository;
 
@@ -190,43 +152,49 @@ export default transactionRepository;
 //                            Helper Functions
 // ===================================================================================
 function buildfindAllTransactionsQuery(args: IfindAllTransactions): { query: string; params: string[] } {
-    const { startDate, endDate, entryType, assetTypeId } = args;
+  const { userId, startDate, endDate, entryType, assetTypeId } = args;
 
-    // Seleciona apenas colunas de transaction para evitar conflito de nomes com o JOIN
-    let query = "SELECT t.* FROM transaction t";
+  // Seleciona apenas colunas de transaction para evitar conflito de nomes com o JOIN
+  let query = "SELECT t.* FROM transaction t";
 
-    const params: string[] = [];
-    const whereClauses: string[] = [];
+  const params: string[] = [];
+  const whereClauses: string[] = [];
 
-    // Se filtrar por tipo de ativo, precisa JOIN com asset
-    if (assetTypeId) {
-        query += " INNER JOIN asset a ON a.id = t.asset_id";
-        whereClauses.push("a.asset_type_id = ?");
-        params.push(assetTypeId);
-    }
+  // Filtrar por userId é obrigatório para garantir que o usuário só veja suas próprias transações
+  if (userId) {
+    whereClauses.push("t.user_id = ?");
+    params.push(userId.toString());
+  }
 
-    // buy / sell filter
-    if (entryType) {
-        whereClauses.push("t.entry_type = ?");
-        params.push(entryType);
-    }
+  // Se filtrar por tipo de ativo, precisa JOIN com asset
+  if (assetTypeId) {
+    query += " INNER JOIN asset a ON a.id = t.asset_id";
+    whereClauses.push("a.asset_type_id = ?");
+    params.push(assetTypeId);
+  }
 
-    // date range filter
-    if (startDate) {
-        whereClauses.push(`t.date >= ?`);
-        params.push(startDate.toISOString().slice(0, 10));
-    }
+  // buy / sell filter
+  if (entryType) {
+    whereClauses.push("t.entry_type = ?");
+    params.push(entryType);
+  }
 
-    if (endDate) {
-        whereClauses.push(`t.date <= ?`);
-        params.push(endDate.toISOString().slice(0, 10));
-    }
+  // date range filter
+  if (startDate) {
+    whereClauses.push(`t.date >= ?`);
+    params.push(startDate.toISOString().slice(0, 10));
+  }
 
-    if (whereClauses.length > 0) {
-        query += ` WHERE ${whereClauses.join(" AND ")}`;
-    }
+  if (endDate) {
+    whereClauses.push(`t.date <= ?`);
+    params.push(endDate.toISOString().slice(0, 10));
+  }
 
-    query += ` ORDER BY t.updated_at DESC`;
+  if (whereClauses.length > 0) {
+    query += ` WHERE ${whereClauses.join(" AND ")} `;
+  }
 
-    return { query, params };
+  query += ` ORDER BY t.updated_at DESC`;
+
+  return { query, params };
 }

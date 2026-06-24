@@ -31,7 +31,7 @@ interface TransactionContextProps {
   updateMutation: UseMutationResult<
     void,
     Error,
-    { id: number; data: Partial<TCreateTransaction> }
+    { id: number; data: TTransaction }
   >;
 }
 // Este objeto inicializa o contexto de transações (TransactionContext) com valores padrão, incluindo uma lista vazia de transações, uma lista filtrada vazia, um ID de ativo selecionado nulo e mutações de criação, atualização e exclusão de transações vazias. Ele é utilizado para garantir que o contexto tenha um estado inicial consistente, permitindo que os componentes que consomem esse contexto possam acessar os dados
@@ -49,7 +49,7 @@ const initialTransactionContext: TransactionContextProps = {
   updateMutation: {} as UseMutationResult<
     void,
     Error,
-    { id: number; data: Partial<TCreateTransaction> }
+    { id: number; data: TTransaction }
   >,
 };
 
@@ -100,7 +100,7 @@ export default function TransactionProvider({
   const updateMutation = useMutation<
     void,
     Error,
-    { id: number; data: Partial<TCreateTransaction> }
+    { id: number; data: TTransaction }
   >({
     mutationFn: ({ id, data }) => updateTransaction(id, data),
     onSuccess: () => {

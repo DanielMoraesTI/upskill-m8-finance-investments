@@ -6,6 +6,7 @@ import { errorResponse } from "@/app/api/_utils/serverUtils";
 import { chatbotSystemInstruction } from "@/app/api/_utils/geminiPrompts";
 import { chatbotTools, ChatbotFunctionSchema } from "@/app/api/_utils/chatbot.functions";
 import chatbotService from "@/app/api/_services/chatbot.service";
+import userService from "@/app/api/_services/user.service";
 
 const MODEL_NAME = process.env.GEMINI_MODEL_NAME || "gemini-3.1-flash-lite-preview";
 
@@ -15,15 +16,21 @@ const functionStepMap: Record<string, string> = {
 
 export async function GET(req: NextRequest) {
     try {
+        // validar o userID
+        const authorizedUser = await userService.requireAuth(req);
+        if (!authorizedUser) {
+            return errorResponse("Não autorizado", 401);
+        }
+        
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
 
         if (id) {
-            const chatHistory = await chatbotService.getConversationMessages(Number(id));
+            const chatHistory = await chatbotService.getConversationMessages(authorizedUser.id, Number(id));
             return NextResponse.json(chatHistory);
         }
 
-        const conversations = await chatbotService.getAllConversationSummary();
+        const conversations = await chatbotService.getAllConversationSummary(authorizedUser.id);
         return NextResponse.json(conversations);
     } catch (error) {
         console.error("Error fetching conversations:", error);
@@ -33,6 +40,12 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
     try {
+        // validar o userID
+        const authorizedUser = await userService.requireAuth(req);
+        if (!authorizedUser) {
+            return errorResponse("Não autorizado", 401);
+        }
+
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
 
@@ -40,7 +53,7 @@ export async function DELETE(req: NextRequest) {
             return errorResponse("Missing conversation ID", 400);
         }
 
-        const deleted = await chatbotService.deleteConversation(Number(id));
+        const deleted = await chatbotService.deleteConversation(authorizedUser.id, Number(id));
         if (deleted) {
             return NextResponse.json({ success: true });
         } else {
@@ -54,11 +67,17 @@ export async function DELETE(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
+        // validar o userID
+        const authorizedUser = await userService.requireAuth(req);
+        if (!authorizedUser) {
+            return errorResponse("Não autorizado", 401);
+        }
+
         const { prompt, conversationId } = await req.json();
 
         let conversation;
         if (conversationId && conversationId > 0) {
-            const currentConversation = await chatbotService.getConversationMessages(Number(conversationId));
+            const currentConversation = await chatbotService.getConversationMessages(authorizedUser.id, Number(conversationId));
             if (currentConversation) {
                 conversation = currentConversation;
             }
@@ -66,7 +85,7 @@ export async function POST(req: NextRequest) {
 
         // If no conversation, create one
         if (!conversation) {
-            conversation = await chatbotService.createConversation(String(prompt));
+            conversation = await chatbotService.createConversation(authorizedUser.id, String(prompt));
         }
 
         // Save user message
@@ -152,7 +171,7 @@ export async function POST(req: NextRequest) {
                                 if (parsedFnName.success) {
                                     sendEvent({ done: false, type: 'function_call', content: functionStepMap[parsedFnName.data] || `Executando ${fc}...` });
 
-                                    const result = await chatbotService.handleFunctionCall(parsedFnName.data, fc.args);
+                                    const result = await chatbotService.handleFunctionCall(authorizedUser.id, parsedFnName.data, fc.args);
 
                                     // Push result to history
                                     currentContents.push({

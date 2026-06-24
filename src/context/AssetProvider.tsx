@@ -1,8 +1,18 @@
 "use client";
 import React, { createContext, useState, useContext } from "react";
-import type { TAssetType, TAssetList, TAssetTypeList } from "@/schemas/assetSchema";
-import { useQuery, useMutation, useQueryClient, UseMutationResult } from "@tanstack/react-query";
-import { getAssetSystemData, patchCurrentPrice, type IPatchCurrentPriceParams} from "@/services/assetService";
+import type {
+  TAssetType,
+  TAssetList,
+  TAssetTypeList,
+  TPatchCurrentPriceRequest,
+} from "@/schemas/assetSchema";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseMutationResult,
+} from "@tanstack/react-query";
+import { getAssetSystemData, patchCurrentPrice } from "@/services/assetService";
 // ==============================================================================
 //                                  CONTEXT
 // ==============================================================================
@@ -12,7 +22,12 @@ interface AssetContextProps {
   assetList: TAssetList;
   assetTypeList: TAssetTypeList;
   setCurrentAssetType: React.Dispatch<React.SetStateAction<TAssetType | null>>;
-  currentPriceMutation: UseMutationResult<void, Error, IPatchCurrentPriceParams, unknown>;
+  currentPriceMutation: UseMutationResult<
+    void,
+    Error,
+    TPatchCurrentPriceRequest,
+    unknown
+  >;
 }
 // Este objeto inicializa o contexto de ativos (AssetContext) com valores padrão, incluindo um tipo de ativo atual selecionado nulo, uma lista vazia de ativos, uma lista vazia de tipos de ativos, uma função vazia para atualizar o tipo de ativo atual selecionado e uma mutação de preço atual vazia. Ele é utilizado para garantir que o contexto tenha um estado inicial consistente, permitindo que os componentes que consomem esse contexto possam acessar os dados relacionados aos ativos mesmo antes de serem carregados ou atualizados.
 const initialAssetContext: AssetContextProps = {
@@ -20,7 +35,12 @@ const initialAssetContext: AssetContextProps = {
   assetList: [],
   assetTypeList: [],
   setCurrentAssetType: () => {},
-  currentPriceMutation: {} as UseMutationResult<void, Error, IPatchCurrentPriceParams, unknown>,
+  currentPriceMutation: {} as UseMutationResult<
+    void,
+    Error,
+    TPatchCurrentPriceRequest,
+    unknown
+  >,
 };
 
 const AssetContext = createContext<AssetContextProps>(initialAssetContext);
@@ -42,7 +62,7 @@ export default function AssetProvider({
   const queryClient = useQueryClient();
 
   const currentPriceMutation = useMutation({
-    mutationFn: (args: IPatchCurrentPriceParams) => patchCurrentPrice(args),
+    mutationFn: (args: TPatchCurrentPriceRequest) => patchCurrentPrice(args),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["assetList"] });
     },
@@ -55,7 +75,7 @@ export default function AssetProvider({
         assetList: data?.assetList || [],
         assetTypeList: data?.assetTypeList || [],
         setCurrentAssetType,
-        currentPriceMutation
+        currentPriceMutation,
       }}
     >
       {children}
