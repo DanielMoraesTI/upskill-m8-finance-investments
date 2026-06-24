@@ -1,10 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { AssetListResponseSchema } from "@/schemas/assetSchema";
 import assetService from "@/app/api/_services/asset.service";
+import userService from '../../_services/user.service';
+import { errorResponse } from "@/app/api/_utils/serverUtils";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
         // validar o userID
+        const authorizedUser = await userService.requireAuth(request);
+        if (!authorizedUser) {
+            return errorResponse("Não autorizado", 401);
+        }
 
         // fazer a query
         const assetTypeList = await assetService.getAssetTypes();
@@ -17,18 +23,14 @@ export async function GET() {
         });
 
         if (!assetListResponse.success) {
-            return NextResponse.json({
-                message: "Erro ao processar a resposta do sistema de ativos"
-            }, { status: 500 });
+            return errorResponse("Erro ao processar a resposta do sistema de ativos", 500);
         }
 
         return NextResponse.json(assetListResponse.data, { status: 200 });
 
     } catch (error) {
         console.error("Error in GET /api/portal/assets:", error);
-        return NextResponse.json({
-            message: "Erro ao processar a solicitação"
-        }, { status: 500 });
+        return errorResponse("Erro ao processar a solicitação", 500);
     }
 }
 

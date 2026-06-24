@@ -8,9 +8,9 @@ import transactionRepository from "@/app/api/_repositories/transaction.repositor
 // ==================================================================================
 //                              GET SERVICES
 // ==================================================================================
-async function getAllTransactions(): Promise<TTransactionList> {
+async function getAllTransactions(userId: number): Promise<TTransactionList> {
     try {
-        const rows = await transactionRepository.findAllTransactions();
+        const rows = await transactionRepository.findAllTransactions(userId);
 
         if (rows.length === 0) return [];
 
@@ -40,10 +40,11 @@ async function getAllTransactions(): Promise<TTransactionList> {
 }
 
 async function getTransactionById(
+    userId: number,
     id: number,
 ): Promise<TTransaction | null> {
     try {
-        const rows = await transactionRepository.findTransactionById(id);
+        const rows = await transactionRepository.findTransactionById(userId, id);
 
         if (rows.length === 0) return null;
 
@@ -102,9 +103,9 @@ async function getAllTransactionsWithArgs(args: IfindAllTransactions): Promise<T
     }
 }
 
-async function getAllTransactionsByAssetId(assetId: number): Promise<TTransactionList> {
+async function getAllTransactionsByAssetId(userId: number, assetId: number): Promise<TTransactionList> {
     try {
-        const rows = await transactionRepository.findAllTransactionsByAssetId(assetId);
+        const rows = await transactionRepository.findAllTransactionsByAssetId(userId, assetId);
         if (rows.length === 0) return [];
 
         const transactionList: TTransactionList = rows.map((row) => ({
@@ -170,10 +171,11 @@ async function createTransaction(
 //                              UPDATE SERVICES
 // ==================================================================================
 async function updateTransaction(
+    userId: number,
     transactionData: TTransaction,
 ): Promise<TTransaction> {
     try {
-        const result = await transactionRepository.updateTransaction(transactionData);
+        const result = await transactionRepository.updateTransaction(userId, transactionData);
         if (!result || result.affectedRows === 0) {
             throw new Error("Failed to update transaction entry");
         }
@@ -200,10 +202,11 @@ async function updateTransaction(
 //                              DELETE SERVICES
 // ==================================================================================
 async function deleteTransaction(
+    userId: number,
     id: number,
 ): Promise<boolean> {
     try {
-        const result = await transactionRepository.deleteTransaction(id);
+        const result = await transactionRepository.deleteTransaction(userId, id);
         if (!result || result.affectedRows === 0) {
             throw new Error("Failed to delete transaction entry");
         }

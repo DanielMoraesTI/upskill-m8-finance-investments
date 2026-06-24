@@ -1,6 +1,6 @@
 import db from "@/app/api/_lib/db";
 import { RowDataPacket } from 'mysql2';
-import type { TUserModel } from "@/schemas/userSchema";
+import { UserModelSchema, type TUserModel } from "@/schemas/userSchema";
 import { ResultSetHeader } from 'mysql2';
 
 async function findByEmail(email: string): Promise<TUserModel | null> {
@@ -11,19 +11,25 @@ async function findByEmail(email: string): Promise<TUserModel | null> {
         if (rows.length === 0) return null;
 
         const user: TUserModel = {
+            id: rows[0].id,
             uuid: rows[0].uuid,
             email: rows[0].email,
             name: rows[0].name,
         };
 
-        return user;
+        const parsed = UserModelSchema.safeParse(user);
+        if (!parsed.success) {
+            throw new Error("Invalid user data from database");
+        }
+
+        return parsed.data;
     } catch (error) {
         console.error("Error fetching user by email:", error);
         throw error;
     }
 }
 
-async function insertNewUser(userData: TUserModel): Promise<TUserModel> {
+async function insertNewUser(userData: Omit<TUserModel, "id">): Promise<TUserModel> {
     try {
         const [result] = await db.query<ResultSetHeader>("INSERT INTO user (uuid, email, name) VALUES (?, ?, ?)", [
             userData.uuid,
@@ -37,6 +43,7 @@ async function insertNewUser(userData: TUserModel): Promise<TUserModel> {
         }
 
         const user: TUserModel = {
+            id: insertedId,
             uuid: userData.uuid,
             email: userData.email,
             name: userData.name,

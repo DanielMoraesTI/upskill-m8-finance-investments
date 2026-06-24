@@ -11,8 +11,8 @@ import chatbotRepository from "@/app/api/_repositories/chatbot.repository";
 // ==================================================================================
 //                              GET SERVICES
 // ==================================================================================
-async function getConversationMessages(conversationId: number): Promise<TConversation | null> {
-    const rows = await chatbotRepository.findMessagesByConversationId(conversationId);
+async function getConversationMessages(userId: number, conversationId: number): Promise<TConversation | null> {
+    const rows = await chatbotRepository.findMessagesByConversationId(userId, conversationId);
     if (rows.length === 0) return null;
 
     const messages: Omit<TMessage, "conversationId">[] = rows.map((row) => ({
@@ -38,8 +38,8 @@ async function getConversationMessages(conversationId: number): Promise<TConvers
     return parsed.data;
 }
 
-async function getAllConversationSummary(): Promise<TConversationSummary> {
-    const rows = await chatbotRepository.findAllConversationSummary();
+async function getAllConversationSummary(userId: number): Promise<TConversationSummary> {
+    const rows = await chatbotRepository.findAllConversationSummary(userId);
     if (rows.length === 0) return [];
 
     const conversationSummary: TConversationSummary = rows.map((row) => ({
@@ -59,8 +59,8 @@ async function getAllConversationSummary(): Promise<TConversationSummary> {
 // ==================================================================================
 //                              DELETE SERVICES
 // ==================================================================================
-async function deleteConversation(conversationId: number): Promise<boolean> {
-    const deleted = await chatbotRepository.deleteConversation(conversationId);
+async function deleteConversation(userId: number, conversationId: number): Promise<boolean> {
+    const deleted = await chatbotRepository.deleteConversation(userId, conversationId);
     return deleted;
 }
 
@@ -69,12 +69,12 @@ async function deleteConversation(conversationId: number): Promise<boolean> {
 //                              POST SERVICES
 // ==================================================================================
 
-async function createConversation(prompt: string): Promise<TConversation> {
+async function createConversation(userId: number, prompt: string): Promise<TConversation> {
     let formattedTitle = prompt.length > 30 ? prompt.slice(0, 30) + '...' : prompt;
     formattedTitle = formattedTitle.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
     formattedTitle = formattedTitle.charAt(0).toUpperCase() + formattedTitle.slice(1);
     
-    const result = await chatbotRepository.createConversation(formattedTitle);
+    const result = await chatbotRepository.createConversation(userId, formattedTitle);
     if (result.affectedRows === 0 || !result.insertId) {
         throw new Error("Failed to create conversation");
     }
@@ -121,10 +121,10 @@ async function createMessage(args: Omit<TMessage, "id" | "createdAt">): Promise<
     return parsed.data;
 }
 
-async function handleFunctionCall(fnName: ChatbotFunction, args: unknown) {
+async function handleFunctionCall(userId: number, fnName: ChatbotFunction, args: unknown) {
     switch (fnName) {
         case "get_investment_summary":
-            return await getInvestmentSummary(args);
+            return await getInvestmentSummary(userId, args);
 
         default:
             throw new Error(`Função '${fnName}' não implementada.`);
@@ -145,7 +145,7 @@ export default chatbotService
 //                            Tool: get_investment_summary
 // ==================================================================================
 
-async function getInvestmentSummary(args: unknown): Promise<TTransactionList> {
+async function getInvestmentSummary(userId: number, args: unknown): Promise<TTransactionList> {
     const { period, type, assetType } = z.object({
         period: z.enum(["week", "month", "quarter", "semester", "year"]),
         type: z.enum(["buy", "sell", "all"]),
@@ -165,6 +165,7 @@ async function getInvestmentSummary(args: unknown): Promise<TTransactionList> {
     }
 
     const transactions = await transactionService.getAllTransactionsWithArgs({
+        userId,
         entryType: type === "all" ? null : type,
         assetTypeId: assetType === "all" ? null : assetType,
         startDate,

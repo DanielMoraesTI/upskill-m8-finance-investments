@@ -1,12 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import assetService from "@/app/api/_services/asset.service";
 import { PatchCurrentPriceRequestSchema } from "@/schemas/assetSchema";
 import { errorResponse } from "@/app/api/_utils/serverUtils";
+import userService from "@/app/api/_services/user.service";
 
-export async function PATCH(request: Request, ctx: RouteContext<'/api/portal/assets/[id]'>) {
+export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/portal/assets/[id]'>) {
   try {
     const { id } = await ctx.params;
     const body = await request.json();
+
+    // validar o userID
+    const authorizedUser = await userService.requireAuth(request);
+    if (!authorizedUser) {
+      return errorResponse("Não autorizado", 401);
+    }
+
     const assetId = Number(id);
 
     const parsedBody = PatchCurrentPriceRequestSchema.safeParse(body);

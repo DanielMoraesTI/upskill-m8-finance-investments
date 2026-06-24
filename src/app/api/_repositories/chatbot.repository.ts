@@ -2,19 +2,17 @@ import type { TMessage } from "@/schemas/chatbotSchema";
 import db from "@/app/api/_lib/db";
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
-const MOCK_USER_ID = 1;
-
 // ==================================================================================
 //                                        SELECTS
 // ==================================================================================
-async function findMessagesByConversationId(conversationId: number): Promise<RowDataPacket[]> {
+async function findMessagesByConversationId(userId: number, conversationId: number): Promise<RowDataPacket[]> {
     try {
         const [rows] = await db.query<RowDataPacket[]>(
             `SELECT c.id conversationId, c.title, c.created_at conversationCreatedAt,c.updated_at conversationUpdatedAt,
             m.id messageId, m.role, m.content, m.created_at messageCreatedAt
             FROM conversation c, message m
-            WHERE c.id = m.conversation_id AND c.id = ? ORDER BY m.created_at DESC
-        `, [conversationId]);
+            WHERE c.id = m.conversation_id AND c.id = ? AND c.user_id = ? ORDER BY m.created_at DESC
+        `, [conversationId, userId]);
         return rows;
     } catch (error) {
         console.error("Error fetching messages by conversation ID:", error);
@@ -22,13 +20,14 @@ async function findMessagesByConversationId(conversationId: number): Promise<Row
     }
 }
 
-async function findAllConversationSummary(): Promise<RowDataPacket[]> {
+async function findAllConversationSummary(userId: number): Promise<RowDataPacket[]> {
     try {
         const [rows] = await db.query<RowDataPacket[]>(
             `SELECT c.id, c.title, c.updated_at
             FROM conversation c
+            WHERE c.user_id = ?
             ORDER BY c.updated_at DESC
-        `);
+        `, [userId]);
         return rows;
     } catch (error) {
         console.error("Error fetching conversation summary:", error);
@@ -39,10 +38,10 @@ async function findAllConversationSummary(): Promise<RowDataPacket[]> {
 // ==================================================================================
 //                                        INSERTS
 // ==================================================================================
-async function createConversation(title: string): Promise<ResultSetHeader> {
+async function createConversation(userId: number, title: string): Promise<ResultSetHeader> {
     try {
         const [result] = await db.query<ResultSetHeader>(
-            `INSERT INTO conversation (title, user_id) VALUES (?, ?)`, [title, MOCK_USER_ID]
+            `INSERT INTO conversation (title, user_id) VALUES (?, ?)`, [title, userId]
         );
         return result;
     } catch (error) {
@@ -83,10 +82,10 @@ async function updateConversationTimestamp(conversationId: number): Promise<void
 // ==================================================================================
 //                                        DELETES
 // ==================================================================================
-async function deleteConversation(conversationId: number): Promise<boolean> {
+async function deleteConversation(userId: number, conversationId: number): Promise<boolean> {
     try {
         const [result] = await db.query<ResultSetHeader>(
-            `DELETE FROM conversation WHERE id = ?`, [conversationId]
+            `DELETE FROM conversation WHERE id = ? AND user_id = ?`, [conversationId, userId]
         );
         return result.affectedRows > 0;
     } catch (error) {

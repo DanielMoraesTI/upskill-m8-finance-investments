@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export interface IfindAllTransactions {
+    userId: number;
     startDate?: Date;
     endDate?: Date;
     entryType: TTransactionEntryType | null;

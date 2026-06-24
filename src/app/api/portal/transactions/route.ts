@@ -7,14 +7,17 @@ import {
 import { errorResponse } from "@/app/api/_utils/serverUtils";
 import transactionService from "@/app/api/_services/transaction.service";
 import walletService from "@/app/api/_services/wallet.service";
+import userService from "@/app/api/_services/user.service";
 
-const DEFAULT_USER_ID = 1;
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // validar o userID
+    const authorizedUser = await userService.requireAuth(request);
+    if (!authorizedUser) {
+      return errorResponse("Não autorizado", 401);
+    }
 
-    const transactionList = await transactionService.getAllTransactions();
+    const transactionList = await transactionService.getAllTransactions(authorizedUser.id);
     const response: TTransactionListResponse = { transactionList };
     const parsed = TransactionListResponseSchema.safeParse(response);
     if (!parsed.success) {
@@ -31,20 +34,24 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    // validar o userID
-    const userId = DEFAULT_USER_ID;
     const body = await request.json();
+
+    // validar o userID
+    const authorizedUser = await userService.requireAuth(request);
+    if (!authorizedUser) {
+      return errorResponse("Não autorizado", 401);
+    }
 
     const parsed = TransactionSchema.safeParse(body);
     if (!parsed.success) {
       return errorResponse("Dados de transação inválidos", 400);
     }
 
-    const createdTransaction = await transactionService.createTransaction(userId, parsed.data);
+    const createdTransaction = await transactionService.createTransaction(authorizedUser.id, parsed.data);
 
     // Recalcular o saldo da carteira associada ao ativo da transação
-    const updatedWalletData = await walletService.recalculateWalletByAsset(parsed.data.asset_id);
-    await walletService.updateWalletData(updatedWalletData);
+    const updatedWalletData = await walletService.recalculateWalletByAsset(authorizedUser.id, parsed.data.asset_id);
+    await walletService.updateWalletData(authorizedUser.id, updatedWalletData);
 
     return NextResponse.json({ transaction: createdTransaction }, { status: 201 });
 

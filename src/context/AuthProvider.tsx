@@ -4,6 +4,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useApp } from "./AppProvider";
 import { usePathname, useRouter } from "next/navigation";
+
 // Esta interface define a estrutura do contexto de autenticação (AuthContextProps), que inclui uma propriedade booleana isAuthenticated para indicar se o usuário está autenticado ou não. Ela é utilizada para garantir a consistência dos dados relacionados à autenticação em todo o código, permitindo que os componentes que consomem esse contexto tenham acesso às informações necessárias sobre o estado de autenticação do usuário e possam tomar decisões com base nessa informação de forma segura e eficiente.
 interface AuthContextProps {
   isAuthenticated: boolean;
@@ -39,7 +40,7 @@ export default function AuthProvider({
     setIsLoading(true);
     router.push("/auth");
   };
-  
+
   useEffect(() => {
     if (!pathname.includes("portal")) return; // Não verifica se não estiver em uma rota protegida
     if (isLoading) return; // Não verifica se já estiver carregando

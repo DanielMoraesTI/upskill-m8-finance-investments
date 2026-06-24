@@ -7,10 +7,12 @@ const UserEmailSchema = z.email("Email inválido");
 const UserNameSchema = z.string().min(1, "O nome é obrigatório").max(50, "O nome deve conter no máximo 100 caracteres");
 
 export const UserModelSchema = z.object({
+    id: z.number(),
     uuid: z.string(),
     email: UserEmailSchema,
     name: UserNameSchema,
 });
+
 // ==============================================================================
 //                                  USER TYPES
 // ==============================================================================

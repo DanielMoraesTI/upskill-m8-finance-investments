@@ -7,9 +7,9 @@ import transactionService from "./transaction.service";
 // ==================================================================================
 //                              GET SERVICES
 // ==================================================================================
-async function getAllWallets(): Promise<TWalletList> {
+async function getAllWallets(userId: number): Promise<TWalletList> {
     try {
-        const rows = await walletRepository.findAllWallets();
+        const rows = await walletRepository.findAllWallets(userId);
 
         if (rows.length === 0) return [];
 
@@ -81,9 +81,9 @@ async function getWalletByAssetId(assetId: number): Promise<TWallet> {
 //                              UPDATE SERVICES
 // ==================================================================================
 // Atualiza todos os campos de uma carteira específica
-async function updateWalletData(walletData: TWallet): Promise<TWallet> {
+async function updateWalletData(userId: number, walletData: TWallet): Promise<TWallet> {
     try {
-        const result = await walletRepository.updateWalletData(walletData);
+        const result = await walletRepository.updateWalletData(userId, walletData);
         if (!result || result.affectedRows === 0) {
             throw new Error("No wallet entry found for the given id");
         }
@@ -107,9 +107,9 @@ async function updateWalletData(walletData: TWallet): Promise<TWallet> {
 }
 
 // Atualiza apenas o Income para Renda Fixa
-async function updateWalletIncome(walletId: number, income: number): Promise<boolean> {
+async function updateWalletIncome(userId: number, walletId: number, income: number): Promise<boolean> {
     try {
-        const result = await walletRepository.updateWalletIncome(walletId, income);
+        const result = await walletRepository.updateWalletIncome(userId, walletId, income);
         return result && result.affectedRows > 0;
     } catch (error) {
         console.error("Error in updateWalletIncome:", error);
@@ -117,10 +117,10 @@ async function updateWalletIncome(walletId: number, income: number): Promise<boo
     }
 }
 
-async function recalculateWalletByAsset(assetId: number): Promise<TWallet> {
+async function recalculateWalletByAsset(userId: number, assetId: number): Promise<TWallet> {
     try {
         // Pegar a listagem de todas as transações ordenada por data da transação.
-        const transactions = await transactionService.getAllTransactionsByAssetId(assetId);
+        const transactions = await transactionService.getAllTransactionsByAssetId(userId, assetId);
 
         const assetType = await assetRepository.findAssetTypeByAssetId(assetId);
         if (!assetType || assetType.length === 0) {

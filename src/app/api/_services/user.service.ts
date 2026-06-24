@@ -1,3 +1,4 @@
+import { NextRequest } from "next/dist/server/web/spec-extension/request";
 import admin from "../_lib/firebaseAdmin";
 import userRepository from "../_repositories/user.repository";
 import type { TCreateUser, TUserModel } from "@/schemas/userSchema";
@@ -46,7 +47,30 @@ async function createUser(userData: TCreateUser): Promise<TUserModel> {
     }
 }
 
+async function requireAuth(request: NextRequest): Promise<TUserModel | null> {
+    try {
+        const token = request.headers.get("Authorization");
+        if (!token) return null;
+        
+        const idToken = token.split('Bearer ')[1];
+
+        // 1. Validação no Firebase (Garante que a pessoa é quem diz ser)
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        if (!decodedToken || !decodedToken.email) return null;
+
+        // 2. Busca no Banco de Dados (Garante que o utilizador existe sistema)
+        const dbUser = await userRepository.findByEmail(decodedToken.email);
+        if (!dbUser) return null;
+
+        return dbUser;
+    } catch (error) {
+        console.error("Error in requireAuth:", error);
+        throw error;
+    }
+}
+
 const userService = {
     createUser,
+    requireAuth,
 };
 export default userService;

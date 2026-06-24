@@ -9,9 +9,9 @@ import {
 // ==================================================================================
 //                                       SELECTS
 // ==================================================================================
-async function findAllTransactions(): Promise<RowDataPacket[]> {
+async function findAllTransactions(userId: number): Promise<RowDataPacket[]> {
   try {
-    const [rows] = await db.query<RowDataPacket[]>("SELECT * FROM transaction");
+    const [rows] = await db.query<RowDataPacket[]>("SELECT * FROM transaction WHERE user_id = ?", [userId]);
     return rows;
   } catch (error) {
     console.error("Error in findAllTransactions:", error);
@@ -20,12 +20,13 @@ async function findAllTransactions(): Promise<RowDataPacket[]> {
 }
 
 async function findTransactionById(
+  userId: number,
   id: number,
 ): Promise<RowDataPacket[]> {
   try {
     const [rows] = await db.query<RowDataPacket[]>(
-      "SELECT * FROM transaction WHERE id = ? LIMIT 1",
-      [id],
+      "SELECT * FROM transaction WHERE id = ? AND user_id = ? LIMIT 1",
+      [id, userId],
     );
     return rows;
   } catch (error) {
@@ -46,11 +47,11 @@ async function findAllTransactionsWithArgs(args: IfindAllTransactions): Promise<
   }
 }
 
-async function findAllTransactionsByAssetId(assetId: number): Promise<RowDataPacket[]> {
+async function findAllTransactionsByAssetId(userId: number, assetId: number): Promise<RowDataPacket[]> {
   try {
     const [rows] = await db.query<RowDataPacket[]>(
-      "SELECT * FROM transaction WHERE asset_id = ? ORDER BY date ASC",
-      [assetId],
+      "SELECT * FROM transaction WHERE asset_id = ? AND user_id = ? ORDER BY date ASC",
+      [assetId, userId],
     );
     return rows;
   } catch (error) {
@@ -92,6 +93,7 @@ async function createTransactionEntry(
 //                                        UPDATES
 // ==================================================================================
 async function updateTransaction(
+  userId: number,
   transactionData: TTransaction,
 ): Promise<ResultSetHeader> {
   try {
@@ -104,14 +106,15 @@ async function updateTransaction(
         unit_price = ?,
         total_value = ?,
         updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?`, [
+        WHERE id = ? AND user_id = ?`, [
       transactionData.asset_id,
       transactionData.entry_type,
       transactionData.date,
       transactionData.quantity,
       transactionData.unit_price,
       transactionData.total_value,
-      String(transactionData.id)
+      transactionData.id,
+      userId
     ]);
     return result;
   } catch (error) {
@@ -123,9 +126,9 @@ async function updateTransaction(
 // ==================================================================================
 //                                        DELETES
 // ==================================================================================
-async function deleteTransaction(id: number): Promise<ResultSetHeader> {
+async function deleteTransaction(userId: number, id: number): Promise<ResultSetHeader> {
   try {
-    const [result] = await db.query<ResultSetHeader>(`DELETE FROM transaction WHERE id = ?`, [id]);
+    const [result] = await db.query<ResultSetHeader>(`DELETE FROM transaction WHERE id = ? AND user_id = ?`, [id, userId]);
     return result;
   } catch (error) {
     console.error("Error in deleteTransaction:", error);
@@ -149,13 +152,19 @@ export default transactionRepository;
 //                            Helper Functions
 // ===================================================================================
 function buildfindAllTransactionsQuery(args: IfindAllTransactions): { query: string; params: string[] } {
-  const { startDate, endDate, entryType, assetTypeId } = args;
+  const { userId, startDate, endDate, entryType, assetTypeId } = args;
 
   // Seleciona apenas colunas de transaction para evitar conflito de nomes com o JOIN
   let query = "SELECT t.* FROM transaction t";
 
   const params: string[] = [];
   const whereClauses: string[] = [];
+
+  // Filtrar por userId é obrigatório para garantir que o usuário só veja suas próprias transações
+  if (userId) {
+    whereClauses.push("t.user_id = ?");
+    params.push(userId.toString());
+  }
 
   // Se filtrar por tipo de ativo, precisa JOIN com asset
   if (assetTypeId) {
@@ -182,7 +191,7 @@ function buildfindAllTransactionsQuery(args: IfindAllTransactions): { query: str
   }
 
   if (whereClauses.length > 0) {
-    query += ` WHERE ${whereClauses.join(" AND ")}`;
+    query += ` WHERE ${whereClauses.join(" AND ")} `;
   }
 
   query += ` ORDER BY t.updated_at DESC`;

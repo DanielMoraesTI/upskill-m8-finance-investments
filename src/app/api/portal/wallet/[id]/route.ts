@@ -2,11 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import walletService from "@/app/api/_services/wallet.service";
 import { UpdateWalletIncomeRequestSchema, WalletSchema } from "@/schemas/walletSchema";
 import { errorResponse } from "@/app/api/_utils/serverUtils";
+import userService from "@/app/api/_services/user.service";
 
 export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/portal/wallet/[id]'>) {
   try {
     const { id } = await ctx.params;
     const body = await request.json();
+    
+    // validar o userID
+    const authorizedUser = await userService.requireAuth(request);
+    if (!authorizedUser) {
+      return errorResponse("Não autorizado", 401);
+    }
+
     const walletId = Number(id);
 
     const parsedIncome = UpdateWalletIncomeRequestSchema.safeParse(body);
@@ -15,7 +23,7 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/portal
       return errorResponse("Rendimento inválido", 400);
     }
 
-    await walletService.updateWalletIncome(walletId, parsedIncome.data.income);
+    await walletService.updateWalletIncome(authorizedUser.id, walletId, parsedIncome.data.income);
 
     return NextResponse.json(
       { message: "Rendimento atualizado com sucesso" },
@@ -31,6 +39,13 @@ export async function PUT(request: NextRequest, ctx: RouteContext<'/api/portal/w
   try {
     const { id } = await ctx.params;
     const body = await request.json();
+
+    // validar o userID
+    const authorizedUser = await userService.requireAuth(request);
+    if (!authorizedUser) {
+      return errorResponse("Não autorizado", 401);
+    }
+
     const walletId = Number(id);
 
     if (id === undefined || isNaN(walletId)) {
@@ -43,7 +58,7 @@ export async function PUT(request: NextRequest, ctx: RouteContext<'/api/portal/w
       return errorResponse("Dados da carteira inválidos", 400);
     }
 
-    const updatedWallet = await walletService.updateWalletData(parsedWallet.data);
+    const updatedWallet = await walletService.updateWalletData(authorizedUser.id, parsedWallet.data);
 
     return NextResponse.json(
       { updatedWallet },

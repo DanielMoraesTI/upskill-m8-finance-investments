@@ -149,7 +149,7 @@ async function getAssetByTypeAndTicker(
 // ==================================================================================
 //                              UPDATE SERVICES
 // ==================================================================================
-export async function updateAssetCurrentPrice(
+async function updateAssetCurrentPrice(
     assetId: number,
     newPrice: number,
 ): Promise<void> {
