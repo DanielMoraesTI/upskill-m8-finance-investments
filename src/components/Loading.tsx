@@ -5,13 +5,11 @@ export default function Loading() {
     // Fundo base escuro
     <div className="fixed top-0 left-0 z-50 flex min-h-screen min-w-screen items-center justify-center bg-[#070b14] overflow-hidden">
       {/* EFEITO DE GLOW RADIAL (Técnica do Blur)
-        Criamos "bolas" de luz atrás do logo e aplicamos um desfoque extremo.
-        Isso funciona nativamente no Tailwind sem risco de quebrar no build.
       */}
       <div className="absolute top-1/2 left-1/2 h-[50vh] w-[50vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1a2b4c] opacity-60 blur-[120px]"></div>
       <div className="absolute top-1/2 left-1/2 h-[30vh] w-[30vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#2dd4bf] opacity-10 blur-[100px]"></div>
 
-      {/* Gradiente linear nos cantos (Classes padrão do Tailwind) */}
+      {/* Gradiente linear nos cantos */}
       <div className="absolute inset-0 bg-linear-to-tr from-[#070b14] via-transparent to-[#0e2142]/40"></div>
 
       {/* Overlay tipo Vignette para escurecer as bordas */}

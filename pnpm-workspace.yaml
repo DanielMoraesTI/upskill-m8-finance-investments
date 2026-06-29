@@ -1,5 +1,6 @@
 allowBuilds:
   '@firebase/util': false
+  '@google/genai': true
   msw: true
   protobufjs: false
   sharp: true

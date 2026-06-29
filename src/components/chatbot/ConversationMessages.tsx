@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import ChatbotHelper from "@/components/chatbot/ChatbotHelper";
 
 const promptSuggestions = [
-  "Quais ativos valorizaram mais nos últimos 6 meses?",
-  "Qual é o rendimento total de renda fixa?",
+  "Quais ativos que mais comprei nos últimos 6 meses?",
+  "Qual ativo tenho comprado menos nos últimos 3 meses?",
   "Compare a carteira atual com 3 meses atrás.",
 ];
 

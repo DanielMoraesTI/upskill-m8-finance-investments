@@ -6,7 +6,7 @@ import type {
 import { getUserToken } from "./api";
 
 const url = `${process.env.NEXT_PUBLIC_API_URL}/portal/chatbot` || "http://localhost:3000/api/portal/chatbot";
-
+// Esta função obtém o resumo das conversas do usuário autenticado, retornando um array de objetos TConversationSummary. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição GET para a API do chatbot, validando a resposta com o esquema ConversationSummarySchema.
 const getConversationSummary = async (): Promise<TConversationSummary> => {
     const token = await getUserToken();
     const response = await fetch(url, {
@@ -24,7 +24,7 @@ const getConversationSummary = async (): Promise<TConversationSummary> => {
 
     return parsed.data;
 }
-
+// Esta função obtém o histórico de mensagens de uma conversa específica do usuário autenticado, retornando um objeto TConversation. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição GET para a API do chatbot com o ID da conversa, validando a resposta com o esquema ConversationSchema.
 const getChatHistory = async (conversationId: number): Promise<TConversation> => {
     const token = await getUserToken();
     const response = await fetch(`${url}?id=${conversationId}`, {
@@ -40,8 +40,7 @@ const getChatHistory = async (conversationId: number): Promise<TConversation> =>
     }
     return parsed.data;
 }
-
-
+// Esta função exclui uma conversa específica do usuário autenticado, retornando um booleano indicando se a exclusão foi bem-sucedida. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição DELETE para a API do chatbot com o ID da conversa.
 async function deleteConversation(conversationId: number): Promise<boolean> {
     const token = await getUserToken();
     const response = await fetch(`${url}?id=${conversationId}`, {
@@ -51,7 +50,7 @@ async function deleteConversation(conversationId: number): Promise<boolean> {
     if (!response.ok) throw new Error('Failed to delete conversation');
     return response.json();
 }
-
+// Esta função inicia uma nova conversa com o chatbot, enviando um prompt inicial e recebendo eventos de resposta em tempo real. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição POST para a API do chatbot com o prompt fornecido. A função onEvent é chamada para cada evento recebido do chatbot, permitindo que o aplicativo processe as respostas em tempo real.
 async function startChat(prompt: string, onEvent: (event: TChatbotEvent) => void): Promise<void> {
     const token = await getUserToken();
     const response = await fetch(url, {
@@ -65,7 +64,7 @@ async function startChat(prompt: string, onEvent: (event: TChatbotEvent) => void
 
     await handleStream(response.body, onEvent);
 }
-
+// Esta função envia uma mensagem para uma conversa existente com o chatbot, enviando o prompt fornecido e recebendo eventos de resposta em tempo real. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição POST para a API do chatbot com o ID da conversa e o prompt fornecido. A função onEvent é chamada para cada evento recebido do chatbot, permitindo que o aplicativo processe as respostas em tempo real.
 async function sendMessage(conversationId: number, prompt: string, onEvent: (event: TChatbotEvent) => void): Promise<void> {
     const token = await getUserToken();
     const response = await fetch(url, {
@@ -79,7 +78,7 @@ async function sendMessage(conversationId: number, prompt: string, onEvent: (eve
 
     await handleStream(response.body, onEvent);
 }
-
+// Esta função lida com o streaming de eventos do chatbot, processando os dados recebidos em tempo real e chamando a função onEvent para cada evento recebido. Ela utiliza um leitor de fluxo (ReadableStream) para ler os dados do corpo da resposta e decodifica os eventos JSON, garantindo que cada evento seja tratado corretamente.
 async function handleStream(body: ReadableStream<Uint8Array>, onEvent: (event: TChatbotEvent) => void): Promise<void> {
     const reader = body.getReader();
     const decoder = new TextDecoder();

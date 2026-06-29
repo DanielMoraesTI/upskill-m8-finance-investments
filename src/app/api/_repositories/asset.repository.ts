@@ -4,6 +4,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 // ==================================================================================
 //                                        SELECTS
 // ==================================================================================
+// Está função busca todos os tipos de ativos disponíveis no banco de dados e retorna um array de objetos representando cada tipo de ativo.
 async function findAllAssetTypes(): Promise<RowDataPacket[]> {
   try {
     const [rows] = await db.query<RowDataPacket[]>(
@@ -15,7 +16,7 @@ async function findAllAssetTypes(): Promise<RowDataPacket[]> {
     throw new Error("An error occurred while fetching asset types");
   }
 }
-
+// Esta função busca todos os ativos disponíveis no banco de dados e retorna um array de objetos representando cada ativo.
 async function findAllAssets(): Promise<RowDataPacket[]> {
   try {
     const [rows] = await db.query<RowDataPacket[]>("SELECT * FROM asset");
@@ -25,7 +26,7 @@ async function findAllAssets(): Promise<RowDataPacket[]> {
     throw new Error("An error occurred while fetching assets");
   }
 }
-
+// Esta função busca um ativo específico no banco de dados com base no tipo de ativo e no ticker fornecidos, retornando um array de objetos representando o ativo encontrado.
 async function findAssetByTypeAndTicker(
   assetTypeId: number,
   ticker: string,
@@ -41,7 +42,7 @@ async function findAssetByTypeAndTicker(
     throw new Error("An error occurred while searching asset by ticker");
   }
 }
-
+// Esta função busca o tipo de ativo associado a um ativo específico no banco de dados com base no ID do ativo fornecido, retornando um array de objetos representando o tipo de ativo encontrado.
 async function findAssetTypeByAssetId(assetId: number): Promise<RowDataPacket[]> {
   try {
     const [rows] = await db.query<RowDataPacket[]>(
@@ -58,6 +59,7 @@ async function findAssetTypeByAssetId(assetId: number): Promise<RowDataPacket[]>
 // ==================================================================================
 //                                        UPDATES
 // ==================================================================================
+// Esta função atualiza o preço atual de um ativo específico no banco de dados com base no ID do ativo e no novo preço fornecidos, retornando o resultado da operação de atualização.
 async function updateAssetCurrentPrice(
   assetId: number,
   newPrice: number,

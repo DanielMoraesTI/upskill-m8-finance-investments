@@ -17,9 +17,12 @@ export const AssetTypeSchema = z.union([
         asset_type: z.literal("Renda Fixa"),
     }),
 ]);
-// Este esquema define a estrutura de uma categoria de FII (FiiCategory), que é um enum com os valores "Fundo de Papel", "Fundo de Tijolo" e "Fundo Híbrido". Ele utiliza o Zod para validação, garantindo que os dados relacionados às categorias de FII sejam consistentes e sigam as regras definidas para cada categoria específica. O uso do Zod permite a validação consistente dos dados relacionados às categorias de FII em todo o código.
+// ==============================================================================
+//                                  ASSET SCHEMAS
+// ==============================================================================
+// Este esquema define a estrutura de uma categoria de FII (Fundo de Investimento Imobiliário), que pode ser "Fundo de Papel", "Fundo de Tijolo" ou "Fundo Híbrido". Ele utiliza o Zod para validação, garantindo que os dados relacionados às categorias de FIIs sejam consistentes e sigam as regras definidas para cada categoria específica. O uso do Zod permite a validação consistente dos dados relacionados às categorias de FIIs em todo o código, facilitando a manipulação segura desses dados em funções e componentes que lidam com informações de ativos do tipo FII.
 const FiiCategorySchema = z.enum(["Fundo de Papel", "Fundo de Tijolo", "Fundo Híbrido"]);
-// Este esquema define a estrutura de um ativo (Asset), que pode ser do tipo Ação, FII ou Renda Fixa. Ele utiliza o Zod para validação, garantindo que os dados relacionados aos ativos sejam consistentes e sigam as regras definidas para cada tipo específico. O uso do Zod permite a validação consistente dos dados relacionados aos ativos em todo o código, facilitando a manipulação segura desses dados em funções e componentes que lidam com informações de ativos.
+
 const BaseSchema = z.object({
     id: z.number(),
     asset_type_id: z.number(),

@@ -3,6 +3,10 @@ import { RowDataPacket } from 'mysql2';
 import { UserModelSchema, type TUserModel } from "@/schemas/userSchema";
 import { ResultSetHeader } from 'mysql2';
 
+// ==================================================================================
+//                                       SELECTS
+// ==================================================================================
+// Esta função busca um usuário específico no banco de dados com base no email fornecido, retornando um objeto representando o usuário encontrado ou null se não houver correspondência.
 async function findByEmail(email: string): Promise<TUserModel | null> {
     try {
         const [rows] = await db.query<RowDataPacket[]>("SELECT * FROM user WHERE email = ?", [
@@ -28,7 +32,10 @@ async function findByEmail(email: string): Promise<TUserModel | null> {
         throw error;
     }
 }
-
+// ==================================================================================
+//                                       INSERTS
+// ==================================================================================
+// Esta função insere um novo usuário no banco de dados com base nos dados fornecidos, retornando o objeto do usuário inserido.
 async function insertNewUser(userData: Omit<TUserModel, "id">): Promise<TUserModel> {
     try {
         const [result] = await db.query<ResultSetHeader>("INSERT INTO user (uuid, email, name) VALUES (?, ?, ?)", [
@@ -55,7 +62,10 @@ async function insertNewUser(userData: Omit<TUserModel, "id">): Promise<TUserMod
         throw error;
     };
 }
-
+// ==================================================================================
+//                                       DELETES
+// ==================================================================================
+// Esta função exclui um usuário específico do banco de dados com base no email fornecido.
 async function deleteByEmail(email: string): Promise<void> {
     try {
         await db.query("DELETE FROM user WHERE email = ?", [email]);

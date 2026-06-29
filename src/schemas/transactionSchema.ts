@@ -1,32 +1,38 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export interface IfindAllTransactions {
-    userId: number;
-    startDate?: Date;
-    endDate?: Date;
-    entryType: TTransactionEntryType | null;
-    assetTypeId: string | null;
+  userId: number;
+  startDate?: Date;
+  endDate?: Date;
+  entryType: TTransactionEntryType | null;
+  assetTypeId: string | null;
 }
 
 // ==============================================================================
 //                                  FRONTEND SCHEMAS
 // ==============================================================================
 // Este esquema define a estrutura de um objeto Transaction, incluindo campos como id, asset_id, entry_type, date, quantity, unit_price, total_value, created_at e updated_at. Ele utiliza o Zod para validação de tipos e regras específicas, como garantir que quantity, unit_price e total_value sejam números positivos. O campo entry_type é definido como um enum com os valores 'buy' e 'sell', enquanto os campos date, created_at e updated_at devem ser datas ISO. O uso do coerce permite que valores de string sejam convertidos para números, facilitando a manipulação de dados provenientes de formulários ou APIs.
-const TransactionEntryTypeSchema = z.enum(['buy', 'sell']);
+const TransactionEntryTypeSchema = z.enum(["buy", "sell"]);
 
-const CreateTransactionSchema = z.object({
-    asset_id: z.number(),
-    entry_type: TransactionEntryTypeSchema,
-    date: z.iso.date(),
-    quantity: z.coerce.number().positive("A quantidade deve ser um número positivo"),
-    unit_price: z.coerce.number().positive("O preço unitário deve ser um número positivo"),
-    total_value: z.coerce.number().positive("O valor total deve ser um número positivo"),
+export const CreateTransactionSchema = z.object({
+  asset_id: z.number(),
+  entry_type: TransactionEntryTypeSchema,
+  date: z.iso.date(),
+  quantity: z.coerce
+    .number()
+    .positive("A quantidade deve ser um número positivo"),
+  unit_price: z.coerce
+    .number()
+    .positive("O preço unitário deve ser um número positivo"),
+  total_value: z.coerce
+    .number()
+    .positive("O valor total deve ser um número positivo"),
 });
 // Este esquema define a estrutura de uma lista de transações (TransactionList), que é um array de objetos Transaction. Ele utiliza o Zod para garantir que cada item na lista siga a estrutura definida pelo TransactionSchema, permitindo validação e manipulação consistente dos dados relacionados às transações de investimento.
 export const TransactionSchema = CreateTransactionSchema.extend({
-    id: z.number(),
-    created_at: z.iso.date(),
-    updated_at: z.iso.date(),
+  id: z.number(),
+  created_at: z.iso.date(),
+  updated_at: z.iso.date(),
 });
 // ==============================================================================
 //                                  FRONTEND TYPES
@@ -42,13 +48,17 @@ export type TTransactionList = z.infer<typeof TransactionListSchema>;
 // ==============================================================================
 //                                  API SCHEMAS
 // ==============================================================================
-
+// Este esquema define a estrutura de uma resposta de lista de transações (TransactionListResponse), que inclui um campo transactionList contendo um array de objetos Transaction. Ele utiliza o Zod para validação, garantindo que a resposta da API siga a estrutura esperada e permitindo manipulação consistente dos dados relacionados às transações em funções e componentes que lidam com a comunicação com a API.
 export const TransactionListResponseSchema = z.object({
-    transactionList: z.array(TransactionSchema),
+  transactionList: z.array(TransactionSchema),
 });
-export type TTransactionListResponse = z.infer<typeof TransactionListResponseSchema>;
+export type TTransactionListResponse = z.infer<
+  typeof TransactionListResponseSchema
+>;
 
 export const UpdateTransactionRequestSchema = z.object({
-    transaction: TransactionSchema,
+  transaction: TransactionSchema,
 });
-export type TUpdateTransactionRequest = z.infer<typeof UpdateTransactionRequestSchema>;
+export type TUpdateTransactionRequest = z.infer<
+  typeof UpdateTransactionRequestSchema
+>;

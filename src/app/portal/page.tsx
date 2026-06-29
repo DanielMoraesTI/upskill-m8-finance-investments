@@ -13,7 +13,7 @@ import {
   buildMonthlyClassSeries,
   buildPortfolioSummary,
 } from "@/utils/portfolioMetrics";
-
+// Esta função de componente React renderiza a página do dashboard, fornecendo um resumo visual e analítico da carteira de investimentos do usuário. Ela exibe informações como valor total investido, distribuição por tipo de ativo, gráficos de barras para evolução mensal e uma tabela detalhada de categorias de fundos imobiliários. O componente utiliza hooks para acessar os dados dos contextos `useAsset`, `useWallet` e `useTransaction`, e calcula métricas relevantes para apresentar ao usuário.
 export default function DashboardPage() {
   const { assetList } = useAsset();
   const { walletList } = useWallet();

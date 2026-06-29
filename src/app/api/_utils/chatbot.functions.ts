@@ -4,9 +4,9 @@ import { Type } from "@google/genai";
 
 export const ChatbotFunctionSchema = z.enum([
     "get_investment_summary",
-    // adicionar mais se necessário aqui
+    // adicionar mais aqui se for necessário
 ]);
-
+// Esta função define o esquema de funções do chatbot, permitindo que o aplicativo interaja com os serviços de inteligência artificial do Google. O esquema inclui a função "get_investment_summary" para obter um resumo das transações de investimentos financeiros.
 export type ChatbotFunction = z.infer<typeof ChatbotFunctionSchema>;
 
 export const getInvestmentSummary: FunctionDeclaration = {

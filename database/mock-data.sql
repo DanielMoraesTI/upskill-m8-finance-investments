@@ -1,28 +1,7 @@
 USE finance_investments;
 
 -- ==================================================================================================
--- MOCK DATA ROBUSTO
--- Objetivo: alimentar backend/frontend com variedade de ativos e transacoes reais para testes.
--- Mantem as tabelas existentes sem mudanca estrutural.
--- ==================================================================================================
-
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE `transaction`;
-TRUNCATE TABLE wallet;
-TRUNCATE TABLE asset;
-TRUNCATE TABLE asset_type;
-SET FOREIGN_KEY_CHECKS = 1;
-
--- Garante usuario base para os testes locais (id 1). Apenas para ambiente local, nao deve ser usado em producao. Utilizado se não houver outro usuario no banco de dados criado com o FireBase.
-INSERT INTO user (id, email, uuid, name)
-VALUES (1, 'investidor.teste@local.dev', 'user-local-uuid-001', 'Investidor Teste')
-ON DUPLICATE KEY UPDATE
-  email = VALUES(email),
-  uuid = VALUES(uuid),
-  name = VALUES(name);
-
--- ==================================================================================================
--- 1) TIPOS DE ATIVO
+-- 1) TIPOS DE ATIVOS
 -- ==================================================================================================
 INSERT INTO asset_type (asset_type) VALUES
   ('Ação'),
@@ -32,29 +11,57 @@ INSERT INTO asset_type (asset_type) VALUES
 -- ==================================================================================================
 -- 2) ATIVOS DO SISTEMA
 -- ==================================================================================================
--- ACOES
+
+-- AÇÕES (Solicitadas + 5 Escolhidas)
 INSERT INTO asset (asset_type_id, ticker, company, current_price) VALUES
-  (1, 'ITSA4', 'Itausa SA', 10.85),
-  (1, 'PETR4', 'Petrobras SA', 39.20),
-  (1, 'VALE3', 'Vale SA', 62.40),
   (1, 'BBAS3', 'Banco do Brasil SA', 28.70),
+  (1, 'CMIG4', 'Companhia Energética de Minas Gerais - Cemig', 11.50),
+  (1, 'ITSA4', 'Itaúsa SA', 10.85),
+  (1, 'PETR4', 'Petróleo Brasileiro SA - Petrobras', 39.20),
+  (1, 'POMO4', 'Marcopolo SA', 8.20),
+  -- 5 adicionais brasileiras
+  (1, 'VALE3', 'Vale SA', 62.40),
   (1, 'WEGE3', 'WEG SA', 47.15),
-  (1, 'TAEE11', 'Taesa SA', 37.90),
-  (1, 'BBDC4', 'Banco Bradesco SA', 14.75),
-  (1, 'ABEV3', 'Ambev SA', 13.05);
+  (1, 'SANB11', 'Banco Santander Brasil SA', 29.10),
+  (1, 'ELET3', 'Centrais Elétricas Brasileiras SA - Eletrobras', 41.30),
+  (1, 'EQTL3', 'Equatorial Energia SA', 33.50);
 
--- FIIS
+-- FIIS (20 Solicitados + 5 Escolhidos, classificados por categoria)
 INSERT INTO asset (asset_type_id, ticker, category, current_price) VALUES
-  (2, 'CPTS11', 'Fundo de Papel', 8.33),
-  (2, 'RECR11', 'Fundo de Papel', 73.80),
-  (2, 'KNCR11', 'Fundo de Papel', 106.40),
+  -- Solicitados: Fundo de Tijolo
+  (2, 'BRCO11', 'Fundo de Tijolo', 121.50),
+  (2, 'BTLG11', 'Fundo de Tijolo', 102.80),
+  (2, 'GARE11', 'Fundo de Tijolo', 9.15),
+  (2, 'GGRC11', 'Fundo de Tijolo', 112.30),
   (2, 'HGLG11', 'Fundo de Tijolo', 165.90),
-  (2, 'XPLG11', 'Fundo de Tijolo', 101.20),
+  (2, 'HGRU11', 'Fundo de Tijolo', 125.40),
+  (2, 'HSML11', 'Fundo de Tijolo', 94.20),
+  (2, 'PVBI11', 'Fundo de Tijolo', 91.80),
+  (2, 'TRXF11', 'Fundo de Tijolo', 104.50),
   (2, 'XPML11', 'Fundo de Tijolo', 109.60),
-  (2, 'MCCI11', 'Fundo Híbrido', 88.10),
-  (2, 'RBRP11', 'Fundo Híbrido', 52.70);
+  
+  -- Solicitados: Fundo de Papel (Recebíveis)
+  (2, 'CPTS11', 'Fundo de Papel', 8.33),
+  (2, 'IRIM11', 'Fundo de Papel', 82.10),
+  (2, 'ITRI11', 'Fundo de Papel', 94.50),
+  (2, 'KNCR11', 'Fundo de Papel', 106.40),
+  (2, 'KNHF11', 'Fundo de Papel', 101.20),
+  (2, 'KNUQ11', 'Fundo de Papel', 88.90),
+  (2, 'RBRR11', 'Fundo de Papel', 91.30),
+  (2, 'RECR11', 'Fundo de Papel', 73.80),
+  
+  -- Solicitados: Fundo Híbrido / Multi-estratégia
+  (2, 'KNRI11', 'Fundo Híbrido', 158.20),
+  (2, 'RBRP11', 'Fundo Híbrido', 52.70),
+  
+  -- 5 FIIs adicionais escolhidos
+  (2, 'XPLG11', 'Fundo de Tijolo', 101.20),
+  (2, 'VISC11', 'Fundo de Tijolo', 115.00),
+  (2, 'MXRF11', 'Fundo de Papel', 10.15),
+  (2, 'HGBS11', 'Fundo de Tijolo', 218.00),
+  (2, 'BCFF11', 'Fundo Híbrido', 9.25);
 
--- RENDA FIXA
+-- RENDA FIXA (Mantidos do modelo)
 INSERT INTO asset (asset_type_id, company) VALUES
   (3, 'Tesouro Selic 2029'),
   (3, 'CDB Banco Inter 115 CDI'),
@@ -63,204 +70,43 @@ INSERT INTO asset (asset_type_id, company) VALUES
   (3, 'CRI Imobiliario AAA 2029');
 
 -- ==================================================================================================
--- 3) TRANSACTIONS (USER 1) - 2025/2026
+-- 3) TRANSAÇÕES - JANEIRO A JUNHO 2026 (IDs Ajustados)
 -- ==================================================================================================
 INSERT INTO transaction (user_id, asset_id, entry_type, date, quantity, unit_price, total_value) VALUES
-  -- ACOES
-  (1, 1, 'buy',  '2025-01-10', 120, 10.20, 1224.00),
-  (1, 1, 'buy',  '2025-03-12',  80, 10.60, 848.00),
-  (1, 1, 'sell', '2025-05-03',  50, 11.30, 565.00),
-  (1, 1, 'buy',  '2025-12-02',  40, 10.10, 404.00),
-
-  (1, 2, 'buy',  '2025-01-15', 100, 35.50, 3550.00),
-  (1, 2, 'buy',  '2025-04-19',  70, 36.80, 2576.00),
-  (1, 2, 'sell', '2025-06-22',  60, 38.10, 2286.00),
-  (1, 2, 'buy',  '2026-01-17',  50, 37.90, 1895.00),
-
-  (1, 3, 'buy',  '2025-02-08',  40, 58.10, 2324.00),
-  (1, 3, 'buy',  '2025-09-10',  35, 60.20, 2107.00),
-  (1, 3, 'sell', '2026-03-13',  20, 64.50, 1290.00),
-
-  (1, 4, 'buy',  '2025-01-20', 150, 24.20, 3630.00),
-  (1, 4, 'buy',  '2025-07-18',  50, 26.70, 1335.00),
-  (1, 4, 'sell', '2025-11-02',  40, 27.80, 1112.00),
-
-  (1, 5, 'buy',  '2025-03-05',  35, 42.10, 1473.50),
-  (1, 5, 'buy',  '2025-08-14',  30, 44.00, 1320.00),
-  (1, 5, 'sell', '2026-02-01',  15, 46.90, 703.50),
-
-  (1, 6, 'buy',  '2025-02-02',  60, 34.70, 2082.00),
-  (1, 6, 'sell', '2025-10-09',  15, 36.10, 541.50),
-
-  (1, 7, 'buy',  '2025-01-12', 180, 13.40, 2412.00),
-  (1, 7, 'buy',  '2025-06-28', 120, 14.10, 1692.00),
-  (1, 7, 'sell', '2026-04-15', 100, 15.20, 1520.00),
-
-  (1, 8, 'buy',  '2025-02-25', 200, 11.60, 2320.00),
-  (1, 8, 'buy',  '2025-09-30', 120, 12.20, 1464.00),
-  (1, 8, 'sell', '2026-01-08',  90, 12.80, 1152.00),
-
-  -- FIIS
-  (1, 9,  'buy',  '2025-01-06',  80, 7.90, 632.00),
-  (1, 9,  'buy',  '2025-03-06',  40, 8.10, 324.00),
-  (1, 9,  'sell', '2025-08-06',  30, 8.50, 255.00),
-
-  (1, 10, 'buy',  '2025-02-15',  25, 69.40, 1735.00),
-  (1, 10, 'buy',  '2025-11-15',  20, 71.80, 1436.00),
-  (1, 10, 'sell', '2026-03-20',  10, 75.20, 752.00),
-
-  (1, 11, 'buy',  '2025-01-25',  18, 101.20, 1821.60),
-  (1, 11, 'buy',  '2025-07-25',  12, 104.10, 1249.20),
-
-  (1, 12, 'buy',  '2025-01-18',  20, 153.00, 3060.00),
-  (1, 12, 'buy',  '2025-06-19',  10, 158.20, 1582.00),
-  (1, 12, 'sell', '2025-12-22',   8, 162.50, 1300.00),
-
-  (1, 13, 'buy',  '2025-02-10',  35, 95.70, 3349.50),
-  (1, 13, 'buy',  '2025-09-11',  20, 98.20, 1964.00),
-
-  (1, 14, 'buy',  '2025-03-03',  30, 102.80, 3084.00),
-  (1, 14, 'sell', '2026-01-12',  10, 110.40, 1104.00),
-
-  (1, 15, 'buy',  '2025-04-02',  40, 83.20, 3328.00),
-  (1, 15, 'buy',  '2026-02-02',  20, 86.40, 1728.00),
-
-  (1, 16, 'buy',  '2025-05-08',  50, 49.10, 2455.00),
-  (1, 16, 'sell', '2025-10-08',  15, 51.30, 769.50),
-
-  -- RENDA FIXA (valor total no unit_price por simplicidade)
-  (1, 17, 'buy',  '2025-01-02', 1, 5000.00, 5000.00),
-  (1, 17, 'buy',  '2025-04-02', 1, 3000.00, 3000.00),
-  (1, 17, 'sell', '2026-03-02', 1, 1000.00, 1000.00),
-
-  (1, 18, 'buy',  '2025-01-10', 1, 2000.00, 2000.00),
-  (1, 18, 'buy',  '2025-05-10', 1, 2500.00, 2500.00),
-
-  (1, 19, 'buy',  '2025-02-12', 1, 3500.00, 3500.00),
-  (1, 19, 'sell', '2025-12-12', 1, 800.00, 800.00),
-
-  (1, 20, 'buy',  '2025-03-15', 1, 4200.00, 4200.00),
-  (1, 20, 'buy',  '2026-03-15', 1, 1800.00, 1800.00),
-
-  (1, 21, 'buy',  '2025-06-01', 1, 2600.00, 2600.00),
-  (1, 21, 'buy',  '2025-11-01', 1, 1400.00, 1400.00);
+  -- AÇÕES (Usando IDs 1-10)
+  (1, 1, 'buy',  '2026-01-15', 50, 28.50, 1425.00),
+  (1, 1, 'sell', '2026-04-20', 30, 30.20, 906.00),
+  (1, 2, 'buy',  '2026-02-10', 40, 11.80, 472.00),
+  (1, 4, 'buy',  '2026-03-05', 60, 40.50, 2430.00),
+  
+  -- FIIS (Usando IDs 11-35 conforme ordem de inserção na tabela asset)
+  -- Ex: HGLG11 (id 15), KNRI11 (id 29), BCFF11 (id 35)
+  (1, 15, 'buy',  '2026-01-20', 20, 165.90, 3318.00), -- HGLG11
+  (1, 29, 'buy',  '2026-03-25', 10, 158.20, 1582.00), -- KNRI11 (Híbrido)
+  (1, 35, 'buy',  '2026-05-10', 100, 9.25, 925.00),    -- BCFF11 (Híbrido)
+  (1, 33, 'buy',  '2026-04-05', 40, 101.20, 4048.00),  -- XPLG11
+  (1, 34, 'buy',  '2026-02-20', 50, 10.15, 507.50),    -- MXRF11
+  
+  -- RENDA FIXA (IDs 36-40 conforme inserção)
+  (1, 36, 'buy',  '2026-01-05', 1, 2000.00, 2000.00), -- Tesouro Selic
+  (1, 37, 'buy',  '2026-04-18', 1, 3500.00, 3500.00); -- CDB Inter
 
 -- ==================================================================================================
--- 4) WALLET CONSOLIDADA (coerente com saldo final das transacoes)
+-- 4) WALLET CONSOLIDADA (Saldos coerentes com as novas transações)
 -- ==================================================================================================
 INSERT INTO wallet (user_id, asset_id, quantity, average_price, total_invested, income, initial_date) VALUES
-  -- ACOES
-  (1, 1, 190.00000000, 10.39, 1976.20, 0.00, NULL),
-  (1, 2, 160.00000000, 36.39, 5825.88, 0.00, NULL),
-  (1, 3, 55.00000000, 58.79, 3233.45, 0.00, NULL),
-  (1, 4, 160.00000000, 24.84, 3973.00, 0.00, NULL),
-  (1, 5, 50.00000000, 43.00, 2150.00, 0.00, NULL),
-  (1, 6, 45.00000000, 34.70, 1561.50, 0.00, NULL),
-  (1, 7, 200.00000000, 13.68, 2736.00, 0.00, NULL),
-  (1, 8, 230.00000000, 11.84, 2723.20, 0.00, NULL),
-
-  -- FIIS
-  (1, 9,  90.00000000, 7.97, 717.00, 0.00, NULL),
-  (1, 10, 35.00000000, 70.47, 2466.45, 0.00, NULL),
-  (1, 11, 30.00000000, 102.36, 3070.80, 0.00, NULL),
-  (1, 12, 22.00000000, 154.73, 3404.06, 0.00, NULL),
-  (1, 13, 55.00000000, 96.61, 5313.50, 0.00, NULL),
-  (1, 14, 20.00000000, 102.80, 2056.00, 0.00, NULL),
-  (1, 15, 60.00000000, 84.27, 5056.00, 0.00, NULL),
-  (1, 16, 35.00000000, 49.10, 1718.50, 0.00, NULL),
-
-  -- RENDA FIXA
-  (1, 17, 1.00000000, 7000.00, 7000.00, 420.00, '2025-01-02'),
-  (1, 18, 1.00000000, 4500.00, 4500.00, 285.00, '2025-01-10'),
-  (1, 19, 1.00000000, 2700.00, 2700.00, 135.00, '2025-02-12'),
-  (1, 20, 1.00000000, 6000.00, 6000.00, 510.00, '2025-03-15'),
-  (1, 21, 1.00000000, 4000.00, 4000.00, 240.00, '2025-06-01');
-
--- ==================================================================================================
--- QUERIES UTEIS DE VERIFICACAO
--- ==================================================================================================
--- SELECT COUNT(*) AS total_assets FROM asset;
--- SELECT COUNT(*) AS total_transactions FROM transaction;
--- SELECT COUNT(*) AS total_wallet_rows FROM wallet;
--- SELECT * FROM wallet ORDER BY asset_id;
-
-
--- const conversations = [
---         {
---             title: 'Análise de Gastos de Fevereiro',
---             messages: [
---                 { role: 'user', content: 'Quanto gastei em alimentação em fevereiro?' },
---                 { role: 'assistant', content: 'Em fevereiro, você gastou um total de 345,50€ em alimentação. Isso representa 15% do seu orçamento total.' }
---             ] },
--- { title: 'Dicas de Planeamento Orçamental',
--- messages: [
---                 { role: 'user', content: 'Como posso economizar mais este mês?' },
---                 { role: 'assistant', content: 'Com base nos seus padrões, sugerimos reduzir os gastos em "Lazer" e "Restaurantes", que aumentaram 20% no último mês. Tente estabelecer um limite semanal para estas categorias.' }
---             ] },
--- { title: 'Projeção de Saldo Mensal',
--- messages: [
---                 { role: 'user', content: 'Qual a projeção do meu saldo para o final de março?' },
---                 { role: 'assistant', content: 'Considerando as suas despesas fixas e o histórico de gastos, prevemos que termine março com um saldo positivo de aproximadamente 450,00€.' }
---             ] } ];
--- CONVERSAS
-INSERT INTO
-    conversation (user_id, title)
-VALUES
-    (1, 'Resumo da carteira'),
-    (1, 'Renda Fixa e Aportes'),
-    (1, 'Ações e Estratégias');
-
--- MENSAGENS PARA RESUMO DA CARTEIRA
-INSERT INTO
-    message (conversation_id, role, content)
-VALUES
-    (
-        1,
-        'user',
-        'Me mostre um resumo da minha carteira.'
-    ),
-    (
-        1,
-        'model',
-        'Claro! Aqui está o resumo da sua carteira: 
-        Ações: 3 ativos, total investido: R$ 8.100,00, quantidade total: 290 ações.
-        FIIs: 3 ativos, total investido: R$ 12.768,33, quantidade total: 120 cotas.
-        Renda Fixa: 2 ativos, total investido: R$ 12.000,00, quantidade total: 5 aportes.'
-    );
-
--- MENSAGENS PARA RENDA FIXA E APORTES
-INSERT INTO
-    message (conversation_id, role, content)
-VALUES
-    (
-        2,
-        'user',
-        'Como foi a evolução dos aportes de renda fixa nos últimos meses?.'
-    ),
-    (
-        2,
-        'model',
-        'Nos últimos meses, você realizou os seguintes aportes em renda fixa:
-        - Janeiro: R$ 5.000,00 no Itaú Crédito Bancário Renda Fixa Crédito Privado e R$ 1.000,00 no Nubank Caixinha.
-        - Fevereiro: R$ 3.000,00 no Itaú Crédito Bancário Renda Fixa Crédito Privado e R$ 500,00 no Nubank Caixinha.
-        - Março: R$ 2.000,00 no Itaú Crédito Bancário Renda Fixa Crédito Privado e R$ 1.500,00 no Nubank Caixinha.
-        Isso totaliza R$ 12.000,00 investidos em renda fixa nos últimos três meses, com uma média de R$ 4.000,00 por mês.'
-    );
-
--- MENSAGENS PARA AÇÕES E ESTRATÉGIAS
-INSERT INTO
-    message (conversation_id, role, content)
-VALUES
-    (
-        3,
-        'user',
-        'Quais foram as minhas principais estratégias de investimento em ações?'
-    ),
-    (
-        3,
-        'model',
-        'Suas principais estratégias de investimento em ações incluíram:
-        - Compra e venda de ações com base em análises de mercado, como visto com ITSA3, PETR4 e CMIG4.
-        - Diversificação do portfólio, investindo em diferentes setores e empresas.
-        - Monitoramento constante do desempenho das ações para ajustar suas posições conforme necessário.'
-    );
+  -- Ações
+  (1, 1, 20.00, 28.50, 570.00, 0.00, '2026-01-15'),
+  (1, 2, 40.00, 11.80, 472.00, 0.00, '2026-02-10'),
+  (1, 4, 60.00, 40.50, 2430.00, 0.00, '2026-03-05'),
+  
+  -- FIIs (Híbridos e outros)
+  (1, 15, 20.00, 165.90, 3318.00, 0.00, '2026-01-20'),
+  (1, 29, 10.00, 158.20, 1582.00, 0.00, '2026-03-25'),
+  (1, 35, 100.00, 9.25, 925.00, 0.00, '2026-05-10'),
+  (1, 33, 40.00, 101.20, 4048.00, 0.00, '2026-04-05'),
+  (1, 34, 50.00, 10.15, 507.50, 0.00, '2026-02-20'),
+  
+  -- Renda Fixa
+  (1, 36, 1.00, 2000.00, 2000.00, 15.00, '2026-01-05'),
+  (1, 37, 1.00, 3500.00, 3500.00, 10.00, '2026-04-18');

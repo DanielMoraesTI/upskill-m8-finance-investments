@@ -5,6 +5,7 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 // ==================================================================================
 //                                        SELECTS
 // ==================================================================================
+// Esta função busca todas as mensagens de uma conversa específica no banco de dados com base no ID do usuário e no ID da conversa fornecidos, retornando um array de objetos representando cada mensagem encontrada.
 async function findMessagesByConversationId(userId: number, conversationId: number): Promise<RowDataPacket[]> {
     try {
         const [rows] = await db.query<RowDataPacket[]>(
@@ -19,7 +20,7 @@ async function findMessagesByConversationId(userId: number, conversationId: numb
         throw error;
     }
 }
-
+// Esta função busca um resumo de todas as conversas de um usuário específico no banco de dados com base no ID do usuário fornecido, retornando um array de objetos representando cada conversa encontrada.
 async function findAllConversationSummary(userId: number): Promise<RowDataPacket[]> {
     try {
         const [rows] = await db.query<RowDataPacket[]>(
@@ -38,6 +39,7 @@ async function findAllConversationSummary(userId: number): Promise<RowDataPacket
 // ==================================================================================
 //                                        INSERTS
 // ==================================================================================
+// Esta função cria uma nova conversa no banco de dados com base no ID do usuário e no título fornecidos, retornando o resultado da operação de inserção.
 async function createConversation(userId: number, title: string): Promise<ResultSetHeader> {
     try {
         const [result] = await db.query<ResultSetHeader>(
@@ -49,7 +51,7 @@ async function createConversation(userId: number, title: string): Promise<Result
         throw error;
     }
 }
-
+// Esta função cria uma nova mensagem no banco de dados com base no ID da conversa, no papel do remetente e no conteúdo da mensagem fornecidos, retornando o resultado da operação de inserção.
 async function createMessage(args: Omit<TMessage, "id" | "createdAt">): Promise<ResultSetHeader> {
     try {
         const [result] = await db.query<ResultSetHeader>(
@@ -65,6 +67,7 @@ async function createMessage(args: Omit<TMessage, "id" | "createdAt">): Promise<
 // ==================================================================================
 //                                        UPDATES
 // ==================================================================================
+// Esta função atualiza o timestamp de atualização de uma conversa específica no banco de dados com base no ID da conversa fornecido, retornando void.
 async function updateConversationTimestamp(conversationId: number): Promise<void> {
     try {
         const [result] = await db.query<ResultSetHeader>(
@@ -82,6 +85,7 @@ async function updateConversationTimestamp(conversationId: number): Promise<void
 // ==================================================================================
 //                                        DELETES
 // ==================================================================================
+// Esta função exclui uma conversa específica do banco de dados com base no ID do usuário e no ID da conversa fornecidos, retornando um booleano indicando se a exclusão foi bem-sucedida.
 async function deleteConversation(userId: number, conversationId: number): Promise<boolean> {
     try {
         const [result] = await db.query<ResultSetHeader>(

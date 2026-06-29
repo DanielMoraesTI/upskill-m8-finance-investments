@@ -41,8 +41,7 @@ export default function PromptArea() {
         </Button>
       </div>
       <div className="text-xs text-center mt-2 opacity-50">
-        Gerado por inteligência artificial. Os dados podem não refletir a
-        realidade. <br />
+        Conteúdo de caráter educativo gerado de forma automatizada por IA. Não constitui recomendação, indicação ou assessoria de investimento (CVM). Os dados simulados podem divergir da realidade. Decisões de alocação são de inteira responsabilidade do usuário. <br />
       </div>
 
       {thinking && (

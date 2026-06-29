@@ -11,14 +11,12 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/react-query";
-import {
-  getWalletList,
-  patchWalletIncome
-} from "@/services/walletService";
+import { getWalletList, patchWalletIncome } from "@/services/walletService";
+import { useAuth } from "./AuthProvider";
 // ==============================================================================
 //                                  CONTEXT
 // ==============================================================================
-// Esta interface define a estrutura do contexto de carteiras (WalletContextProps), que inclui a lista completa de carteiras (walletList), a lista filtrada de carteiras (filteredWalletList) e a mutação para atualizar a renda de uma carteira (walletIncomeMutation). Ela é utilizada para garantir a consistência dos dados relacionados às carteiras em todo o código, permitindo que os componentes que consomem esse contexto tenham acesso às informações necessárias e possam realizar as operações de atualização de forma segura e eficiente.
+// Esta interface define a estrutura do contexto de carteiras (WalletContextProps), que inclui a lista completa de carteiras (walletList), a lista filtrada de carteiras (filteredWalletList) e a mutação para atualizar a renda de uma carteira (walletIncomeMutation).
 interface WalletContextProps {
   walletList: TWalletList;
   filteredWalletList: TWalletList;
@@ -28,7 +26,7 @@ interface WalletContextProps {
     TUpdateWalletIncomeRequest
   >;
 }
-// Este objeto inicializa o contexto de carteiras (WalletContext) com valores padrão, incluindo uma lista vazia de carteiras, uma lista filtrada vazia e uma mutação de renda de carteira vazia. Ele é utilizado para garantir que o contexto tenha um estado inicial consistente, permitindo que os componentes que consomem esse contexto possam acessar os dados relacionados às carteiras mesmo antes de serem carregados ou atualizados.
+// Este objeto inicializa o contexto de carteiras (WalletContext) com valores padrão, incluindo uma lista vazia de carteiras, uma lista filtrada vazia e uma mutação de renda de carteira vazia.
 const initialWalletContext: WalletContextProps = {
   walletList: [],
   filteredWalletList: [],
@@ -46,9 +44,12 @@ export default function WalletProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const { isAuthenticated } = useAuth();
+
   const { data: walletList } = useQuery({
     queryKey: ["walletList"],
     queryFn: getWalletList,
+    enabled: isAuthenticated,
   });
 
   const queryClient = useQueryClient();
@@ -61,6 +62,8 @@ export default function WalletProvider({
     mutationFn: (args) => patchWalletIncome(args),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["walletList"] });
+      queryClient.invalidateQueries({ queryKey: ["assetList"] });
+      queryClient.invalidateQueries({ queryKey: ["transactionList"] });
     },
   });
 

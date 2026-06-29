@@ -13,7 +13,7 @@ const MODEL_NAME = process.env.GEMINI_MODEL_NAME || "gemini-3.1-flash-lite-previ
 const functionStepMap: Record<string, string> = {
     "get_investment_summary": "Consultando resumo financeiro...",
 };
-
+// Esta função assíncrona processa as requisições POST para o endpoint "/api/portal/chatbot", interagindo com o modelo de inteligência artificial do Google Gemini para gerar respostas baseadas em prompts do usuário. Ela valida o ID do usuário autorizado, processa os eventos de resposta do modelo, incluindo chamadas de função, e retorna os resultados apropriados, tratando erros de rede e validação.
 export async function GET(req: NextRequest) {
     try {
         // validar o userID
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
         return errorResponse("Internal Server Error", 500);
     }
 }
-
+// Esta função assíncrona processa as requisições DELETE para o endpoint "/api/portal/chatbot", permitindo que o usuário autorizado exclua uma conversa específica com base no ID fornecido. Ela valida o ID do usuário, trata erros de rede e retorna respostas apropriadas em caso de falha.
 export async function DELETE(req: NextRequest) {
     try {
         // validar o userID
@@ -64,7 +64,7 @@ export async function DELETE(req: NextRequest) {
         return errorResponse("Internal Server Error", 500);
     }
 };
-
+// Esta função assíncrona processa as requisições POST para o endpoint "/api/portal/chatbot", interagindo com o modelo de inteligência artificial do Google Gemini para gerar respostas baseadas em prompts do usuário. Ela valida o ID do usuário autorizado, processa os eventos de resposta do modelo, incluindo chamadas de função, e retorna os resultados apropriados, tratando erros de rede e validação.
 export async function POST(req: NextRequest) {
     try {
         // validar o userID
@@ -83,12 +83,12 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // If no conversation, create one
+        // Se não houver uma conversa existente, cria uma nova conversa
         if (!conversation) {
             conversation = await chatbotService.createConversation(authorizedUser.id, String(prompt));
         }
 
-        // Save user message
+        // Salva a mensagem do usuário na conversa
         await chatbotService.createMessage({
             conversationId: conversation.id,
             role: 'user',
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
             parts: [{ text: m.content }]
         }));
 
-        // Add current user prompt to history for the model
+        // Faz a chamada para o modelo Gemini com o histórico da conversa e o prompt do usuário, processando os eventos de resposta em tempo real e retornando-os como um stream de eventos.
         history.push({ role: 'user', parts: [{ text: prompt }] });
 
         const encoder = new TextEncoder();
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
                 const systemInstruction = chatbotSystemInstruction();
 
                 try {
-                    // Send an initial thought
+                    // Enviar um evento inicial de "thought" para indicar que o modelo está processando os dados do usuário.
                     sendEvent({ done: false, type: 'thought', content: 'Analisando os seus dados...' });
 
                     const config: GenerateContentConfig = {
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
 
                     let fullText = "";
                     const currentContents = [...history];
-
+                    // Loop para lidar com chamadas de função e continuar a conversa até que o modelo forneça uma resposta final de texto.
                     while (true) {
                         const response = await ai.models.generateContentStream({
                             model: MODEL_NAME,
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
                         let hasFunctionCall = false;
                         const functionCalls: FunctionCall[] = [];
                         let thoughtSignature = "";
-
+                        // Processa o stream de eventos do modelo Gemini, lidando com pensamentos, textos e chamadas de função, e enviando eventos apropriados para o cliente em tempo real.
                         for await (const chunk of response) {
                             const candidate = chunk.candidates?.[0];
                             const parts = candidate?.content?.parts;
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
                         }
 
                         if (hasFunctionCall) {
-                            // Push the model's call to history
+                            // Se houver chamadas de função, envia um evento de "function_call" para o cliente e processa cada chamada de função, chamando a função apropriada no backend e salvando os resultados na conversa.
                             currentContents.push({ role: 'model', parts: functionCalls.map(fc => ({ functionCall: fc, thoughtSignature })) });
 
                             for (const fc of functionCalls) {
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
 
                                     const result = await chatbotService.handleFunctionCall(authorizedUser.id, parsedFnName.data, fc.args);
 
-                                    // Push result to history
+                                    // Salva a resposta da função na conversa, permitindo que o modelo Gemini continue a conversa com base nos resultados da função chamada.
                                     currentContents.push({
                                         role: 'user',
                                         parts: [{
@@ -187,15 +187,15 @@ export async function POST(req: NextRequest) {
                                 }
 
                             }
-                            // Continue the loop to get the next response from Gemini
+                            // Continua o loop para processar a próxima rodada de respostas do modelo Gemini, agora com os resultados das funções chamadas incluídos no histórico da conversa.
                             continue;
                         }
 
-                        // If we reach here, it's the final text response
+                        // Se não houver mais chamadas de função, envia um evento final de "done" com o texto completo da resposta do modelo Gemini e fecha o stream de eventos.
                         break;
                     }
 
-                    // Save assistant message
+                    // Salva a resposta final do modelo na conversa, permitindo que o histórico da conversa seja mantido para futuras interações.
                     await chatbotService.createMessage({
                         conversationId: conversation.id,
                         role: 'model',
@@ -208,7 +208,7 @@ export async function POST(req: NextRequest) {
                     console.error("Chatbot Streaming Error:", err);
                     const error = err as ApiError;
                     let errorMessage = "O serviço encontrou um problema.";
-
+                    // Se o erro for um 503, indica que o modelo está com alta demanda, então envia uma mensagem apropriada para o usuário.
                     if (error?.status === 503) {
                         errorMessage = "O modelo está com alta demanda no momento. Por favor, tente novamente em alguns instantes.";
                     }

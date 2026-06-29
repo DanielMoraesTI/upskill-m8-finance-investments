@@ -6,20 +6,38 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useTransaction } from "@/context/TransactionProvider";
 import type { TTransaction } from "@/schemas/transactionSchema";
-// Este componente é o formulário de edição de transação (EditTransactionForm), que permite aos usuários editar as informações de uma transação existente. Ele recebe os dados da transação como props e pré-configura os campos do formulário com essas informações, permitindo que os usuários façam alterações conforme necessário. O formulário inclui campos para o tipo de transação (compra ou venda), a data, a quantidade, o valor unitário e o valor total, que é calculado automaticamente com base na quantidade e no valor unitário. O EditTransactionForm utiliza o hook useTransaction para acessar a função de atualização de transação (updateMutation) e gerenciar o estado de feedback para o usuário, exibindo mensagens de sucesso ou erro com base no resultado da operação de atualização. O formulário é projetado para ser fácil de usar e acessível, garantindo que os usuários possam editar suas transações sem dificuldades, melhorando a eficiência e a satisfação do usuário ao interagir com o portal de investimentos.
+// Este componente é o formulário de edição de transação (EditTransactionForm), que permite aos usuários editar as informações de uma transação existente.
 interface EditTransactionFormProps {
   transaction: TTransaction;
   assetLabel: string;
+  isRendaFixa?: boolean;
   onSuccess?: () => void;
+}
+
+function sanitizeUnsignedNumberInput(value: string): string {
+  return value.replace(/[-+]/g, "");
 }
 
 function formatBRL(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function normalizeDateValue(dateValue: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+    return dateValue;
+  }
+
+  if (dateValue.includes("T")) {
+    return dateValue.split("T")[0] || "";
+  }
+
+  return dateValue;
+}
+
 export default function EditTransactionForm({
   transaction,
   assetLabel,
+  isRendaFixa = false,
   onSuccess,
 }: EditTransactionFormProps) {
   const { updateMutation } = useTransaction();
@@ -31,27 +49,37 @@ export default function EditTransactionForm({
   const [entryType, setEntryType] = useState<"buy" | "sell">(
     transaction.entry_type,
   );
-  const [date, setDate] = useState(transaction.date);
+  const [date, setDate] = useState(normalizeDateValue(transaction.date));
   const [quantidade, setQuantidade] = useState(String(transaction.quantity));
   const [valor, setValor] = useState(String(transaction.unit_price));
 
   const total = () => {
-    const q = parseFloat(quantidade);
+    const q = isRendaFixa ? 1 : parseFloat(quantidade);
     const v = parseFloat(valor.replace(",", "."));
     return !isNaN(q) && !isNaN(v) ? q * v : 0;
   };
 
-  const canConfirm = quantidade !== "" && valor !== "" && date !== "";
+  const quantityNumber = isRendaFixa ? 1 : parseFloat(quantidade);
+  const unitPriceNumber = parseFloat(valor.replace(",", "."));
+  const canConfirm =
+    date !== "" &&
+    Number.isFinite(unitPriceNumber) &&
+    (isRendaFixa || (Number.isFinite(quantityNumber) && quantityNumber > 0)) &&
+    unitPriceNumber > 0;
 
   function handleSubmit() {
     setFeedback(null);
 
+    if ((!isRendaFixa && quantityNumber <= 0) || unitPriceNumber <= 0) {
+      return;
+    }
+
     const updatedTransaction: TTransaction = {
       ...transaction,
       entry_type: entryType,
-      date,
-      quantity: parseFloat(quantidade),
-      unit_price: parseFloat(valor.replace(",", ".")),
+      date: normalizeDateValue(date),
+      quantity: isRendaFixa ? 1 : quantityNumber,
+      unit_price: unitPriceNumber,
       total_value: total(),
     };
 
@@ -142,23 +170,32 @@ export default function EditTransactionForm({
         </Field>
 
         {/* Quantidade */}
-        <Field>
-          <FieldLabel
-            htmlFor="edit-quantidade"
-            className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
-          >
-            Quantidade
-          </FieldLabel>
-          <Input
-            id="edit-quantidade"
-            type="number"
-            min={1}
-            placeholder="0"
-            value={quantidade}
-            onChange={(e) => setQuantidade(e.target.value)}
-            className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-          />
-        </Field>
+        {!isRendaFixa && (
+          <Field>
+            <FieldLabel
+              htmlFor="edit-quantidade"
+              className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
+            >
+              Quantidade
+            </FieldLabel>
+            <Input
+              id="edit-quantidade"
+              type="number"
+              min={1}
+              placeholder="0"
+              value={quantidade}
+              onChange={(e) =>
+                setQuantidade(sanitizeUnsignedNumberInput(e.target.value))
+              }
+              onKeyDown={(event) => {
+                if (["-", "+", "e", "E"].includes(event.key)) {
+                  event.preventDefault();
+                }
+              }}
+              className="no-number-spinner bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+            />
+          </Field>
+        )}
 
         {/* Valor Unitário */}
         <Field>
@@ -175,8 +212,15 @@ export default function EditTransactionForm({
             step={0.01}
             placeholder="0,00"
             value={valor}
-            onChange={(e) => setValor(e.target.value)}
-            className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+            onChange={(e) =>
+              setValor(sanitizeUnsignedNumberInput(e.target.value))
+            }
+            onKeyDown={(event) => {
+              if (["-", "+", "e", "E"].includes(event.key)) {
+                event.preventDefault();
+              }
+            }}
+            className="no-number-spinner bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
           />
         </Field>
 

@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAsset } from "@/context/AssetProvider";
 import { useWallet } from "@/context/WalletProvider";
-import { ACOES_DISPONIVEIS, FIIS_DISPONIVEIS } from "@/utils/assetOptions";
+import { getUserToken } from "@/services/api";
 
 type OperationType = "compra" | "venda";
 export type InvestmentType = "acoes" | "fiis" | "renda-fixa" | "";
@@ -34,6 +34,10 @@ function toAssetTypeId(investimento: InvestmentType): 1 | 2 | 3 | null {
   if (investimento === "fiis") return 2;
   if (investimento === "renda-fixa") return 3;
   return null;
+}
+
+function sanitizeUnsignedNumberInput(value: string): string {
+  return value.replace(/[-+]/g, "");
 }
 // Este componente é o componente principal para registrar operações de compra e venda de investimentos (BusinessAction). Ele renderiza uma interface de usuário que permite aos usuários selecionar o tipo de investimento, a operação, o ativo específico, a quantidade, o valor unitário e o valor total para operações de renda fixa. O componente gerencia os estados relacionados à operação, investimento, código do ativo selecionado, texto de busca, quantidade, valor e feedback para o usuário. Ele utiliza funções auxiliares para converter o tipo de investimento em um ID numérico correspondente e para calcular as opções disponíveis de ativos com base no tipo de investimento e operação selecionados. O BusinessAction é essencial para permitir que os usuários registrem suas operações de investimento de forma fácil e eficiente, garantindo que as informações sejam validadas corretamente antes do envio e fornecendo feedback claro sobre o sucesso ou falha da operação. Ele se integra com o contexto de ativos e carteiras para garantir que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O BusinessAction é um componente central para a funcionalidade de registro de operações de investimento no aplicativo, proporcionando uma experiência de usuário intuitiva e eficiente para gerenciar suas operações financeiras.
 export default function BusinessAction({
@@ -69,36 +73,24 @@ export default function BusinessAction({
   );
   // Este hook useMemo é utilizado para calcular as opções disponíveis de ativos com base no tipo de investimento e operação selecionados pelo usuário. Ele verifica o tipo de investimento e a operação para determinar quais ativos devem ser exibidos como opções válidas para compra ou venda. Para operações de compra, ele filtra os ativos disponíveis no sistema com base no tipo de investimento (ações ou fundos imobiliários) e os mapeia para um formato adequado para exibição. Para operações de venda, ele filtra os ativos que o usuário possui em sua carteira com base no tipo de investimento e os mapeia para exibição, utilizando o ticker ou o nome da empresa quando disponível. O availableAssetOptions é essencial para garantir que os usuários possam selecionar apenas os ativos relevantes para a operação que estão realizando, proporcionando uma experiência de usuário intuitiva e eficiente ao registrar suas operações de investimento. Ele também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos.
   const availableAssetOptions = useMemo(() => {
-    if (investimento === "acoes" && operacao === "compra") {
-      return ACOES_DISPONIVEIS.map((ticker) => ({
-        value: ticker,
-        label: ticker,
-      }));
-    }
-
-    if (investimento === "fiis" && operacao === "compra") {
-      return FIIS_DISPONIVEIS.map((ticker) => ({
-        value: ticker,
-        label: ticker,
-      }));
-    }
-
     const assetTypeId = toAssetTypeId(investimento);
     if (!assetTypeId) return [];
 
     return assetList
       .filter((asset) => asset.asset_type_id === assetTypeId)
-      .filter((asset) => walletAssetIds.has(asset.id))
+      .filter((asset) => operacao === "compra" || walletAssetIds.has(asset.id))
       .map((asset) => {
+        const value = String(asset.id);
+
         if (assetTypeId === 3) {
           return {
-            value: String(asset.id),
+            value,
             label: "company" in asset ? asset.company : `Ativo ${asset.id}`,
           };
         }
 
         return {
-          value: String(asset.id),
+          value,
           label: "ticker" in asset ? asset.ticker : `Ativo ${asset.id}`,
         };
       });
@@ -118,6 +110,20 @@ export default function BusinessAction({
     const v = parseFloat(valor.replace(",", "."));
     return !isNaN(q) && !isNaN(v) ? q * v : 0;
   }, [quantidade, valor]);
+
+  const quantityNumber = parseFloat(quantidade);
+  const unitPriceNumber = parseFloat(valor.replace(",", "."));
+
+  const selectedWalletQuantity = useMemo(() => {
+    if (isRendaFixa || operacao !== "venda") return Number.POSITIVE_INFINITY;
+    const selectedAssetId = Number(selectedCode);
+    if (!selectedAssetId) return 0;
+
+    const walletItem = walletList.find(
+      (item) => item.asset_id === selectedAssetId,
+    );
+    return Number(walletItem?.quantity || 0);
+  }, [isRendaFixa, operacao, selectedCode, walletList]);
   // Este hook useMemo é utilizado para determinar se o botão de confirmação da operação deve estar habilitado ou desabilitado, com base na validação dos campos obrigatórios para a operação de compra ou venda de investimentos. Ele verifica se um código de ativo foi selecionado e, em seguida, valida os campos específicos para operações de renda fixa ou variáveis. Para operações de renda fixa, ele verifica se o campo de valor total não está vazio e é um número maior que zero. Para operações variáveis (ações ou fundos imobiliários), ele verifica se os campos de quantidade e valor unitário não estão vazios e se o valor total calculado é maior que zero. O canConfirm é essencial para garantir que os usuários só possam confirmar a operação quando todas as informações necessárias forem fornecidas e válidas, evitando erros no registro das operações de investimento e melhorando a experiência do usuário ao fornecer feedback claro sobre o estado da operação que estão registrando. Ele também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O estado de habilitação do botão de confirmação é uma funcionalidade importante para facilitar a compreensão do usuário sobre o que é necessário para concluir o registro de suas operações de investimento, melhorando a experiência geral ao gerenciar suas operações financeiras.
   const canConfirm = useMemo(() => {
     if (!selectedCode) return false;
@@ -126,13 +132,29 @@ export default function BusinessAction({
       return totalRendaFixa !== "" && parseFloat(totalRendaFixa) > 0;
     }
 
-    return quantidade !== "" && valor !== "" && totalVariavel > 0;
+    if (!Number.isFinite(quantityNumber) || !Number.isFinite(unitPriceNumber)) {
+      return false;
+    }
+
+    if (quantityNumber <= 0 || unitPriceNumber <= 0 || totalVariavel <= 0) {
+      return false;
+    }
+
+    if (operacao === "venda" && quantityNumber > selectedWalletQuantity) {
+      return false;
+    }
+
+    return quantidade !== "" && valor !== "";
   }, [
     isRendaFixa,
+    quantityNumber,
+    selectedWalletQuantity,
+    operacao,
     quantidade,
     selectedCode,
     totalRendaFixa,
     totalVariavel,
+    unitPriceNumber,
     valor,
   ]);
   // Esta função é responsável por resetar os campos do formulário de registro de operações de investimento para seus valores iniciais. Ela é chamada sempre que o tipo de operação ou o tipo de investimento é alterado, garantindo que os campos sejam limpos e prontos para receber novas informações relacionadas à nova seleção do usuário. A função resetFields é essencial para melhorar a experiência do usuário ao registrar suas operações de investimento, evitando que informações anteriores sejam mantidas nos campos quando o usuário muda o contexto da operação que está registrando. Ela também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O reset dos campos do formulário é uma funcionalidade importante para facilitar a compreensão do usuário sobre o estado atual da operação que estão registrando, melhorando a experiência geral ao gerenciar suas operações financeiras.
@@ -162,10 +184,12 @@ export default function BusinessAction({
     setFeedback(null);
 
     try {
+      const token = await getUserToken();
       const response = await fetch(`${API_URL}/portal/transactions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token,
         },
         body: JSON.stringify(payload),
       });
@@ -198,13 +222,16 @@ export default function BusinessAction({
       setIsSubmitting(false);
     }
   }
-  // Esta função é responsável por lidar com a confirmação da operação de compra ou venda de investimento. Ela valida as informações fornecidas pelo usuário, constrói o payload da transação com base no tipo de investimento e operação selecionados, e chama a função submitTransaction para enviar a transação para a API. A função handleConfirmar é essencial para garantir que as operações de investimento sejam registradas corretamente no sistema, proporcionando uma experiência de usuário eficiente e confiável ao gerenciar suas operações financeiras. Ela também garante que as informações exibidas sejam consistentes com os dados do usuário e que as operações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos. O processo de confirmação da operação é uma funcionalidade central para o registro de operações de investimento, permitindo que os usuários gerenciem suas operações financeiras de forma eficiente e confiável.
+  // Esta função é responsável por lidar com a confirmação da operação de compra ou venda de investimento. Ela valida as informações fornecidas pelo usuário, constrói o payload da transação com base no tipo de investimento e operação selecionados, e chama a função submitTransaction para enviar a transação para a API.
   async function handleConfirmar() {
     const assetTypeId = toAssetTypeId(investimento);
     if (!assetTypeId) return;
 
     const entryType = operacao === "compra" ? "buy" : "sell";
-    const date = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const date = new Date(now.getTime() - now.getTimezoneOffset() * 60_000)
+      .toISOString()
+      .slice(0, 10);
 
     if (isRendaFixa) {
       const total = parseFloat(totalRendaFixa);
@@ -224,11 +251,27 @@ export default function BusinessAction({
 
     const quantity = parseFloat(quantidade);
     const unitPrice = parseFloat(valor.replace(",", "."));
+    const assetId = Number(selectedCode);
+
+    if (!assetId) return;
+
+    if (!Number.isFinite(quantity) || !Number.isFinite(unitPrice)) {
+      return;
+    }
+
+    if (quantity <= 0 || unitPrice <= 0) {
+      return;
+    }
+
+    if (operacao === "venda" && quantity > selectedWalletQuantity) {
+      setFeedback({
+        type: "error",
+        message: "Quantidade de venda maior que a disponível.",
+      });
+      return;
+    }
 
     if (operacao === "venda") {
-      const assetId = Number(selectedCode);
-      if (!assetId) return;
-
       await submitTransaction({
         asset_id: assetId,
         entry_type: entryType,
@@ -240,32 +283,8 @@ export default function BusinessAction({
       return;
     }
 
-    const selectedTicker = selectedCode;
-    const existingAsset = assetList.find(
-      (asset) =>
-        asset.asset_type_id === assetTypeId &&
-        "ticker" in asset &&
-        asset.ticker === selectedTicker,
-    );
-
-    if (existingAsset) {
-      await submitTransaction({
-        asset_id: existingAsset.id,
-        entry_type: entryType,
-        date,
-        quantity,
-        unit_price: unitPrice,
-        total_value: totalVariavel,
-      });
-      return;
-    }
-    // Se o ativo não existe, registra a transação usando o ticker e o tipo de ativo, e a API deve lidar com a criação do ativo se necessário. Isso é importante para permitir que os usuários registrem operações de compra para ativos que ainda não possuem em sua carteira, garantindo que o processo seja fluido e sem obstáculos, mesmo quando o ativo ainda não foi registrado no sistema. A função submitTransaction é chamada com as informações necessárias para registrar a operação, e a API deve ser projetada para lidar com esse cenário, criando o ativo se ele não existir e associando a transação corretamente. Essa abordagem melhora a experiência do usuário ao permitir que eles registrem suas operações de investimento de forma eficiente, mesmo quando estão lidando com novos ativos, e garante que as informações sejam registradas corretamente no sistema, atualizando as consultas relevantes para refletir as mudanças nos dados de transações, carteiras e ativos.
     await submitTransaction({
-      asset_type_id: assetTypeId,
-      ticker: selectedTicker,
-      company: assetTypeId === 1 ? selectedTicker : undefined,
-      category: assetTypeId === 2 ? "Fundo Híbrido" : undefined,
-      current_price: unitPrice,
+      asset_id: assetId,
       entry_type: entryType,
       date,
       quantity,
@@ -416,8 +435,17 @@ export default function BusinessAction({
                   min={1}
                   placeholder="0"
                   value={quantidade}
-                  onChange={(event) => setQuantidade(event.target.value)}
-                  className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+                  onChange={(event) =>
+                    setQuantidade(
+                      sanitizeUnsignedNumberInput(event.target.value),
+                    )
+                  }
+                  onKeyDown={(event) => {
+                    if (["-", "+", "e", "E"].includes(event.key)) {
+                      event.preventDefault();
+                    }
+                  }}
+                  className="no-number-spinner bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
                 />
               </Field>
               <Field>
@@ -434,33 +462,75 @@ export default function BusinessAction({
                   step={0.01}
                   placeholder="0,00"
                   value={valor}
-                  onChange={(event) => setValor(event.target.value)}
-                  className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+                  onChange={(event) =>
+                    setValor(sanitizeUnsignedNumberInput(event.target.value))
+                  }
+                  onKeyDown={(event) => {
+                    if (["-", "+", "e", "E"].includes(event.key)) {
+                      event.preventDefault();
+                    }
+                  }}
+                  className="no-number-spinner bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+                />
+              </Field>
+              <Field className="md:col-span-2">
+                <FieldLabel
+                  htmlFor="total-variavel"
+                  className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
+                >
+                  Total
+                </FieldLabel>
+                <Input
+                  id="total-variavel"
+                  readOnly
+                  value={totalVariavel > 0 ? totalVariavel.toFixed(2) : ""}
+                  placeholder="0,00"
+                  className="bg-muted/20 border-border/30 text-chart-1 font-bold cursor-default"
                 />
               </Field>
             </FieldGroup>
           )}
 
           {investimento !== "" && isRendaFixa && (
-            <Field>
-              <FieldLabel
-                htmlFor="total-rf"
-                className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
-              >
-                Valor Total (R$)
-              </FieldLabel>
-              <Input
-                id="total-rf"
-                type="number"
-                min={0}
-                step={0.01}
-                placeholder="0,00"
-                value={totalRendaFixa}
-                onChange={(event) => setTotalRendaFixa(event.target.value)}
-                className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-              />
-            </Field>
+            <FieldGroup className="grid w-full grid-cols-1 gap-4">
+              <Field>
+                <FieldLabel
+                  htmlFor="total-rf"
+                  className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
+                >
+                  Valor Total (R$)
+                </FieldLabel>
+                <Input
+                  id="total-rf"
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  placeholder="0,00"
+                  value={totalRendaFixa}
+                  onChange={(event) =>
+                    setTotalRendaFixa(
+                      sanitizeUnsignedNumberInput(event.target.value),
+                    )
+                  }
+                  onKeyDown={(event) => {
+                    if (["-", "+", "e", "E"].includes(event.key)) {
+                      event.preventDefault();
+                    }
+                  }}
+                  className="no-number-spinner bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+                />
+              </Field>
+            </FieldGroup>
           )}
+
+          {!isRendaFixa &&
+            operacao === "venda" &&
+            quantidade !== "" &&
+            quantityNumber > selectedWalletQuantity && (
+              <div className="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-600">
+                Quantidade disponível para venda: {selectedWalletQuantity}
+              </div>
+            )}
 
           <Button
             className={`w-full font-semibold shadow-lg transition-all duration-200 ${

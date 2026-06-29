@@ -98,7 +98,8 @@ CREATE TABLE wallet (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES user(id),
   FOREIGN KEY (asset_id) REFERENCES asset(id),
-  UNIQUE KEY unique_user_asset (user_id, asset_id) -- Garante apenas um registro por ativo na carteira do usuário
+  -- Garante apenas um registro por ativo na carteira do usuário
+  UNIQUE KEY unique_user_asset (user_id, asset_id)
 );
 
 CREATE TABLE conversation (

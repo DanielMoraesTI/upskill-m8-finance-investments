@@ -6,7 +6,7 @@ import DeleteConversation from "@/components/chatbot/DeleteConversation";
 import { useChatbot } from "@/context/ChatbotProvider";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
+// Esta função de componente React renderiza a página de Insights, que fornece um resumo e análise da carteira de investimentos do usuário utilizando Inteligência Artificial.
 export default function Insights() {
   const { dispatch } = useChatbot();
 

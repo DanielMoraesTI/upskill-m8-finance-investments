@@ -20,7 +20,7 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
-
+// Esta função de componente React renderiza a página da carteira de investimentos, exibindo informações detalhadas sobre os ativos do usuário, incluindo resumos, tabelas e botões de ação para operações de compra. Ela utiliza hooks para gerenciar o estado da ordenação dos ativos e filtra a lista de ativos com base no tipo selecionado.
 export default function Carteira() {
   const { filteredWalletList } = useWallet();
   const { currentAssetType, assetList } = useAsset();
@@ -44,7 +44,7 @@ export default function Carteira() {
     )?.value || 0;
 
   const assetType = currentAssetType?.asset_type;
-
+  // Função auxiliar para ordenar a lista de ativos com base no valor atualizado, considerando o tipo de ordenação selecionado pelo usuário (ascendente, descendente ou sem ordenação).
   const sortedWalletList = useMemo(() => {
     if (sortOrder === "none") return filteredWalletList;
 
@@ -59,7 +59,7 @@ export default function Carteira() {
       return updatedB - updatedA;
     });
   }, [assetList, filteredWalletList, sortOrder]);
-
+  // Função auxiliar para determinar o título da página com base no tipo de ativo selecionado
   const getPageTitle = () => {
     switch (assetType) {
       case "Ação":
@@ -101,10 +101,10 @@ export default function Carteira() {
           </div>
 
           {/* Botões de ação — aparecem apenas quando há um tipo de ativo selecionado */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             {assetType && (
               <NativeSelect
-                className="h-9 w-58 bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+                className="h-9 w-full sm:w-auto min-w-[160px] sm:min-w-max bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
                 value={sortOrder}
                 onChange={(event) =>
                   setSortOrder(event.target.value as "none" | "asc" | "desc")
@@ -114,14 +114,16 @@ export default function Carteira() {
                   Sem ordenação
                 </NativeSelectOption>
                 <NativeSelectOption value="asc">
-                  Valor atualizado: menor para maior
+                  Valor Atual: menor para maior
                 </NativeSelectOption>
                 <NativeSelectOption value="desc">
-                  Valor atualizado: maior para menor
+                  Valor Atual: maior para menor
                 </NativeSelectOption>
               </NativeSelect>
             )}
-            {renderActionButtons()}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+              {renderActionButtons()}
+            </div>
           </div>
         </div>
 

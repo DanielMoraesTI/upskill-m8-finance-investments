@@ -23,7 +23,7 @@ import { auth } from "@/lib/firebase";
 import Loading from "@/components/Loading";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppProvider";
-
+// Esta função de componente React renderiza a interface de autenticação, permitindo que os usuários façam login ou se cadastrem. Ela gerencia o estado do formulário, valida os dados de entrada e lida com a autenticação usando Firebase, fornecendo feedback visual sobre o sucesso ou falha das operações.
 export default function Authentication() {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const router = useRouter();
@@ -144,7 +144,7 @@ export default function Authentication() {
                     />
                     {!isLogin && (
                       <FieldDescription className="text-xs text-muted-foreground/70">
-                        Deve ter pelo menos 6 caracteres.
+                        Digite sua senha.
                       </FieldDescription>
                     )}
                   </Field>
@@ -154,7 +154,7 @@ export default function Authentication() {
                         htmlFor="confirm-password"
                         className="text-sm font-medium text-foreground/80"
                       >
-                        Confirmar Senha
+                        Digite sua senha.
                       </FieldLabel>
                       <Input
                         id="confirm-password"
@@ -164,7 +164,7 @@ export default function Authentication() {
                         className="bg-muted/40 border-border/60 focus:border-primary/60 focus:ring-primary/20 transition-colors"
                       />
                       <FieldDescription className="text-xs text-muted-foreground/70">
-                        Por favor, confirme sua senha
+                        Por favor, confirme sua senha.
                       </FieldDescription>
                     </Field>
                   )}

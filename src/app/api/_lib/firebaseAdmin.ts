@@ -1,3 +1,4 @@
+// O arquivo firebaseAdmin.ts é responsável por configurar e exportar a instância do Firebase Admin SDK, permitindo que o aplicativo interaja com os serviços do Firebase, como autenticação, banco de dados em tempo real e Firestore.
 import admin from "firebase-admin";
 
 if (!admin.apps.length) {

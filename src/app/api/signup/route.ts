@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CreateUserRequestSchema } from '@/schemas/userSchema';
 import userService from '../_services/user.service';
 import type { TUserModel } from '@/schemas/userSchema';
-
+// Esta função assíncrona processa as requisições POST para o endpoint "/api/signup", permitindo que um novo usuário seja registrado no sistema. Ela valida o corpo da requisição, cria o usuário e retorna uma resposta apropriada em caso de sucesso ou falha.
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();

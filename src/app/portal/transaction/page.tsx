@@ -12,7 +12,7 @@ import {
   TransactionFilter,
   FilterType,
 } from "@/components/investmentsList/TransactionFilter";
-
+// Esta função de componente React renderiza a página de transações, exibindo um histórico detalhado das operações de compra e venda do usuário. Ela permite filtrar as transações por tipo (compra, venda ou todos) e por categoria de ativo (ações, fundos imobiliários ou renda fixa). A página também oferece funcionalidades para editar ou excluir transações, utilizando os dados fornecidos pelos contextos `useTransaction` e `useAsset`.
 function TransactionPageContent() {
   const [filter, setFilter] = useState<FilterType>("all");
 
@@ -45,11 +45,11 @@ function TransactionPageContent() {
     url.searchParams.delete("assetId");
     window.history.replaceState({}, "", url.toString());
   }
-
+  // Função para lidar com a ação de edição de uma transação, atualmente apenas registra o ID da transação a ser editada no console.
   function handleEdit(id: string) {
     console.log("Editar transação:", id);
   }
-
+  // Função para lidar com a ação de exclusão de uma transação, chamando a mutação de exclusão fornecida pelo TransactionProvider.
   function handleDelete(id: string) {
     deleteMutation.mutate(Number(id));
   }
@@ -98,8 +98,13 @@ function TransactionPageContent() {
     }
     return true;
   });
-
-  const transactionCardDataList = filteredTransactions.reduce<
+  // Ordenar as transações por data (mais recentes primeiro) e, em caso de empate, pelo ID da transação (mais recente primeiro).
+  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
+    if (a.date === b.date) return b.id - a.id;
+    return b.date.localeCompare(a.date);
+  });
+  // Construir a lista de dados para os cartões de transação, combinando informações da transação e do ativo correspondente.
+  const transactionCardDataList = sortedTransactions.reduce<
     TransactionCardItem[]
   >((acc, transaction) => {
     const assetData = assetList.find(
@@ -166,7 +171,7 @@ function TransactionPageContent() {
             Histórico de Transações
           </h1>
           <p className="text-sm text-muted-foreground/60">
-            Todas as suas operações de compra e venda registradas
+            Todas as suas operações de compra e venda registradas em um único lugar.
           </p>
         </div>
 

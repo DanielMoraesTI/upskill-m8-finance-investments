@@ -14,7 +14,10 @@ import type {
 import type { Dispatch } from "react";
 import chatbotService from "@/services/chatbotService";
 import { useQueryClient } from "@tanstack/react-query";
-
+// ==============================================================================
+//                                  CONTEXT
+// ==============================================================================
+// Esta interface define a estrutura do estado do chatbot (ChatbotState), que inclui a lista completa de conversas (conversationList), a lista filtrada de conversas (filteredConversations), a conversa atual (currentConversation), o prompt do usuário (userPrompt), o estado de pensamento (thinking), a mensagem de pensamento (thinkingMessage), a mensagem em streaming (streamingMessage), o estado de exclusão de conversa (deletingConversation) e a função para lidar com a exclusão de uma conversa (handleDeleteConversation).
 interface ChatbotState {
   conversationList: TConversationSummary;
   filteredConversations: TConversationSummary;
@@ -49,7 +52,7 @@ type ChatbotStateAction =
   | { type: "setStreamingMessage"; value: string }
   | { type: "appendStreamingMessage"; value: string }
   | { type: "setDeletingConversation"; value: boolean };
-
+// Esta interface define a estrutura do contexto do chatbot (ChatbotContextProps), que estende o estado do chatbot (ChatbotState) e inclui a lista completa de conversas (conversationList), a função de despacho (dispatch), a função para abrir uma conversa específica (handleOpenConversation) e a função para enviar uma mensagem (handleSendMessage).
 interface ChatbotContextProps extends Omit<ChatbotState, "conversationList"> {
   conversationList: TConversationSummary | undefined;
   dispatch: Dispatch<ChatbotStateAction>;
@@ -89,7 +92,7 @@ function chatbotReducer(
       return state;
   }
 }
-
+// Este componente é o provedor do contexto do chatbot (ChatbotProvider), que envolve os componentes filhos e fornece o contexto do chatbot para eles. Ele utiliza o hook useReducer para gerenciar o estado do chatbot, o hook useState para gerenciar o ID da conversa aberta, o hook useQuery para buscar a lista de conversas e o histórico de mensagens da conversa atual, e o hook useMutation para criar uma mutação que permite excluir uma conversa. O useEffect é utilizado para filtrar a lista de conversas com base na data de atualização, garantindo que as conversas mais recentes sejam exibidas primeiro. O ChatbotProvider é responsável por fornecer os dados relacionados ao chatbot para os componentes filhos, permitindo que eles acessem as informações necessárias e possam realizar as operações de envio de mensagens e exclusão de conversas de forma segura e eficiente.
 export default function ChatbotProvider({
   children,
 }: {
@@ -101,13 +104,13 @@ export default function ChatbotProvider({
   );
   const queryClient = useQueryClient();
 
-  // fetch conversations with react-query
+  // O Fetching da lista de conversas é feito utilizando o hook useQuery do React Query, que busca os dados da API e atualiza o estado do contexto do chatbot com a lista de conversas.
   const { data: conversationList } = useQuery({
     queryKey: ["conversationsList"],
     queryFn: chatbotService.getConversationSummary,
   });
 
-  // fetch chat history with react-query
+  // O Fetching do histórico de mensagens da conversa atual é feito utilizando o hook useQuery do React Query, que busca os dados da API com base no ID da conversa aberta e atualiza o estado do contexto do chatbot com o histórico de mensagens.
   const { data: chatHistory } = useQuery({
     queryKey: ["chatHistory", openConversationId],
     queryFn: () => chatbotService.getChatHistory(openConversationId!),

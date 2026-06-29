@@ -17,10 +17,11 @@ import {
   updateTransaction,
   deleteTransaction,
 } from "@/services/transactionService";
+import { useAuth } from "./AuthProvider";
 // ==============================================================================
 //                                  CONTEXT
 // ==============================================================================
-// Esta interface define a estrutura do contexto de transações (TransactionContextProps), que inclui a lista completa de transações (transactionList), a lista filtrada de transações (filteredTransactionList), o ID do ativo selecionado (selectedAssetId), a função para atualizar o ID do ativo selecionado (setSelectedAssetId) e as mutações para criar, atualizar e deletar transações. Ela é utilizada para garantir a consistência dos dados relacionados às transações em todo o código, permitindo que os componentes que consomem esse contexto tenham acesso às informações necessárias e possam realizar as operações de criação, atualização e exclusão de forma segura e eficiente.
+// Esta interface define a estrutura do contexto de transações (TransactionContextProps), que inclui a lista completa de transações (transactionList), a lista filtrada de transações (filteredTransactionList), o ID do ativo selecionado (selectedAssetId), a função para atualizar o ID do ativo selecionado (setSelectedAssetId) e as mutações para criar, atualizar e deletar transações.
 interface TransactionContextProps {
   transactionList: TTransaction[];
   filteredTransactionList: TTransaction[];
@@ -34,7 +35,7 @@ interface TransactionContextProps {
     { id: number; data: TTransaction }
   >;
 }
-// Este objeto inicializa o contexto de transações (TransactionContext) com valores padrão, incluindo uma lista vazia de transações, uma lista filtrada vazia, um ID de ativo selecionado nulo e mutações de criação, atualização e exclusão de transações vazias. Ele é utilizado para garantir que o contexto tenha um estado inicial consistente, permitindo que os componentes que consomem esse contexto possam acessar os dados
+// Este objeto inicializa o contexto de transações (TransactionContext) com valores padrão, incluindo uma lista vazia de transações, uma lista filtrada vazia, um ID de ativo selecionado nulo e mutações de criação, atualização e exclusão de transações vazias.
 const initialTransactionContext: TransactionContextProps = {
   transactionList: [],
   filteredTransactionList: [],
@@ -56,16 +57,19 @@ const initialTransactionContext: TransactionContextProps = {
 const TransactionContext = createContext<TransactionContextProps>(
   initialTransactionContext,
 );
-// Este componente é o provedor do contexto de transações (TransactionProvider), que envolve os componentes filhos e fornece o contexto de transações para eles. Ele utiliza o hook useQuery para buscar a lista de transações da API, o hook useMutation para criar mutações que permitem criar, atualizar e deletar transações, e o hook useState para gerenciar a lista filtrada de transações e o ID do ativo selecionado. O useEffect é utilizado para filtrar a lista de transações com base no ID do ativo selecionado e no tipo de ativo selecionado, garantindo que os dados relacionados às transações sejam consistentes e sigam as regras definidas para cada tipo específico. O TransactionProvider é responsável por fornecer os dados relacionados às transações para os componentes filhos, permitindo que eles acessem as informações necessárias e possam realizar as operações de criação, atualização e exclusão de forma segura e eficiente.
+// Este componente é o provedor do contexto de transações (TransactionProvider), que envolve os componentes filhos e fornece o contexto de transações para eles. Ele utiliza o hook useQuery para buscar a lista de transações da API, o hook useMutation para criar mutações que permitem criar, atualizar e deletar transações, e o hook useState para gerenciar a lista filtrada de transações e o ID do ativo selecionado. O useEffect é utilizado para filtrar a lista de transações com base no ID do ativo selecionado e no tipo de ativo selecionado, garantindo que os dados relacionados às transações sejam consistentes e sigam as regras definidas para cada tipo específico.
 export default function TransactionProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { isAuthenticated } = useAuth();
+
   // Busca a lista de transações usando o TanStack React Query
   const { data: transactionList } = useQuery({
     queryKey: ["transactionList"],
     queryFn: getTransactionList,
+    enabled: isAuthenticated,
   });
 
   const [filteredTransactionList, setFilteredTransactionList] = useState<
@@ -86,6 +90,7 @@ export default function TransactionProvider({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactionList"] });
       queryClient.invalidateQueries({ queryKey: ["walletList"] });
+      queryClient.invalidateQueries({ queryKey: ["assetList"] });
     },
   });
 
@@ -94,6 +99,7 @@ export default function TransactionProvider({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactionList"] });
       queryClient.invalidateQueries({ queryKey: ["walletList"] });
+      queryClient.invalidateQueries({ queryKey: ["assetList"] });
     },
   });
 
@@ -106,6 +112,7 @@ export default function TransactionProvider({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactionList"] });
       queryClient.invalidateQueries({ queryKey: ["walletList"] });
+      queryClient.invalidateQueries({ queryKey: ["assetList"] });
     },
   });
 

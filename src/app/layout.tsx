@@ -8,7 +8,7 @@ import ThemeProvider from "@/context/ThemeProvider";
 import QueryProvider from "@/context/QueryProvider";
 
 const inter = Inter({ subsets: ["latin"] });
-
+// O arquivo layout.tsx define a estrutura de layout principal do aplicativo, incluindo a configuração de fontes, provedores de contexto e temas. Ele envolve o conteúdo da aplicação com provedores que gerenciam estado global, autenticação, tema e consultas de dados, garantindo que esses recursos estejam disponíveis em toda a aplicação.
 export const metadata: Metadata = {
   title: "Investify - Sistema de Investimentos",
   description: "Gerencie seus investimentos de forma simples e eficiente com o Investify, seu sistema completo para controle financeiro e análise de portfólio.",

@@ -179,6 +179,16 @@
 
 /* ── Efeitos de Dashboard Empreendedor/Sucesso ── */
 @layer utilities {
+  .no-number-spinner {
+    appearance: textfield;
+  }
+
+  .no-number-spinner::-webkit-outer-spin-button,
+  .no-number-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   .glow-primary {
     box-shadow: 0 0 22px -4px var(--primary);
   }

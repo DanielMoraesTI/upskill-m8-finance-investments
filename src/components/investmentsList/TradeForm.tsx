@@ -8,12 +8,18 @@ import { useTransaction } from "@/context/TransactionProvider";
 import { useMemo } from "react";
 
 type TradeOperacao = "comprar" | "vender" | "resgatar";
-// Este componente é o formulário de negociação (TradeForm), que é utilizado para registrar operações de compra, venda ou resgate de ativos. Ele recebe props como a operação a ser realizada (comprar, vender ou resgatar), o rótulo do ativo, o ID do ativo e uma função de callback para ser chamada após uma operação bem-sucedida. O TradeForm utiliza estados locais para gerenciar os valores de quantidade, valor unitário e feedback para o usuário. Ele calcula o valor total da operação com base na quantidade e no valor unitário, e formata esse valor para exibição em reais (BRL). O formulário inclui campos de entrada para a quantidade e o valor unitário, um campo somente leitura para o total calculado, e um botão para confirmar a operação. Ao enviar o formulário, ele chama a função createMutation do contexto de transações para registrar a operação, e exibe feedback de sucesso ou erro com base no resultado da operação. O TradeForm é essencial para fornecer uma interface de usuário clara e eficiente para os usuários registrarem suas operações de investimento, garantindo que eles possam inserir as informações necessárias de forma fácil e receber feedback imediato sobre o status da operação. Ele melhora a experiência do usuário ao simplificar o processo de registro de operações de compra, venda e resgate, permitindo que os usuários gerenciem suas transações financeiras de forma eficiente e com confiança, sabendo que receberão feedback claro sobre o sucesso ou falha de suas operações. O TradeForm é um componente fundamental para a funcionalidade do portal de investimentos, garantindo que os usuários possam interagir facilmente com o sistema para registrar suas operações de investimento, contribuindo para uma experiência geral positiva ao usar o portal de investimentos. Ele é projetado para ser responsivo e se adaptar a diferentes tamanhos de tela, garantindo que os usuários possam acessar e usar o formulário de negociação em dispositivos móveis e desktops, melhorando a acessibilidade e a conveniência para os usuários ao gerenciar suas operações financeiras. O TradeForm é uma parte crucial da interface do usuário do portal de investimentos, proporcionando uma maneira eficiente e intuitiva para os usuários registrarem suas operações de compra, venda e resgate, melhorando a usabilidade e a satisfação geral dos usuários ao interagir com o portal de investimentos. Ele é implementado com uma abordagem flexível, permitindo que novos tipos de operações ou campos sejam adicionados facilmente no futuro, garantindo que o componente possa evoluir junto com as necessidades dos usuários e as funcionalidades do aplicativo. O TradeForm é um componente chave para a experiência do usuário no portal de investimentos, garantindo que os usuários possam gerenciar suas operações financeiras de forma eficiente e com confiança, sabendo que o processo de registro de operações é simples, claro e fornece feedback imediato sobre o status de suas transações, contribuindo para uma experiência geral positiva ao usar o portal de investimentos. Ele é projetado para ser fácil de usar e acessível, garantindo que os usuários possam registrar suas operações de investimento sem dificuldades, melhorando a eficiência e a satisfação do usuário ao interagir com o portal de investimentos. O TradeForm é um componente essencial para os usuários do portal, permitindo que eles tenham controle total sobre o registro de suas operações de compra, venda e resgate, garantindo que as informações sejam registradas corretamente no sistema e que os usuários recebam feedback claro sobre o status de suas operações, melhorando a experiência geral do usuário ao gerenciar suas transações financeiras no portal de investimentos. Ele é um componente fundamental para garantir que os usuários possam navegar e gerenciar suas operações de forma eficaz, proporcionando uma experiência de usuário personalizada e eficiente no portal de investimentos.
+// Este componente é o formulário de negociação (TradeForm), que é utilizado para registrar operações de compra, venda ou resgate de ativos. Ele recebe props como a operação a ser realizada (comprar, vender ou resgatar), o rótulo do ativo, o ID do ativo e uma função de callback para ser chamada após uma operação bem-sucedida.
 interface TradeFormProps {
   operacao: TradeOperacao;
   assetLabel: string;
   assetId?: number;
+  assetType?: string | null;
+  maxQuantity?: number;
   onSuccess?: () => void;
+}
+
+function sanitizeUnsignedNumberInput(value: string): string {
+  return value.replace(/[-+]/g, "");
 }
 
 function formatBRL(value: number): string {
@@ -30,23 +36,37 @@ export default function TradeForm({
   operacao,
   assetLabel,
   assetId,
+  assetType,
+  maxQuantity,
   onSuccess,
 }: TradeFormProps) {
+  const isCompra = operacao === "comprar";
+  const isResgatar = operacao === "resgatar";
+  const isRendaFixa = assetType === "Renda Fixa";
   const { createMutation } = useTransaction();
-  const [quantidade, setQuantidade] = useState("");
+  const [quantidade, setQuantidade] = useState(
+    isResgatar || isRendaFixa ? "1" : "",
+  );
   const [valor, setValor] = useState("");
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
     message: string;
   } | null>(null);
 
-  const isCompra = operacao === "comprar";
-  const isResgatar = operacao === "resgatar";
   const total = useMemo(
     () => calcTotal(quantidade, valor),
     [quantidade, valor],
   );
-  const canConfirm = quantidade !== "" && valor !== "" && !!assetId;
+  const quantityNumber = isRendaFixa ? 1 : parseFloat(quantidade);
+  const unitPriceNumber = parseFloat(valor.replace(",", "."));
+  const canConfirm =
+    !!assetId &&
+    Number.isFinite(unitPriceNumber) &&
+    (isRendaFixa || (Number.isFinite(quantityNumber) && quantityNumber > 0)) &&
+    unitPriceNumber > 0 &&
+    (operacao !== "vender" ||
+      maxQuantity === undefined ||
+      quantityNumber <= maxQuantity);
 
   const title = isCompra ? "Comprar" : isResgatar ? "Resgatar" : "Vender";
   const subtitle = isCompra
@@ -62,16 +82,45 @@ export default function TradeForm({
   function handleSubmit() {
     if (!assetId) return;
 
+    const quantityValue = isRendaFixa ? 1 : parseFloat(quantidade);
+    const unitPriceValue = parseFloat(valor.replace(",", "."));
+    const now = new Date();
+    const transactionDate = new Date(
+      now.getTime() - now.getTimezoneOffset() * 60_000,
+    )
+      .toISOString()
+      .slice(0, 10);
+
+    if (!Number.isFinite(quantityValue) || !Number.isFinite(unitPriceValue)) {
+      return;
+    }
+
     setFeedback(null);
+
+    if ((!isRendaFixa && quantityValue <= 0) || unitPriceValue <= 0) {
+      return;
+    }
+
+    if (
+      operacao === "vender" &&
+      maxQuantity !== undefined &&
+      quantityValue > maxQuantity
+    ) {
+      setFeedback({
+        type: "error",
+        message: `Quantidade de venda maior que a disponível (${maxQuantity}).`,
+      });
+      return;
+    }
 
     createMutation.mutate(
       {
         asset_id: assetId,
         entry_type: operacao === "comprar" ? "buy" : "sell",
-        date: new Date().toISOString().slice(0, 10),
-        quantity: parseFloat(quantidade),
-        unit_price: parseFloat(valor.replace(",", ".")),
-        total_value: total,
+        date: transactionDate,
+        quantity: quantityValue,
+        unit_price: unitPriceValue,
+        total_value: quantityValue * unitPriceValue,
       },
       {
         onSuccess: () => {
@@ -79,7 +128,7 @@ export default function TradeForm({
             type: "success",
             message: `${title} registrada com sucesso.`,
           });
-          setQuantidade("");
+          setQuantidade(isResgatar || isRendaFixa ? "1" : "");
           setValor("");
           onSuccess?.();
         },
@@ -106,23 +155,33 @@ export default function TradeForm({
       <div className="w-full h-px bg-border/40" />
 
       <FieldGroup className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field>
-          <FieldLabel
-            htmlFor="trade-quantidade"
-            className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
-          >
-            Quantidade
-          </FieldLabel>
-          <Input
-            id="trade-quantidade"
-            type="number"
-            min={1}
-            placeholder="0"
-            value={quantidade}
-            onChange={(e) => setQuantidade(e.target.value)}
-            className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
-          />
-        </Field>
+        {!isRendaFixa && (
+          <Field>
+            <FieldLabel
+              htmlFor="trade-quantidade"
+              className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-widest"
+            >
+              Quantidade
+            </FieldLabel>
+            <Input
+              id="trade-quantidade"
+              type="number"
+              min={1}
+              placeholder="0"
+              value={quantidade}
+              readOnly={isResgatar}
+              onChange={(e) =>
+                setQuantidade(sanitizeUnsignedNumberInput(e.target.value))
+              }
+              onKeyDown={(event) => {
+                if (["-", "+", "e", "E"].includes(event.key)) {
+                  event.preventDefault();
+                }
+              }}
+              className="no-number-spinner bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+            />
+          </Field>
+        )}
 
         <Field>
           <FieldLabel
@@ -138,8 +197,15 @@ export default function TradeForm({
             step={0.01}
             placeholder="0,00"
             value={valor}
-            onChange={(e) => setValor(e.target.value)}
-            className="bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
+            onChange={(e) =>
+              setValor(sanitizeUnsignedNumberInput(e.target.value))
+            }
+            onKeyDown={(event) => {
+              if (["-", "+", "e", "E"].includes(event.key)) {
+                event.preventDefault();
+              }
+            }}
+            className="no-number-spinner bg-muted/30 border-border/50 focus:border-primary/50 transition-colors"
           />
         </Field>
 

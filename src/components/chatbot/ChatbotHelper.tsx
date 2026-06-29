@@ -48,8 +48,8 @@ export default function ChatbotHelper() {
                   Exemplos
                 </h4>
                 <ul className="list-disc list-inside text-sm space-y-1">
-                  <li>Quais ativos valorizaram mais nos últimos 6 meses?</li>
-                  <li>Qual é o rendimento total de renda fixa?</li>
+                  <li>Quais ativos que mais comprei nos últimos 6 meses?</li>
+                  <li>Qual ativo tenho comprado menos nos últimos 3 meses?</li>
                   <li>Compare a carteira atual com 3 meses atrás.</li>
                 </ul>
               </section>

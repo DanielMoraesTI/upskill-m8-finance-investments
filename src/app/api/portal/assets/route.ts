@@ -3,7 +3,7 @@ import { AssetListResponseSchema } from "@/schemas/assetSchema";
 import assetService from "@/app/api/_services/asset.service";
 import userService from '../../_services/user.service';
 import { errorResponse } from "@/app/api/_utils/serverUtils";
-
+// Esta função assíncrona busca a lista de tipos de ativos e a lista de ativos disponíveis, enviando uma requisição GET para o endpoint "/api/portal/assets". Ela valida o ID do usuário autorizado, trata erros de rede e valida a resposta, retornando respostas apropriadas em caso de falha.
 export async function GET(request: NextRequest) {
     try {
         // validar o userID
@@ -12,11 +12,11 @@ export async function GET(request: NextRequest) {
             return errorResponse("Não autorizado", 401);
         }
 
-        // fazer a query
+        // fazer a query. Query é usada para buscar dados do banco de dados ou de um serviço externo, retornando os resultados da consulta.
         const assetTypeList = await assetService.getAssetTypes();
         const assetList = await assetService.getAllAssets();
 
-        // fazer o parse da response
+        // fazer o parse da response. safeParse é usado para validar a resposta e garantir que ela esteja no formato esperado, evitando erros de tipo ou estrutura.
         const assetListResponse = AssetListResponseSchema.safeParse({
             assetTypeList: assetTypeList || [],
             assetList: assetList || [],
