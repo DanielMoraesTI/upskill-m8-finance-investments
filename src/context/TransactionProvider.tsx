@@ -58,7 +58,7 @@ const initialTransactionContext: TransactionContextProps = {
 const TransactionContext = createContext<TransactionContextProps>(
   initialTransactionContext,
 );
-// Este componente é o provedor do contexto de transações (TransactionProvider), que envolve os componentes filhos e fornece o contexto de transações para eles. Ele utiliza o hook useQuery para buscar a lista de transações da API, o hook useMutation para criar mutações que permitem criar, atualizar e deletar transações, e o hook useState para gerenciar a lista filtrada de transações e o ID do ativo selecionado. O useEffect é utilizado para filtrar a lista de transações com base no ID do ativo selecionado e no tipo de ativo selecionado, garantindo que os dados relacionados às transações sejam consistentes e sigam as regras definidas para cada tipo específico.
+// Este componente é o provedor do contexto de transações (TransactionProvider), que envolve os componentes filhos e fornece o contexto de transações para eles. Ele utiliza o hook useQuery para buscar a lista de transações da API, o hook useMutation para criar mutações que permitem criar, atualizar e deletar transações, e o hook useState para gerenciar a lista filtrada de transações e o ID do ativo selecionado.
 export default function TransactionProvider({
   children,
 }: {
@@ -85,7 +85,7 @@ export default function TransactionProvider({
   const { currentAssetType, assetList } = useAsset();
 
   // Configura as mutações para atualizar e deletar transações
-  const queryClient = useQueryClient(); // âœ…
+  const queryClient = useQueryClient(); 
 
   const createMutation = useMutation<TTransaction, Error, TCreateTransaction>({
     mutationFn: (payload) => createTransaction(payload),

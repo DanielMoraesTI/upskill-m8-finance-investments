@@ -18,7 +18,7 @@ import { useApp } from "./AppProvider";
 // ==============================================================================
 //                                  CONTEXT
 // ==============================================================================
-// Esta interface define a estrutura do contexto de ativos (AssetContextProps), que inclui o tipo de ativo atual selecionado (currentAssetType), a lista completa de ativos (assetList), a lista de tipos de ativos (assetTypeList), a funÃ§Ã£o para atualizar o tipo de ativo atual selecionado (setCurrentAssetType) e a mutaÃ§Ã£o para atualizar o preÃ§o atual de um ativo (currentPriceMutation).
+// Esta interface define a estrutura do contexto de ativos (AssetContextProps), que inclui o tipo de ativo atual selecionado (currentAssetType), a lista completa de ativos (assetList), a lista de tipos de ativos (assetTypeList), a função para atualizar o tipo de ativo atual selecionado (setCurrentAssetType) e a mutação para atualizar o preço atual de um ativo (currentPriceMutation).
 interface AssetContextProps {
   currentAssetType: TAssetType | null;
   assetList: TAssetList;

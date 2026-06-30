@@ -39,7 +39,7 @@ const initialWalletContext: WalletContextProps = {
 };
 
 const WalletContext = createContext<WalletContextProps>(initialWalletContext);
-// Este componente é o provedor do contexto de carteiras (WalletProvider), que envolve os componentes filhos e fornece o contexto de carteiras para eles. Ele utiliza o hook useQuery para buscar a lista de carteiras da API, o hook useMutation para criar uma mutação que atualiza a renda de uma carteira, e o hook useState para gerenciar a lista filtrada de carteiras. O useEffect é utilizado para filtrar a lista de carteiras com base no tipo de ativo selecionado, garantindo que os dados relacionados às carteiras sejam consistentes e sigam as regras definidas para cada tipo especí­fico. O WalletProvider é responsável por fornecer os dados relacionados às carteiras para os componentes filhos, permitindo que eles acessem as informaçõµes necessárias e possam realizar as operações de atualização de forma segura e eficiente.
+// Este componente é o provedor do contexto de carteiras (WalletProvider), que envolve os componentes filhos e fornece o contexto de carteiras para eles. Ele utiliza o hook useQuery para buscar a lista de carteiras da API, o hook useMutation para criar uma mutação que atualiza a renda de uma carteira, e o hook useState para gerenciar a lista filtrada de carteiras.
 export default function WalletProvider({
   children,
 }: {

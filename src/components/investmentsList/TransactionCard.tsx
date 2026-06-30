@@ -151,8 +151,8 @@ export function TransactionCard({
                 className={cn(
                   "mt-1 w-fit text-xs font-semibold flex items-center gap-1 border px-2 py-0.5 rounded-full",
                   isCompra
-                    ? "bg-emerald-950/50 text-emerald-400 border-emerald-800/50"
-                    : "bg-rose-950/50 text-rose-400 border-rose-800/50",
+                    ? "bg-emerald-200 text-black border-emerald-500"
+                    : "bg-red-200 text-black border-red-500",
                 )}
               >
                 {isCompra ? (
@@ -257,11 +257,11 @@ export function TransactionCard({
               {/* Tipo */}
               <div className="shrink-0">
                 {isCompra ? (
-                  <div className="p-1.5 rounded-full bg-emerald-950/50 text-emerald-400 border border-emerald-800/50">
+                  <div className="p-1.5 rounded-full bg-emerald-200 text-black border border-emerald-500">
                     <TrendingUp className="h-3.5 w-3.5" />
                   </div>
                 ) : (
-                  <div className="p-1.5 rounded-full bg-rose-950/50 text-rose-400 border border-rose-800/50">
+                  <div className="p-1.5 rounded-full bg-red-200 text-black border border-red-500">
                     <TrendingDown className="h-3.5 w-3.5" />
                   </div>
                 )}
@@ -336,8 +336,8 @@ export function TransactionCard({
                     className={cn(
                       "mt-1 w-fit text-xs font-semibold flex items-center gap-1 border px-2 py-0.5 rounded-full",
                       isCompra
-                        ? "bg-emerald-950/50 text-emerald-400 border-emerald-800/50"
-                        : "bg-rose-950/50 text-rose-400 border-rose-800/50",
+                        ? "bg-emerald-200 text-black border-emerald-500"
+                        : "bg-red-200 text-black border-red-500",
                     )}
                   >
                     {isCompra ? (

@@ -1,7 +1,7 @@
 ﻿"use client";
 import { useState, createContext, useContext, useRef, useEffect } from "react";
 import { CheckCircle2, XCircle } from "lucide-react";
-// Esta interface define a estrutura do contexto do aplicativo (AppContextProps), que inclui o estado de carregamento (isLoading), a funÃ§Ã£o para atualizar o estado de carregamento (setIsLoading), a mensagem de resultado (resultMessage), a funÃ§Ã£o para atualizar a mensagem de resultado (setResultMessage), o resultado da operaÃ§Ã£o (result) e a funÃ§Ã£o para atualizar o resultado da operaÃ§Ã£o (setResult).
+// Esta interface define a estrutura do contexto do aplicativo (AppContextProps), que inclui o estado de carregamento (isLoading), a função para atualizar o estado de carregamento (setIsLoading), a mensagem de resultado (resultMessage), a função para atualizar a mensagem de resultado (setResultMessage), o resultado da operação (result) e a função para atualizar o resultado da operação (setResult).
 type TResult = "success" | "error" | null;
 
 interface AppContextProps {
@@ -15,7 +15,7 @@ interface AppContextProps {
 }
 
 const AppContext = createContext<null | AppContextProps>(null);
-// Este componente Ã© o provedor do contexto do aplicativo (AppProvider), que envolve os componentes filhos e fornece o contexto do aplicativo para eles. Ele utiliza o hook useState para gerenciar o estado de carregamento, mensagens de resultado e resultados de operaÃ§Ãµes, e o hook useEffect para implementar um reset automÃ¡tico do estado de resultado apÃ³s 5 segundos, limpando as mensagens de feedback.
+// Este componente é o provedor do contexto do aplicativo (AppProvider), que envolve os componentes filhos e fornece o contexto do aplicativo para eles. Ele utiliza o hook useState para gerenciar o estado de carregamento, mensagens de resultado e resultados de operações, e o hook useEffect para implementar um reset automático do estado de resultado após 5 segundos, limpando as mensagens de feedback.
 export default function AppProvider({
   children,
 }: {
@@ -33,7 +33,7 @@ export default function AppProvider({
     setResultMessage(message);
   };
 
-  // Reset automÃ¡tico do estado de resultado apÃ³s 5 segundos para limpar mensagens de feedback
+  // Reset automático do estado de resultado após 5 segundos para limpar mensagens de feedback
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     if (result) {

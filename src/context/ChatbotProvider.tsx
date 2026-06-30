@@ -93,7 +93,7 @@ function chatbotReducer(
       return state;
   }
 }
-// Este componente é o provedor do contexto do chatbot (ChatbotProvider), que envolve os componentes filhos e fornece o contexto do chatbot para eles. Ele utiliza o hook useReducer para gerenciar o estado do chatbot, o hook useState para gerenciar o ID da conversa aberta, o hook useQuery para buscar a lista de conversas e o histórico de mensagens da conversa atual, e o hook useMutation para criar uma mutação que permite excluir uma conversa. O useEffect é utilizado para filtrar a lista de conversas com base na data de atualização, garantindo que as conversas mais recentes sejam exibidas primeiro. O ChatbotProvider é responsável por fornecer os dados relacionados ao chatbot para os componentes filhos, permitindo que eles acessem as informações necessárias e possam realizar as operações de envio de mensagens e exclusão de conversas de forma segura e eficiente.
+// Este componente é o provedor do contexto do chatbot (ChatbotProvider), que envolve os componentes filhos e fornece o contexto do chatbot para eles. Ele utiliza o hook useReducer para gerenciar o estado do chatbot, o hook useState para gerenciar o ID da conversa aberta, o hook useQuery para buscar a lista de conversas e o histórico de mensagens da conversa atual, e o hook useMutation para criar uma mutação que permite excluir uma conversa.
 export default function ChatbotProvider({
   children,
 }: {
