@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { createContext, useState, useContext, useEffect } from "react";
 import type {
   TTransaction,
@@ -18,6 +18,7 @@ import {
   deleteTransaction,
 } from "@/services/transactionService";
 import { useAuth } from "./AuthProvider";
+import { useApp } from "./AppProvider";
 // ==============================================================================
 //                                  CONTEXT
 // ==============================================================================
@@ -64,6 +65,7 @@ export default function TransactionProvider({
   children: React.ReactNode;
 }) {
   const { isAuthenticated } = useAuth();
+  const { notifyResult } = useApp();
 
   // Busca a lista de transações usando o TanStack React Query
   const { data: transactionList } = useQuery({
@@ -83,14 +85,30 @@ export default function TransactionProvider({
   const { currentAssetType, assetList } = useAsset();
 
   // Configura as mutações para atualizar e deletar transações
-  const queryClient = useQueryClient(); // ✅
+  const queryClient = useQueryClient(); // âœ…
 
   const createMutation = useMutation<TTransaction, Error, TCreateTransaction>({
     mutationFn: (payload) => createTransaction(payload),
-    onSuccess: () => {
+    onSuccess: (_, payload) => {
       queryClient.invalidateQueries({ queryKey: ["transactionList"] });
       queryClient.invalidateQueries({ queryKey: ["walletList"] });
       queryClient.invalidateQueries({ queryKey: ["assetList"] });
+
+      const assetData = assetList.find(
+        (asset) => asset.id === payload.asset_id,
+      );
+      const isResgate =
+        assetData?.asset_type_id === 3 && payload.entry_type === "sell";
+      const operationLabel = isResgate
+        ? "Resgate"
+        : payload.entry_type === "buy"
+          ? "Compra"
+          : "Venda";
+
+      notifyResult("success", `${operationLabel} realizada com sucesso.`);
+    },
+    onError: () => {
+      notifyResult("error", "Não foi possí­vel registrar a transação.");
     },
   });
 
@@ -100,6 +118,10 @@ export default function TransactionProvider({
       queryClient.invalidateQueries({ queryKey: ["transactionList"] });
       queryClient.invalidateQueries({ queryKey: ["walletList"] });
       queryClient.invalidateQueries({ queryKey: ["assetList"] });
+      notifyResult("success", "Transação excluí­da com sucesso.");
+    },
+    onError: () => {
+      notifyResult("error", "Não foi possí­vel excluir a transação.");
     },
   });
 
@@ -113,6 +135,10 @@ export default function TransactionProvider({
       queryClient.invalidateQueries({ queryKey: ["transactionList"] });
       queryClient.invalidateQueries({ queryKey: ["walletList"] });
       queryClient.invalidateQueries({ queryKey: ["assetList"] });
+      notifyResult("success", "Transação atualizada com sucesso.");
+    },
+    onError: () => {
+      notifyResult("error", "Não foi possí­vel atualizar a transação.");
     },
   });
 
@@ -125,14 +151,14 @@ export default function TransactionProvider({
 
       let filtered = [...transactionList];
 
-      // 1. Filtro por Histórico Específico (clique na linha da carteira)
+      // 1. Filtro por Histórico Especí­fico (clique na linha da carteira)
       if (selectedAssetId !== null) {
         filtered = filtered.filter(
           (transactionItem) => transactionItem.asset_id === selectedAssetId,
         );
       }
 
-      // 2. Filtro por Categoria Global (Ações, FIIs, etc.) vindo da Navbar/Tabs
+      // 2. Filtro por Categoria Global (AÃ§Ãµes, FIIs, etc.) vindo da Navbar/Tabs
       if (currentAssetType) {
         filtered = filtered.filter((transactionItem) => {
           const assetData = assetList.find(
@@ -169,7 +195,7 @@ export default function TransactionProvider({
 export const useTransaction = () => {
   const transactionContext = useContext(TransactionContext);
   if (!transactionContext) {
-    throw new Error("useTransaction must be used within a TransactionProvider");
+    throw new Error("useTransaction deve ser usado dentro de um TransactionProvider");
   }
   return transactionContext;
 };

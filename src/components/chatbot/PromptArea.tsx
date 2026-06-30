@@ -17,11 +17,11 @@ export default function PromptArea() {
   };
 
   return (
-    <div className="relative p-4 bg-base-100 border-t border-base-300 z-1">
+    <div className="relative p-3 sm:p-4 bg-base-100 border-t border-base-300 z-1">
       <div className="relative">
         <Textarea
           placeholder="Pergunte algo sobre seus investimentos..."
-          className="resize-none pr-10"
+          className="resize-none pr-10 min-h-10"
           rows={1}
           value={userPrompt}
           onChange={(e) =>
@@ -40,12 +40,15 @@ export default function PromptArea() {
           <Send size={18} />
         </Button>
       </div>
-      <div className="text-xs text-center mt-2 opacity-50">
-        Conteúdo de caráter educativo gerado de forma automatizada por IA. Não constitui recomendação, indicação ou assessoria de investimento (CVM). Os dados simulados podem divergir da realidade. Decisões de alocação são de inteira responsabilidade do usuário. <br />
+      <div className="text-[10px] sm:text-xs text-center mt-2 opacity-50 leading-relaxed">
+        Conteúdo de caráter educativo gerado de forma automatizada por IA. Não
+        constitui recomendação, indicação ou assessoria de investimento (CVM).
+        Os dados simulados podem divergir da realidade. Decisões de alocação são
+        de inteira responsabilidade do usuário. <br />
       </div>
 
       {thinking && (
-        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2">
+        <div className="mt-2">
           <div className="flex items-center gap-2 text-sm font-bold mt-4 text-primary w-full justify-center">
             <Bot size={14} className={`animate-bounce text-primary`} />
             <span className={`text-sm font-bold`}>{thinkingMessage}</span>

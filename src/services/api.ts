@@ -1,4 +1,4 @@
-import { auth } from "@/lib/firebase";
+﻿import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
 // Esta função aguarda até que o usuário esteja autenticado ou até que o tempo limite seja atingido, retornando o usuário autenticado ou null se o tempo limite for atingido. Ela utiliza o Firebase Authentication para monitorar o estado de autenticação do usuário.
 async function waitForAuthenticatedUser(
@@ -28,13 +28,13 @@ export async function getUserToken(): Promise<string> {
   try {
     const currentUser = auth.currentUser ?? (await waitForAuthenticatedUser());
     if (!currentUser) {
-      throw new Error("User is not authenticated");
+      throw new Error("Usuário não autenticado");
     }
 
     const token = await currentUser.getIdToken();
     return `Bearer ${token}`;
   } catch (error) {
-    console.error("Error getting user token:", error);
-    throw new Error("An error occurred while retrieving the user token");
+    console.error("Erro ao obter token do usuário:", error);
+    throw new Error("Ocorreu um erro ao obter o token do usuario");
   }
 }

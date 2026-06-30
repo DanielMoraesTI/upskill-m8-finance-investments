@@ -1,4 +1,4 @@
-import {
+﻿import {
   WalletListSchema,
   WalletSchema,
   type TWalletList,
@@ -34,13 +34,13 @@ async function getAllWallets(userId: number): Promise<TWalletList> {
 
     const parsed = WalletListSchema.safeParse(walletList);
     if (!parsed.success) {
-      console.log("Wallet List parsing error:", parsed.error);
-      throw new Error("Invalid wallet data");
+      console.log("Erro ao validar lista da carteira:", parsed.error);
+      throw new Error("Dados da carteira inválidos");
     }
     return parsed.data;
   } catch (error) {
-    console.error("Error in findAllWallets:", error);
-    throw new Error("An error occurred while fetching wallet data");
+    console.error("Erro em findAllWallets:", error);
+    throw new Error("Ocorreu um erro ao buscar dados da carteira");
   }
 }
 
@@ -51,7 +51,9 @@ async function getWalletByAssetId(
   try {
     const rows = await walletRepository.findWalletByAssetId(userId, assetId);
     if (rows.length === 0) {
-      throw new Error("No wallet found for the given asset id");
+      throw new Error(
+        "Nenhuma carteira encontrada para o id do ativo informado",
+      );
     }
 
     const row = rows[0];
@@ -76,14 +78,14 @@ async function getWalletByAssetId(
 
     const parsed = WalletSchema.safeParse(wallet);
     if (!parsed.success) {
-      console.log("Wallet parsing error:", parsed.error);
-      throw new Error("Invalid wallet data");
+      console.log("Erro ao validar carteira:", parsed.error);
+      throw new Error("Dados da carteira inválidos");
     }
 
     return parsed.data;
   } catch (error) {
-    console.error("Error in getWalletById:", error);
-    throw new Error("An error occurred while fetching wallet data");
+    console.error("Erro em getWalletById:", error);
+    throw new Error("Ocorreu um erro ao buscar dados da carteira");
   }
 }
 
@@ -105,7 +107,7 @@ async function ensureWalletByAsset(
 // ==================================================================================
 //                              UPDATE SERVICES
 // ==================================================================================
-// Atualiza todos os campos de uma carteira específica
+// Atualiza todos os campos de uma carteira especí­fica
 async function updateWalletData(
   userId: number,
   walletData: TWallet,
@@ -113,7 +115,9 @@ async function updateWalletData(
   try {
     const result = await walletRepository.updateWalletData(userId, walletData);
     if (!result || result.affectedRows === 0) {
-      throw new Error("No wallet entry found for the given id");
+      throw new Error(
+        "Nenhum registro de carteira encontrado para o id informado",
+      );
     }
 
     const updatedWallet: TWallet = {
@@ -123,14 +127,14 @@ async function updateWalletData(
 
     const parsed = WalletSchema.safeParse(updatedWallet);
     if (!parsed.success) {
-      console.log("Updated Wallet parsing error:", parsed.error);
-      throw new Error("Invalid updated wallet data");
+      console.log("Erro ao validar carteira atualizada:", parsed.error);
+      throw new Error("Dados atualizados da carteira invalidos");
     }
 
     return parsed.data;
   } catch (error) {
-    console.error("Error in updateWalletData:", error);
-    throw new Error("An error occurred while updating wallet data");
+    console.error("Erro em updateWalletData:", error);
+    throw new Error("Ocorreu um erro ao atualizar dados da carteira");
   }
 }
 
@@ -148,8 +152,8 @@ async function updateWalletIncome(
     );
     return result && result.affectedRows > 0;
   } catch (error) {
-    console.error("Error in updateWalletIncome:", error);
-    throw new Error("An error occurred while updating wallet data");
+    console.error("Erro em updateWalletIncome:", error);
+    throw new Error("Ocorreu um erro ao atualizar dados da carteira");
   }
 }
 
@@ -166,7 +170,7 @@ async function recalculateWalletByAsset(
 
     const assetType = await assetRepository.findAssetTypeByAssetId(assetId);
     if (!assetType || assetType.length === 0) {
-      throw new Error("No asset type found for the given asset id");
+      throw new Error("Nenhum tipo de ativo encontrado para o id informado");
     }
 
     const currentWallet = await ensureWalletByAsset(userId, assetId);
@@ -178,14 +182,14 @@ async function recalculateWalletByAsset(
 
     const parsed = WalletSchema.safeParse(updatedWallet);
     if (!parsed.success) {
-      console.log("Recalculated Wallet parsing error:", parsed.error);
-      throw new Error("Invalid recalculated wallet data");
+      console.log("Erro ao validar carteira recalculada:", parsed.error);
+      throw new Error("Dados recalculados da carteira invalidos");
     }
 
     return parsed.data;
   } catch (error) {
-    console.error("Error in recalculateWalletByAsset:", error);
-    throw new Error("An error occurred while recalculating wallet data");
+    console.error("Erro em recalculateWalletByAsset:", error);
+    throw new Error("Ocorreu um erro ao recalcular dados da carteira");
   }
 }
 

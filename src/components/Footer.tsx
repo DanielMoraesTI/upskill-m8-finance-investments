@@ -67,42 +67,44 @@ export default function Footer() {
 
   // Nas demais páginas, renderiza o Footer com o resumo dos investimentos
   return (
-    <footer className="w-full border-t border-border/50 bg-card/60 backdrop-blur-sm px-6 py-2">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 md:grid-cols-4 divide-x divide-border/40">
-        <div className="flex items-center justify-center gap-2 px-4 py-1">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-            Total Investido
-          </span>
-          <span className="text-xs font-bold tabular-nums text-foreground/80">
-            {formatCurrency(summary.totalUpdated)}
-          </span>
-        </div>
+    <footer className="w-full border-t border-border/50 bg-card/60 backdrop-blur-sm px-1.5 sm:px-6 py-0.5 sm:py-2">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid grid-cols-4 divide-x divide-border/40">
+          <div className="flex flex-col items-center justify-center gap-0.5 px-1 sm:px-4 py-0.5">
+            <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/50 leading-none text-center">
+              Total Investido
+            </span>
+            <span className="text-[10px] sm:text-xs font-bold tabular-nums text-foreground/80 leading-none text-center">
+              {formatCurrency(summary.totalUpdated)}
+            </span>
+          </div>
 
-        <div className="flex items-center justify-center gap-2 px-4 py-1">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-            Ações
-          </span>
-          <span className="text-xs font-bold tabular-nums text-foreground/80">
-            {formatCurrency(summary.byTypeUpdated.stock)}
-          </span>
-        </div>
+          <div className="flex flex-col items-center justify-center gap-0.5 px-1 sm:px-4 py-0.5">
+            <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/50 leading-none text-center">
+              Ações
+            </span>
+            <span className="text-[10px] sm:text-xs font-bold tabular-nums text-foreground/80 leading-none text-center">
+              {formatCurrency(summary.byTypeUpdated.stock)}
+            </span>
+          </div>
 
-        <div className="flex items-center justify-center gap-2 px-4 py-1">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-            Fundos Imobiliários
-          </span>
-          <span className="text-xs font-bold tabular-nums text-foreground/80">
-            {formatCurrency(summary.byTypeUpdated.fii)}
-          </span>
-        </div>
+          <div className="flex flex-col items-center justify-center gap-0.5 px-1 sm:px-4 py-0.5">
+            <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/50 leading-none text-center">
+              Fundos Imob.
+            </span>
+            <span className="text-[10px] sm:text-xs font-bold tabular-nums text-foreground/80 leading-none text-center">
+              {formatCurrency(summary.byTypeUpdated.fii)}
+            </span>
+          </div>
 
-        <div className="flex items-center justify-center gap-2 px-4 py-1">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-            Renda Fixa
-          </span>
-          <span className="text-xs font-bold tabular-nums text-foreground/80">
-            {formatCurrency(summary.byTypeUpdated.fixedIncome)}
-          </span>
+          <div className="flex flex-col items-center justify-center gap-0.5 px-1 sm:px-4 py-0.5">
+            <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/50 leading-none text-center">
+              Renda Fixa
+            </span>
+            <span className="text-[10px] sm:text-xs font-bold tabular-nums text-foreground/80 leading-none text-center">
+              {formatCurrency(summary.byTypeUpdated.fixedIncome)}
+            </span>
+          </div>
         </div>
       </div>
     </footer>

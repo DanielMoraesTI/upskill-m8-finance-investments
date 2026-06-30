@@ -1,4 +1,4 @@
-import { ConversationSummarySchema, ConversationSchema } from "@/schemas/chatbotSchema";
+﻿import { ConversationSummarySchema, ConversationSchema } from "@/schemas/chatbotSchema";
 import type {
     TConversationSummary,
     TChatbotEvent, TConversation,
@@ -14,40 +14,40 @@ const getConversationSummary = async (): Promise<TConversationSummary> => {
         headers: { 'Authorization': token },
     });
 
-    if (!response.ok) throw new Error('Failed to fetch conversation summary');
+    if (!response.ok) throw new Error('Falha ao buscar resumo da conversa');
 
     const data = await response.json();
     const parsed = ConversationSummarySchema.safeParse(data);
     if (!parsed.success) {
-        throw new Error('Invalid conversation summary data');
+        throw new Error('Dados de resumo da conversa invalidos');
     }
 
     return parsed.data;
 }
-// Esta função obtém o histórico de mensagens de uma conversa específica do usuário autenticado, retornando um objeto TConversation. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição GET para a API do chatbot com o ID da conversa, validando a resposta com o esquema ConversationSchema.
+// Esta função obtém o histórico de mensagens de uma conversa especí­fica do usuário autenticado, retornando um objeto TConversation. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição GET para a API do chatbot com o ID da conversa, validando a resposta com o esquema ConversationSchema.
 const getChatHistory = async (conversationId: number): Promise<TConversation> => {
     const token = await getUserToken();
     const response = await fetch(`${url}?id=${conversationId}`, {
         method: 'GET',
         headers: { 'Authorization': token },
     });
-    if (!response.ok) throw new Error('Failed to fetch chat history');
+    if (!response.ok) throw new Error('Falha ao buscar historico do chat');
 
     const data = await response.json();
     const parsed = ConversationSchema.safeParse(data);
     if (!parsed.success) {
-        throw new Error('Invalid conversation data');
+        throw new Error('Dados de conversa invalidos');
     }
     return parsed.data;
 }
-// Esta função exclui uma conversa específica do usuário autenticado, retornando um booleano indicando se a exclusão foi bem-sucedida. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição DELETE para a API do chatbot com o ID da conversa.
+// Esta função exclui uma conversa especí­fica do usuário autenticado, retornando um booleano indicando se a exclusão foi bem-sucedida. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição DELETE para a API do chatbot com o ID da conversa.
 async function deleteConversation(conversationId: number): Promise<boolean> {
     const token = await getUserToken();
     const response = await fetch(`${url}?id=${conversationId}`, {
         method: 'DELETE',
         headers: { 'Authorization': token },
     });
-    if (!response.ok) throw new Error('Failed to delete conversation');
+    if (!response.ok) throw new Error('Falha ao excluir conversa');
     return response.json();
 }
 // Esta função inicia uma nova conversa com o chatbot, enviando um prompt inicial e recebendo eventos de resposta em tempo real. Ela utiliza a função getUserToken para obter o token de autenticação do usuário e faz uma requisição POST para a API do chatbot com o prompt fornecido. A função onEvent é chamada para cada evento recebido do chatbot, permitindo que o aplicativo processe as respostas em tempo real.
@@ -59,7 +59,7 @@ async function startChat(prompt: string, onEvent: (event: TChatbotEvent) => void
         headers: { 'Content-Type': 'application/json', 'Authorization': token },
     });
 
-    if (!response.ok) throw new Error('Failed to start chat');
+    if (!response.ok) throw new Error('Falha ao iniciar chat');
     if (!response.body) throw new Error('No response body');
 
     await handleStream(response.body, onEvent);
@@ -73,7 +73,7 @@ async function sendMessage(conversationId: number, prompt: string, onEvent: (eve
         headers: { 'Content-Type': 'application/json', 'Authorization': token },
     });
 
-    if (!response.ok) throw new Error('Failed to send message');
+    if (!response.ok) throw new Error('Falha ao enviar mensagem');
     if (!response.body) throw new Error('No response body');
 
     await handleStream(response.body, onEvent);
@@ -99,7 +99,7 @@ async function handleStream(body: ReadableStream<Uint8Array>, onEvent: (event: T
                     const event = JSON.parse(trimmedLine.slice(6)) as TChatbotEvent;
                     onEvent(event);
                 } catch (e) {
-                    console.error('Error parsing stream event', e);
+                    console.error('Erro ao processar evento do stream', e);
                 }
             }
         }

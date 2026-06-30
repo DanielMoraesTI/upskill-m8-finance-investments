@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   createContext,
@@ -14,6 +14,7 @@ import type {
 import type { Dispatch } from "react";
 import chatbotService from "@/services/chatbotService";
 import { useQueryClient } from "@tanstack/react-query";
+import { useApp } from "./AppProvider";
 // ==============================================================================
 //                                  CONTEXT
 // ==============================================================================
@@ -52,7 +53,7 @@ type ChatbotStateAction =
   | { type: "setStreamingMessage"; value: string }
   | { type: "appendStreamingMessage"; value: string }
   | { type: "setDeletingConversation"; value: boolean };
-// Esta interface define a estrutura do contexto do chatbot (ChatbotContextProps), que estende o estado do chatbot (ChatbotState) e inclui a lista completa de conversas (conversationList), a função de despacho (dispatch), a função para abrir uma conversa específica (handleOpenConversation) e a função para enviar uma mensagem (handleSendMessage).
+// Esta interface define a estrutura do contexto do chatbot (ChatbotContextProps), que estende o estado do chatbot (ChatbotState) e inclui a lista completa de conversas (conversationList), a função de despacho (dispatch), a função para abrir uma conversa especí­fica (handleOpenConversation) e a função para enviar uma mensagem (handleSendMessage).
 interface ChatbotContextProps extends Omit<ChatbotState, "conversationList"> {
   conversationList: TConversationSummary | undefined;
   dispatch: Dispatch<ChatbotStateAction>;
@@ -103,6 +104,7 @@ export default function ChatbotProvider({
     null,
   );
   const queryClient = useQueryClient();
+  const { notifyResult } = useApp();
 
   // O Fetching da lista de conversas é feito utilizando o hook useQuery do React Query, que busca os dados da API e atualiza o estado do contexto do chatbot com a lista de conversas.
   const { data: conversationList } = useQuery({
@@ -136,7 +138,7 @@ export default function ChatbotProvider({
     if (conversationList) {
       handleSortConversations();
     }
-  }, [conversationList]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [conversationList]);
 
   const handleOpenConversation = async (conversationId: number) => {
     setOpenConversationId(conversationId);
@@ -158,8 +160,10 @@ export default function ChatbotProvider({
       await deleteConversationMutation.mutateAsync(conversationId);
       dispatch({ type: "setDeletingConversation", value: false });
       dispatch({ type: "setCurrentConversation", value: null });
+      notifyResult("success", "Conversa excluÃ­da com sucesso.");
     } catch (error) {
-      console.error("Error deleting conversation:", error);
+      console.error("Erro ao excluir conversa:", error);
+      notifyResult("error", "NÃ£o foi possÃ­vel excluir a conversa.");
     }
   };
 
@@ -206,12 +210,13 @@ export default function ChatbotProvider({
         },
       );
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Erro ao enviar mensagem:", error);
       dispatch({ type: "setThinking", value: false });
       dispatch({
         type: "setThinkingMessage",
         value: "Erro ao enviar mensagem.",
       });
+      notifyResult("error", "NÃ£o foi possÃ­vel enviar a mensagem no chatbot.");
     }
   };
 
@@ -234,7 +239,7 @@ export default function ChatbotProvider({
 export function useChatbot() {
   const context = useContext(ChatbotContext);
   if (!context) {
-    throw new Error("useChatbot must be used within a ChatbotProvider");
+    throw new Error("useChatbot deve ser usado dentro de um ChatbotProvider");
   }
   return context;
 }

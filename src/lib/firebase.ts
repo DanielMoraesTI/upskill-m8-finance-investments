@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-// vamos inserir comentários objetivos e de clare o tipo de retorno das funções para melhorar a legibilidade e manutenção do código.
 // Esta função inicializa o aplicativo Firebase com a configuração fornecida, permitindo que o aplicativo utilize os serviços do Firebase, como autenticação e banco de dados. A configuração é obtida das variáveis de ambiente, garantindo que as credenciais sensíveis não sejam expostas no código-fonte.
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

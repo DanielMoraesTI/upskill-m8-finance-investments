@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { createContext, useState, useContext } from "react";
 import type {
   TAssetType,
@@ -14,10 +14,11 @@ import {
 } from "@tanstack/react-query";
 import { getAssetSystemData, patchCurrentPrice } from "@/services/assetService";
 import { useAuth } from "./AuthProvider";
+import { useApp } from "./AppProvider";
 // ==============================================================================
 //                                  CONTEXT
 // ==============================================================================
-// Esta interface define a estrutura do contexto de ativos (AssetContextProps), que inclui o tipo de ativo atual selecionado (currentAssetType), a lista completa de ativos (assetList), a lista de tipos de ativos (assetTypeList), a função para atualizar o tipo de ativo atual selecionado (setCurrentAssetType) e a mutação para atualizar o preço atual de um ativo (currentPriceMutation).
+// Esta interface define a estrutura do contexto de ativos (AssetContextProps), que inclui o tipo de ativo atual selecionado (currentAssetType), a lista completa de ativos (assetList), a lista de tipos de ativos (assetTypeList), a funÃ§Ã£o para atualizar o tipo de ativo atual selecionado (setCurrentAssetType) e a mutaÃ§Ã£o para atualizar o preÃ§o atual de um ativo (currentPriceMutation).
 interface AssetContextProps {
   currentAssetType: TAssetType | null;
   assetList: TAssetList;
@@ -55,6 +56,7 @@ export default function AssetProvider({
     null,
   );
   const { isAuthenticated } = useAuth();
+  const { notifyResult } = useApp();
 
   const { data } = useQuery({
     queryKey: ["assetList"],
@@ -70,6 +72,10 @@ export default function AssetProvider({
       queryClient.invalidateQueries({ queryKey: ["assetList"] });
       queryClient.invalidateQueries({ queryKey: ["walletList"] });
       queryClient.invalidateQueries({ queryKey: ["transactionList"] });
+      notifyResult("success", "Ativo atualizado com sucesso.");
+    },
+    onError: () => {
+      notifyResult("error", "Não foi possí­vel atualizar o ativo.");
     },
   });
 
@@ -91,7 +97,7 @@ export default function AssetProvider({
 export const useAsset = () => {
   const assetContext = useContext(AssetContext);
   if (!assetContext) {
-    throw new Error("useAsset should be inside a AssetProvider");
+    throw new Error("useAsset deve estar dentro de um AssetProvider");
   }
 
   return assetContext;

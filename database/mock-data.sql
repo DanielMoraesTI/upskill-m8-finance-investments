@@ -15,15 +15,15 @@ INSERT INTO asset_type (asset_type) VALUES
 -- AÇÕES (Solicitadas + 5 Escolhidas)
 INSERT INTO asset (asset_type_id, ticker, company, current_price) VALUES
   (1, 'BBAS3', 'Banco do Brasil SA', 28.70),
-  (1, 'CMIG4', 'Companhia Energética de Minas Gerais - Cemig', 11.50),
+  (1, 'CMIG4', 'Cia Energética de MG', 11.50),
   (1, 'ITSA4', 'Itaúsa SA', 10.85),
-  (1, 'PETR4', 'Petróleo Brasileiro SA - Petrobras', 39.20),
+  (1, 'PETR4', 'Petrobras SA', 39.20),
   (1, 'POMO4', 'Marcopolo SA', 8.20),
   -- 5 adicionais brasileiras
   (1, 'VALE3', 'Vale SA', 62.40),
   (1, 'WEGE3', 'WEG SA', 47.15),
-  (1, 'SANB11', 'Banco Santander Brasil SA', 29.10),
-  (1, 'ELET3', 'Centrais Elétricas Brasileiras SA - Eletrobras', 41.30),
+  (1, 'SANB11', 'Santander Brasil SA', 29.10),
+  (1, 'ELET3', 'Eletrobras SA', 41.30),
   (1, 'EQTL3', 'Equatorial Energia SA', 33.50);
 
 -- FIIS (20 Solicitados + 5 Escolhidos, classificados por categoria)
@@ -66,8 +66,8 @@ INSERT INTO asset (asset_type_id, company) VALUES
   (3, 'Tesouro Selic 2029'),
   (3, 'CDB Banco Inter 115 CDI'),
   (3, 'LCI Itau 2027'),
-  (3, 'Debenture Incentivada Energia 2031'),
-  (3, 'CRI Imobiliario AAA 2029');
+  (3, 'Debenture Incentivada'),
+  (3, 'CRI Imobiliario 2029');
 
 -- ==================================================================================================
 -- 3) TRANSAÇÕES - JANEIRO A JUNHO 2026 (IDs Ajustados)

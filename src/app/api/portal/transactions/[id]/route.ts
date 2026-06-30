@@ -132,7 +132,7 @@ export async function PUT(
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error in PUT /api/transactions/:id:", error);
+    console.error("Erro em PUT /api/transactions/:id:", error);
     return errorResponse("Erro ao processar a solicitação", 500);
   }
 }
@@ -174,7 +174,7 @@ export async function DELETE(
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error in DELETE /api/transactions/:id:", error);
+    console.error("Erro em DELETE /api/transactions/:id:", error);
     return errorResponse("Erro ao processar a solicitação", 500);
   }
 }

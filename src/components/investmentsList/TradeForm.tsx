@@ -17,15 +17,15 @@ interface TradeFormProps {
   maxQuantity?: number;
   onSuccess?: () => void;
 }
-
+// Função auxiliar para sanitizar a entrada de números, removendo sinais de mais e menos.
 function sanitizeUnsignedNumberInput(value: string): string {
   return value.replace(/[-+]/g, "");
 }
-
+// Função auxiliar para formatar um valor numérico em moeda brasileira (BRL).
 function formatBRL(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
-
+// Função auxiliar para calcular o total da operação com base na quantidade e no valor unitário.
 function calcTotal(quantidade: string, valor: string): number {
   const q = parseFloat(quantidade);
   const v = parseFloat(valor.replace(",", "."));

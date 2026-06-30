@@ -1,4 +1,4 @@
-import db from "@/app/api/_lib/db";
+﻿import db from "@/app/api/_lib/db";
 import { RowDataPacket } from 'mysql2';
 import { UserModelSchema, type TUserModel } from "@/schemas/userSchema";
 import { ResultSetHeader } from 'mysql2';
@@ -6,7 +6,7 @@ import { ResultSetHeader } from 'mysql2';
 // ==================================================================================
 //                                       SELECTS
 // ==================================================================================
-// Esta função busca um usuário específico no banco de dados com base no email fornecido, retornando um objeto representando o usuário encontrado ou null se não houver correspondência.
+// Esta função busca um usuário especí­fico no banco de dados com base no email fornecido, retornando um objeto representando o usuário encontrado ou null se não houver correspondência.
 async function findByEmail(email: string): Promise<TUserModel | null> {
     try {
         const [rows] = await db.query<RowDataPacket[]>("SELECT * FROM user WHERE email = ?", [
@@ -23,19 +23,19 @@ async function findByEmail(email: string): Promise<TUserModel | null> {
 
         const parsed = UserModelSchema.safeParse(user);
         if (!parsed.success) {
-            throw new Error("Invalid user data from database");
+            throw new Error("Dados de usuario invalidos no banco de dados");
         }
 
         return parsed.data;
     } catch (error) {
-        console.error("Error fetching user by email:", error);
+        console.error("Erro ao buscar usuario por email:", error);
         throw error;
     }
 }
 // ==================================================================================
 //                                       INSERTS
 // ==================================================================================
-// Esta função insere um novo usuário no banco de dados com base nos dados fornecidos, retornando o objeto do usuário inserido.
+// Esta funçãoo insere um novo usuário no banco de dados com base nos dados fornecidos, retornando o objeto do usuário inserido.
 async function insertNewUser(userData: Omit<TUserModel, "id">): Promise<TUserModel> {
     try {
         const [result] = await db.query<ResultSetHeader>("INSERT INTO user (uuid, email, name) VALUES (?, ?, ?)", [
@@ -58,19 +58,19 @@ async function insertNewUser(userData: Omit<TUserModel, "id">): Promise<TUserMod
 
         return user;
     } catch (error) {
-        console.error("Error inserting new user:", error);
+        console.error("Erro ao inserir novo usuario:", error);
         throw error;
     };
 }
 // ==================================================================================
 //                                       DELETES
 // ==================================================================================
-// Esta função exclui um usuário específico do banco de dados com base no email fornecido.
+// Esta função exclui um usuário especí­fico do banco de dados com base no email fornecido.
 async function deleteByEmail(email: string): Promise<void> {
     try {
         await db.query("DELETE FROM user WHERE email = ?", [email]);
     } catch (error) {
-        console.error("Error deleting user by email:", error);
+        console.error("Erro ao excluir usuario por email:", error);
         throw error;
     }
 }

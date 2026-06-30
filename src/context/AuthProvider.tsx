@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, createContext, useContext } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -29,7 +29,7 @@ export default function AuthProvider({
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setIsAuthenticated(true);
-        const fallbackName = firebaseUser.email?.split("@")[0] || "Usuário";
+        const fallbackName = firebaseUser.email?.split("@")[0] || "UsuÃ¡rio";
         setUserName(firebaseUser.displayName || fallbackName);
       } else {
         setIsAuthenticated(false);
@@ -78,7 +78,7 @@ export default function AuthProvider({
 export const useAuth = () => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
-    throw new Error("useAuth should be inside a AuthProvider");
+    throw new Error("useAuth deve estar dentro de um AuthProvider");
   }
 
   return authContext;

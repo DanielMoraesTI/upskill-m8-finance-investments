@@ -1,4 +1,4 @@
-import { ChatbotFunction } from "../_utils/chatbot.functions";
+﻿import { ChatbotFunction } from "../_utils/chatbot.functions";
 import type { TConversation, TMessage, TConversationSummary } from "@/schemas/chatbotSchema";
 import { ConversationSchema, ConversationSummarySchema, MessageSchema } from "@/schemas/chatbotSchema";
 import { z } from "zod";
@@ -32,8 +32,8 @@ async function getConversationMessages(userId: number, conversationId: number): 
 
     const parsed = ConversationSchema.safeParse(conversation);
     if (!parsed.success) {
-        console.log("Conversation parsing error:", parsed.error);
-        throw new Error("Invalid conversation data");
+        console.log("Erro ao validar conversa:", parsed.error);
+        throw new Error("Dados de conversa invalidos");
     }
     return parsed.data;
 }
@@ -50,8 +50,8 @@ async function getAllConversationSummary(userId: number): Promise<TConversationS
 
     const parsed = ConversationSummarySchema.safeParse(conversationSummary);
     if (!parsed.success) {
-        console.log("Conversation Summary parsing error:", parsed.error);
-        throw new Error("Invalid conversation summary data");
+        console.log("Erro ao validar resumo da conversa:", parsed.error);
+        throw new Error("Dados de resumo da conversa invalidos");
     }
     return parsed.data;
 }
@@ -76,7 +76,7 @@ async function createConversation(userId: number, prompt: string): Promise<TConv
     
     const result = await chatbotRepository.createConversation(userId, formattedTitle);
     if (result.affectedRows === 0 || !result.insertId) {
-        throw new Error("Failed to create conversation");
+        throw new Error("Falha ao criar conversa");
     }
 
     const conversation: TConversation = {
@@ -89,8 +89,8 @@ async function createConversation(userId: number, prompt: string): Promise<TConv
 
     const parsed = ConversationSchema.safeParse(conversation);
     if (!parsed.success) {
-        console.log("Conversation parsing error:", parsed.error);
-        throw new Error("Invalid conversation data");
+        console.log("Erro ao validar conversa:", parsed.error);
+        throw new Error("Dados de conversa invalidos");
     }
 
     return parsed.data;
@@ -99,7 +99,7 @@ async function createConversation(userId: number, prompt: string): Promise<TConv
 async function createMessage(args: Omit<TMessage, "id" | "createdAt">): Promise<TMessage> {
     const result = await chatbotRepository.createMessage(args);
     if (result.affectedRows === 0 || !result.insertId) {
-        throw new Error("Failed to create message");
+        throw new Error("Falha ao criar mensagem");
     }
 
     const message: TMessage = {
@@ -112,8 +112,8 @@ async function createMessage(args: Omit<TMessage, "id" | "createdAt">): Promise<
 
     const parsed = MessageSchema.safeParse(message);
     if (!parsed.success) {
-        console.log("Message parsing error:", parsed.error);
-        throw new Error("Invalid message data");
+        console.log("Erro ao validar mensagem:", parsed.error);
+        throw new Error("Dados de mensagem invalidos");
     }
 
     await chatbotRepository.updateConversationTimestamp(args.conversationId);
@@ -127,7 +127,7 @@ async function handleFunctionCall(userId: number, fnName: ChatbotFunction, args:
             return await getInvestmentSummary(userId, args);
 
         default:
-            throw new Error(`Função '${fnName}' não implementada.`);
+            throw new Error(`FunÃ§Ã£o '${fnName}' nÃ£o implementada.`);
     }
 }
 

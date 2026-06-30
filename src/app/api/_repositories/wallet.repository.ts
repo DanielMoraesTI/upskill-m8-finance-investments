@@ -1,11 +1,11 @@
-import db from "@/app/api/_lib/db";
+﻿import db from "@/app/api/_lib/db";
 import { RowDataPacket, ResultSetHeader } from "mysql2";
 import { TWallet } from "@/schemas/walletSchema";
 
 // ==================================================================================
 //                                       SELECTS
 // ==================================================================================
-// Esta função busca todas as carteiras de um usuário específico no banco de dados com base no ID do usuário fornecido, retornando um array de objetos representando cada carteira encontrada.
+// Esta funÃ§Ã£o busca todas as carteiras de um usuÃ¡rio especÃ­fico no banco de dados com base no ID do usuÃ¡rio fornecido, retornando um array de objetos representando cada carteira encontrada.
 async function findAllWallets(userId: number): Promise<RowDataPacket[]> {
   try {
     const [rows] = await db.query<RowDataPacket[]>(
@@ -14,11 +14,11 @@ async function findAllWallets(userId: number): Promise<RowDataPacket[]> {
     );
     return rows;
   } catch (error) {
-    console.error("Error in findAllWallets:", error);
-    throw new Error("An error occurred while fetching wallet data");
+    console.error("Erro em findAllWallets:", error);
+    throw new Error("Ocorreu um erro ao buscar dados da carteira");
   }
 }
-// Esta função busca uma carteira específica de um usuário no banco de dados com base no ID do usuário e no ID do ativo fornecidos, retornando um array de objetos representando a carteira encontrada.
+// Esta funÃ§Ã£o busca uma carteira especÃ­fica de um usuÃ¡rio no banco de dados com base no ID do usuÃ¡rio e no ID do ativo fornecidos, retornando um array de objetos representando a carteira encontrada.
 async function findWalletByAssetId(
   userId: number,
   assetId: number,
@@ -30,14 +30,14 @@ async function findWalletByAssetId(
     );
     return rows;
   } catch (error) {
-    console.error("Error in findWalletByAssetId:", error);
-    throw new Error("An error occurred while fetching wallet by asset ID");
+    console.error("Erro em findWalletByAssetId:", error);
+    throw new Error("Ocorreu um erro ao buscar carteira por id do ativo");
   }
 }
 // ==================================================================================
 //                                       INSERTS
 // ==================================================================================
-// Esta função cria uma nova entrada de carteira no banco de dados com base no ID do usuário e no ID do ativo fornecidos, retornando o resultado da operação de inserção.
+// Esta funÃ§Ã£o cria uma nova entrada de carteira no banco de dados com base no ID do usuÃ¡rio e no ID do ativo fornecidos, retornando o resultado da operaÃ§Ã£o de inserÃ§Ã£o.
 async function createWalletEntry(
   userId: number,
   assetId: number,
@@ -51,15 +51,15 @@ async function createWalletEntry(
     );
     return result;
   } catch (error) {
-    console.error("Error in createWalletEntry:", error);
-    throw new Error("An error occurred while creating wallet entry");
+    console.error("Erro em createWalletEntry:", error);
+    throw new Error("Ocorreu um erro ao criar registro da carteira");
   }
 }
 
 // ==================================================================================
 //                                        UPDATES
 // ==================================================================================
-// Esta função atualiza os dados de uma carteira específica no banco de dados com base no ID do usuário e nos dados da carteira fornecidos, retornando o resultado da operação de atualização.
+// Esta funÃ§Ã£o atualiza os dados de uma carteira especÃ­fica no banco de dados com base no ID do usuÃ¡rio e nos dados da carteira fornecidos, retornando o resultado da operaÃ§Ã£o de atualizaÃ§Ã£o.
 async function updateWalletData(
   userId: number,
   walletData: TWallet,
@@ -86,8 +86,8 @@ async function updateWalletData(
     );
     return result;
   } catch (error) {
-    console.error("Error in updateWalletData:", error);
-    throw new Error("An error occurred while updating wallet entry");
+    console.error("Erro em updateWalletData:", error);
+    throw new Error("Ocorreu um erro ao atualizar registro da carteira");
   }
 }
 
@@ -107,8 +107,8 @@ async function updateWalletIncome(
     );
     return result;
   } catch (error) {
-    console.error("Error in updateWalletIncome:", error);
-    throw new Error("An error occurred while updating wallet income");
+    console.error("Erro em updateWalletIncome:", error);
+    throw new Error("Ocorreu um erro ao atualizar rendimento da carteira");
   }
 }
 

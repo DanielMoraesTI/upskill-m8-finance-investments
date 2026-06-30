@@ -1,4 +1,4 @@
-import db from "@/app/api/_lib/db";
+﻿import db from "@/app/api/_lib/db";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import {
   TCreateTransaction,
@@ -9,7 +9,7 @@ import {
 // ==================================================================================
 //                                       SELECTS
 // ==================================================================================
-// Esta função busca todas as transações de um usuário específico no banco de dados com base no ID do usuário fornecido, retornando um array de objetos representando cada transação encontrada.
+// Esta funÃ§Ã£o busca todas as transaÃ§Ãµes de um usuÃ¡rio especÃ­fico no banco de dados com base no ID do usuÃ¡rio fornecido, retornando um array de objetos representando cada transaÃ§Ã£o encontrada.
 async function findAllTransactions(userId: number): Promise<RowDataPacket[]> {
   try {
     const [rows] = await db.query<RowDataPacket[]>(
@@ -18,11 +18,11 @@ async function findAllTransactions(userId: number): Promise<RowDataPacket[]> {
     );
     return rows;
   } catch (error) {
-    console.error("Error in findAllTransactions:", error);
-    throw new Error("An error occurred while fetching transactions");
+    console.error("Erro em findAllTransactions:", error);
+    throw new Error("Ocorreu um erro ao buscar transacoes");
   }
 }
-// Esta função busca uma transação específica no banco de dados com base no ID do usuário e no ID da transação fornecidos, retornando um array de objetos representando a transação encontrada.
+// Esta funÃ§Ã£o busca uma transaÃ§Ã£o especÃ­fica no banco de dados com base no ID do usuÃ¡rio e no ID da transaÃ§Ã£o fornecidos, retornando um array de objetos representando a transaÃ§Ã£o encontrada.
 async function findTransactionById(
   userId: number,
   id: number,
@@ -34,11 +34,11 @@ async function findTransactionById(
     );
     return rows;
   } catch (error) {
-    console.error("Error in findTransactionById:", error);
-    throw new Error("An error occurred while fetching transaction by ID");
+    console.error("Erro em findTransactionById:", error);
+    throw new Error("Ocorreu um erro ao buscar transacao por id");
   }
 }
-// Esta função busca todas as transações de um usuário específico no banco de dados com base nos argumentos fornecidos, retornando um array de objetos representando cada transação encontrada. Os argumentos podem incluir o ID do usuário, a data de início, a data de término, o tipo de entrada e o ID do tipo de ativo.
+// Esta funÃ§Ã£o busca todas as transaÃ§Ãµes de um usuÃ¡rio especÃ­fico no banco de dados com base nos argumentos fornecidos, retornando um array de objetos representando cada transaÃ§Ã£o encontrada. Os argumentos podem incluir o ID do usuÃ¡rio, a data de inÃ­cio, a data de tÃ©rmino, o tipo de entrada e o ID do tipo de ativo.
 async function findAllTransactionsWithArgs(
   args: IfindAllTransactions,
 ): Promise<RowDataPacket[]> {
@@ -48,11 +48,11 @@ async function findAllTransactionsWithArgs(
     const [rows] = await db.query<RowDataPacket[]>(query, params);
     return rows;
   } catch (error) {
-    console.error("Error fetching transaction list:", error);
+    console.error("Erro ao buscar lista de transações:", error);
     throw error;
   }
 }
-// Esta função busca todas as transações de um usuário específico no banco de dados com base no ID do usuário e no ID do ativo fornecidos, retornando um array de objetos representando cada transação encontrada.
+// Esta função busca todas as transações de um usuário especí­fico no banco de dados com base no ID do usuário e no ID do ativo fornecidos, retornando um array de objetos representando cada transação encontrada.
 async function findAllTransactionsByAssetId(
   userId: number,
   assetId: number,
@@ -64,10 +64,8 @@ async function findAllTransactionsByAssetId(
     );
     return rows;
   } catch (error) {
-    console.error("Error in findAllTransactionsByAssetId:", error);
-    throw new Error(
-      "An error occurred while fetching transactions by asset ID",
-    );
+    console.error("Erro em findAllTransactionsByAssetId:", error);
+    throw new Error("Ocorreu um erro ao buscar transacoes por id do ativo");
   }
 }
 
@@ -96,8 +94,8 @@ async function createTransactionEntry(
 
     return result;
   } catch (error) {
-    console.error("Error in createTransactionEntry:", error);
-    throw new Error("An error occurred while creating transaction entry");
+    console.error("Erro em createTransactionEntry:", error);
+    throw new Error("Ocorreu um erro ao criar transacao entry");
   }
 }
 
@@ -133,8 +131,8 @@ async function updateTransaction(
     );
     return result;
   } catch (error) {
-    console.error("Error in updateTransaction:", error);
-    throw new Error("An error occurred while updating transaction entry");
+    console.error("Erro em updateTransaction:", error);
+    throw new Error("Ocorreu um erro ao atualizar transacao entry");
   }
 }
 
@@ -153,8 +151,8 @@ async function deleteTransaction(
     );
     return result;
   } catch (error) {
-    console.error("Error in deleteTransaction:", error);
-    throw new Error("An error occurred while deleting transaction");
+    console.error("Erro em deleteTransaction:", error);
+    throw new Error("Ocorreu um erro ao excluir transacao");
   }
 }
 
@@ -204,7 +202,7 @@ function buildfindAllTransactionsQuery(args: IfindAllTransactions): {
     params.push(entryType);
   }
 
-  // filtro de data de início e fim, convertendo para string no formato YYYY-MM-DD
+  // filtro de data de iní­cio e fim, convertendo para string no formato YYYY-MM-DD
   if (startDate) {
     whereClauses.push(`t.date >= ?`);
     params.push(startDate.toISOString().slice(0, 10));

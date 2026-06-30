@@ -1,4 +1,4 @@
-import {
+﻿import {
   TUpdateTransactionRequest,
   TTransaction,
   TCreateTransaction,
@@ -10,7 +10,7 @@ import {
 import { getUserToken } from "@/services/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
-// Esta função assíncrona busca a lista de transações do sistema, fazendo uma requisição GET para o endpoint "/portal/transactions". Ela trata erros de rede e valida a resposta usando o esquema TransactionListResponseSchema, retornando a lista de transações se a resposta for válida.
+// Esta funçã£o assí­ncrona busca a lista de transações do sistema, fazendo uma requisição GET para o endpoint "/portal/transactions". Ela trata erros de rede e valida a resposta usando o esquema TransactionListResponseSchema, retornando a lista de transações se a resposta for válida.
 export async function getTransactionList(): Promise<TTransactionList> {
   try {
     const token = await getUserToken();
@@ -19,19 +19,19 @@ export async function getTransactionList(): Promise<TTransactionList> {
       method: "GET",
       headers: { Authorization: token },
     });
-    if (!response.ok) throw new Error("Failed to fetch transaction data");
+    if (!response.ok) throw new Error("Falha ao buscar dados de transação");
 
     const data = await response.json();
     const parsed = TransactionListResponseSchema.safeParse(data);
-    if (!parsed.success) throw new Error("Invalid transaction data");
+    if (!parsed.success) throw new Error("Dados de transação inválidos");
 
     return parsed.data.transactionList;
   } catch (error) {
     console.error(error);
-    throw new Error("An error occurred while fetching transaction data");
+    throw new Error("Ocorreu um erro ao buscar dados de transação");
   }
 }
-// Esta função assíncrona cria uma nova transação, enviando uma requisição POST para o endpoint "/portal/transactions" com os dados da transação a ser criada. Ela trata erros de rede e valida a resposta usando o esquema TransactionSchema, retornando a transação criada se a resposta for válida.
+// Esta função assí­ncrona cria uma nova transação, enviando uma requisição POST para o endpoint "/portal/transactions" com os dados da transação a ser criada. Ela trata erros de rede e valida a resposta usando o esquema TransactionSchema, retornando a transação criada se a resposta for válida.
 export async function createTransaction(
   transactionData: TCreateTransaction,
 ): Promise<TTransaction> {
@@ -44,21 +44,21 @@ export async function createTransaction(
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Failed to create transaction");
+      throw new Error(errorData.message || "Falha ao criar transação");
     }
 
     const data = await response.json();
     const parsed = TransactionSchema.safeParse(data?.transaction ?? data);
-    if (!parsed.success) throw new Error("Invalid transaction data");
+    if (!parsed.success) throw new Error("Dados de transação inválidos");
 
     return parsed.data;
   } catch (error) {
     console.error(error);
-    throw new Error("An error occurred while creating transaction");
+    throw new Error("Ocorreu um erro ao criar transação");
   }
 }
 
-// Esta função assíncrona atualiza os dados de uma transação específica, identificada pelo ID, enviando uma requisição PUT para o endpoint "/portal/transactions/{id}" com os dados da transação a serem atualizados. Ela trata erros de rede e valida a resposta, lançando erros apropriados em caso de falha.
+// Esta função assí­ncrona atualiza os dados de uma transação especí­fica, identificada pelo ID, enviando uma requisição PUT para o endpoint "/portal/transactions/{id}" com os dados da transação a serem atualizados. Ela trata erros de rede e valida a resposta, lançando erros apropriados em caso de falha.
 export async function updateTransaction(
   id: number,
   transactionData: TTransaction,
@@ -73,7 +73,7 @@ export async function updateTransaction(
       transaction: body.transaction,
     });
     if (!parsed.success) {
-      throw new Error("Invalid transaction data");
+      throw new Error("Dados de transação invalidos");
     }
 
     const token = await getUserToken();
@@ -87,14 +87,14 @@ export async function updateTransaction(
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Failed to update transaction");
+      throw new Error(errorData.message || "Falha ao atualizar transacao");
     }
   } catch (error) {
     console.error(error);
-    throw new Error("An error occurred while updating transaction");
+    throw new Error("Ocorreu um erro ao atualizar transação");
   }
 }
-// Esta função assíncrona deleta uma transação específica, identificada pelo ID, enviando uma requisição DELETE para o endpoint "/portal/transactions/{id}". Ela trata erros de rede e valida a resposta, lançando erros apropriados em caso de falha.
+// Esta função assí­ncrona deleta uma transação especí­fica, identificada pelo ID, enviando uma requisição DELETE para o endpoint "/portal/transactions/{id}". Ela trata erros de rede e valida a resposta, lançando erros apropriados em caso de falha.
 export async function deleteTransaction(id: number): Promise<void> {
   try {
     const token = await getUserToken();
@@ -102,9 +102,9 @@ export async function deleteTransaction(id: number): Promise<void> {
       method: "DELETE",
       headers: { Authorization: token },
     });
-    if (!response.ok) throw new Error("Failed to delete transaction");
+    if (!response.ok) throw new Error("Falha ao excluir transação");
   } catch (error) {
     console.error(error);
-    throw new Error("An error occurred while deleting transaction");
+    throw new Error("Ocorreu um erro ao excluir transação");
   }
 }

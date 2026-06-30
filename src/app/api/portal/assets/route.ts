@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { AssetListResponseSchema } from "@/schemas/assetSchema";
 import assetService from "@/app/api/_services/asset.service";
 import userService from '../../_services/user.service';
 import { errorResponse } from "@/app/api/_utils/serverUtils";
-// Esta função assíncrona busca a lista de tipos de ativos e a lista de ativos disponíveis, enviando uma requisição GET para o endpoint "/api/portal/assets". Ela valida o ID do usuário autorizado, trata erros de rede e valida a resposta, retornando respostas apropriadas em caso de falha.
+// Esta função assí­ncrona busca a lista de tipos de ativos e a lista de ativos disponí­veis, enviando uma requisição GET para o endpoint "/api/portal/assets". Ela valida o ID do usuário autorizado, trata erros de rede e valida a resposta, retornando respostas apropriadas em caso de falha.
 export async function GET(request: NextRequest) {
     try {
         // validar o userID
         const authorizedUser = await userService.requireAuth(request);
         if (!authorizedUser) {
-            return errorResponse("Não autorizado", 401);
+            return errorResponse("NÃ£o autorizado", 401);
         }
 
         // fazer a query. Query é usada para buscar dados do banco de dados ou de um serviço externo, retornando os resultados da consulta.
@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(assetListResponse.data, { status: 200 });
 
     } catch (error) {
-        console.error("Error in GET /api/portal/assets:", error);
-        return errorResponse("Erro ao processar a solicitação", 500);
+        console.error("Erro em GET /api/portal/assets:", error);
+        return errorResponse("Erro ao processar a solicitaÃ§Ã£o", 500);
     }
 }
 

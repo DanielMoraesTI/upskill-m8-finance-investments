@@ -4,13 +4,23 @@ import { MessageSquare, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ChatbotHelper from "@/components/chatbot/ChatbotHelper";
 
-export default function ChatHistory() {
-  const { filteredConversations, currentConversation, handleOpenConversation, dispatch } =
-    useChatbot();
+interface ChatHistoryProps {
+  onConversationAction?: () => void;
+}
+
+export default function ChatHistory({
+  onConversationAction,
+}: ChatHistoryProps) {
+  const {
+    filteredConversations,
+    currentConversation,
+    handleOpenConversation,
+    dispatch,
+  } = useChatbot();
 
   return (
-    <div className="w-full md:w-60 h-full flex flex-col bg-base-200 border-r border-base-300 py-2">
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+    <div className="w-full md:w-60 h-56 max-h-[45dvh] md:max-h-none md:h-full shrink-0 flex flex-col bg-base-200 border-b md:border-b-0 md:border-r border-base-300 py-2">
+      <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-1">
         <div className="flex flex-row items-center justify-between px-3 py-2 text-xs font-semibold text-base-content/50 uppercase">
           Chats Recentes
         </div>
@@ -32,6 +42,7 @@ export default function ChatHistory() {
                 onClick={() => {
                   dispatch({ type: "setDeletingConversation", value: false });
                   handleOpenConversation(conversation.id);
+                  onConversationAction?.();
                 }}
               >
                 <MessageSquare size={16} className="shrink-0" />
@@ -43,10 +54,11 @@ export default function ChatHistory() {
               <Button
                 variant="ghost"
                 size="icon-sm"
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                 onClick={() => {
                   dispatch({ type: "setDeletingConversation", value: true });
                   handleOpenConversation(conversation.id);
+                  onConversationAction?.();
                 }}
               >
                 <Trash2 size={12} />

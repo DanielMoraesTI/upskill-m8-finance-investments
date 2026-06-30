@@ -1,4 +1,4 @@
-import {
+﻿import {
   TCreateTransaction,
   TransactionSchema,
   TransactionListSchema,
@@ -50,13 +50,13 @@ async function getAllTransactions(userId: number): Promise<TTransactionList> {
 
     const parsed = TransactionListSchema.safeParse(transactionList);
     if (!parsed.success) {
-      console.log("Transaction List parsing error:", parsed.error);
-      throw new Error("Invalid transaction data");
+      console.log("Erro ao validar lista de transacoes:", parsed.error);
+      throw new Error("Dados de transacao invalidos");
     }
 
     return parsed.data;
   } catch (error) {
-    console.error("Error in getAllTransactions:", error);
+    console.error("Erro em getAllTransactions:", error);
     throw error;
   }
 }
@@ -85,13 +85,13 @@ async function getTransactionById(
 
     const parsed = TransactionSchema.safeParse(transaction);
     if (!parsed.success) {
-      throw new Error("Invalid transaction data");
+      throw new Error("Dados de transacao invalidos");
     }
 
     return parsed.data;
   } catch (error) {
-    console.error("Error in getTransactionById:", error);
-    throw new Error("An error occurred while finding transaction entry");
+    console.error("Erro em getTransactionById:", error);
+    throw new Error("Ocorreu um erro ao buscar registro da transacao");
   }
 }
 
@@ -116,13 +116,13 @@ async function getAllTransactionsWithArgs(
 
     const parsed = TransactionListSchema.safeParse(transactionList);
     if (!parsed.success) {
-      console.log("Transaction List parsing error:", parsed.error);
-      throw new Error("Invalid transaction list data");
+      console.log("Erro ao validar lista de transacoes:", parsed.error);
+      throw new Error("Dados da lista de transacoes invalidos");
     }
 
     return parsed.data;
   } catch (error) {
-    console.error("Error fetching transaction list:", error);
+    console.error("Erro ao buscar lista de transações:", error);
     throw error;
   }
 }
@@ -152,16 +152,14 @@ async function getAllTransactionsByAssetId(
 
     const parsed = TransactionListSchema.safeParse(transactionList);
     if (!parsed.success) {
-      console.log("Transaction List parsing error:", parsed.error);
-      throw new Error("Invalid transaction list data");
+      console.log("Erro ao validar lista de transacoes:", parsed.error);
+      throw new Error("Dados da lista de transacoes invalidos");
     }
 
     return parsed.data;
   } catch (error) {
-    console.error("Error fetching transactions by asset ID:", error);
-    throw new Error(
-      "An error occurred while fetching transactions by asset ID",
-    );
+    console.error("Erro ao buscar transações por id do ativo:", error);
+    throw new Error("Ocorreu um erro ao buscar transacoes por id do ativo");
   }
 }
 
@@ -178,7 +176,7 @@ async function createTransaction(
       transactionData,
     );
     if (!result || result.affectedRows === 0) {
-      throw new Error("Failed to create transaction entry");
+      throw new Error("Falha ao criar registro da transação");
     }
 
     const transaction: TTransaction = {
@@ -190,14 +188,14 @@ async function createTransaction(
 
     const parsed = TransactionSchema.safeParse(transaction);
     if (!parsed.success) {
-      console.log("Transaction parsing error:", parsed.error);
-      throw new Error("Invalid transaction data");
+      console.log("Erro ao validar transacao:", parsed.error);
+      throw new Error("Dados de transacao invalidos");
     }
 
     return parsed.data;
   } catch (error) {
-    console.error("Error in createTransactionEntry:", error);
-    throw new Error("An error occurred while creating transaction entry");
+    console.error("Erro em createTransactionEntry:", error);
+    throw new Error("Ocorreu um erro ao criar registro da transação");
   }
 }
 
@@ -214,24 +212,24 @@ async function updateTransaction(
       transactionData,
     );
     if (!result || result.affectedRows === 0) {
-      throw new Error("Failed to update transaction entry");
+      throw new Error("Falha ao atualizar registro da transação");
     }
 
     const updatedTransaction: TTransaction = {
       ...transactionData,
-      updated_at: getTodayLocalDate(), // Atualiza a data de atualização para o momento atual sem deslocamento de timezone
+      updated_at: getTodayLocalDate(), // Atualiza a data de atualizaÃ§Ã£o para o momento atual sem deslocamento de timezone
     };
 
     const parsed = TransactionSchema.safeParse(updatedTransaction);
     if (!parsed.success) {
-      console.log("Transaction parsing error:", parsed.error);
-      throw new Error("Invalid transaction data");
+      console.log("Erro ao validar transacao:", parsed.error);
+      throw new Error("Dados de transacao invalidos");
     }
 
     return parsed.data;
   } catch (error) {
-    console.error("Error in updateTransaction:", error);
-    throw new Error("An error occurred while updating transaction entry");
+    console.error("Erro em updateTransaction:", error);
+    throw new Error("Ocorreu um erro ao atualizar registro da transação");
   }
 }
 
@@ -242,13 +240,13 @@ async function deleteTransaction(userId: number, id: number): Promise<boolean> {
   try {
     const result = await transactionRepository.deleteTransaction(userId, id);
     if (!result || result.affectedRows === 0) {
-      throw new Error("Failed to delete transaction entry");
+      throw new Error("Falha ao excluir registro da transação");
     }
 
     return true;
   } catch (error) {
-    console.error("Error in deleteTransaction:", error);
-    throw new Error("An error occurred while deleting transaction entry");
+    console.error("Erro em deleteTransaction:", error);
+    throw new Error("Ocorreu um erro ao excluir registro da transação");
   }
 }
 
