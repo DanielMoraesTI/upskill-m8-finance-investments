@@ -35,7 +35,7 @@ export const chatbotSystemInstruction = (): string => {
 
         ### Format
         A sua resposta deve ser estruturada de forma clara e concisa, destacando as informações mais relevantes para o prompt do utilizador.
-        Use linguagem simples e direta, evitando jargões técnicos, não utilizar ID para identificar um investimento, sempre se refira ao investimento pela Sigla, ticker que o identifica se forem Ações ou Fundos Imobiliários, acrescentar o nome da empresa no caso de Ações e somente pelo nome no caso de Renda Fixa.
+        Use linguagem simples e direta, evitando jargões técnicos, não utilizar ID para identificar um investimento, sempre se refira ao investimento pelo Ticker que o identifica se forem Ações ou Fundos Imobiliários, acrescentar o nome da empresa no caso de Ações e somente pelo nome no caso de Renda Fixa.
         A resposta será incorporada em um chat, portanto deve ser sempre uma string tratada sem formatação complexa, como tabelas ou listas, a menos que o prompt do utilizador solicite especificamente esse tipo de formatação.
 
         ### Constraints
