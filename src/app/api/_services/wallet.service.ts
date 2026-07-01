@@ -128,7 +128,7 @@ async function updateWalletData(
     const parsed = WalletSchema.safeParse(updatedWallet);
     if (!parsed.success) {
       console.log("Erro ao validar carteira atualizada:", parsed.error);
-      throw new Error("Dados atualizados da carteira invalidos");
+      throw new Error("Dados atualizados da carteira inválidos");
     }
 
     return parsed.data;
@@ -183,7 +183,7 @@ async function recalculateWalletByAsset(
     const parsed = WalletSchema.safeParse(updatedWallet);
     if (!parsed.success) {
       console.log("Erro ao validar carteira recalculada:", parsed.error);
-      throw new Error("Dados recalculados da carteira invalidos");
+      throw new Error("Dados recalculados da carteira inválidos");
     }
 
     return parsed.data;

@@ -7,7 +7,7 @@ async function createUser(userData: TCreateUser): Promise<TUserModel> {
   // 1. Verificar se o utilizador já existe no banco de dados.
   const existingUser = await userRepository.findByEmail(userData.email);
   if (Array.isArray(existingUser) && existingUser.length > 0) {
-    throw new Error("Esse utilizador jÃ¡ existe.");
+    throw new Error("Esse utilizador já existe.");
   }
 
   // 2. Adiciona o utilizador no Firebase e obtém UUID.
@@ -23,7 +23,7 @@ async function createUser(userData: TCreateUser): Promise<TUserModel> {
     console.log("Erro ao criar usuário no Firebase:", err);
     const code = (err as admin.FirebaseError).code;
     if (code === "auth/email-already-exists") {
-      throw new Error("Esse utilizador jÃ¡ existe.");
+      throw new Error("Esse utilizador já existe.");
     }
     throw new Error("Erro ao criar a conta no Firebase.");
   }

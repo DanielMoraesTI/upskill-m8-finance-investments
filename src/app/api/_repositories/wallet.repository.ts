@@ -5,7 +5,7 @@ import { TWallet } from "@/schemas/walletSchema";
 // ==================================================================================
 //                                       SELECTS
 // ==================================================================================
-// Esta funÃ§Ã£o busca todas as carteiras de um usuÃ¡rio especÃ­fico no banco de dados com base no ID do usuÃ¡rio fornecido, retornando um array de objetos representando cada carteira encontrada.
+// Esta função busca todas as carteiras de um usuário especí­fico no banco de dados com base no ID do usuário fornecido, retornando um array de objetos representando cada carteira encontrada.
 async function findAllWallets(userId: number): Promise<RowDataPacket[]> {
   try {
     const [rows] = await db.query<RowDataPacket[]>(
@@ -18,7 +18,7 @@ async function findAllWallets(userId: number): Promise<RowDataPacket[]> {
     throw new Error("Ocorreu um erro ao buscar dados da carteira");
   }
 }
-// Esta funÃ§Ã£o busca uma carteira especÃ­fica de um usuÃ¡rio no banco de dados com base no ID do usuÃ¡rio e no ID do ativo fornecidos, retornando um array de objetos representando a carteira encontrada.
+// Esta função busca uma carteira especí­fica de um usuário no banco de dados com base no ID do usuário e no ID do ativo fornecidos, retornando um array de objetos representando a carteira encontrada.
 async function findWalletByAssetId(
   userId: number,
   assetId: number,
@@ -37,7 +37,7 @@ async function findWalletByAssetId(
 // ==================================================================================
 //                                       INSERTS
 // ==================================================================================
-// Esta funÃ§Ã£o cria uma nova entrada de carteira no banco de dados com base no ID do usuÃ¡rio e no ID do ativo fornecidos, retornando o resultado da operaÃ§Ã£o de inserÃ§Ã£o.
+// Esta função cria uma nova entrada de carteira no banco de dados com base no ID do usuário e no ID do ativo fornecidos, retornando o resultado da operação de inserção.
 async function createWalletEntry(
   userId: number,
   assetId: number,
@@ -59,7 +59,7 @@ async function createWalletEntry(
 // ==================================================================================
 //                                        UPDATES
 // ==================================================================================
-// Esta funÃ§Ã£o atualiza os dados de uma carteira especÃ­fica no banco de dados com base no ID do usuÃ¡rio e nos dados da carteira fornecidos, retornando o resultado da operaÃ§Ã£o de atualizaÃ§Ã£o.
+// Esta função atualiza os dados de uma carteira especí­fica no banco de dados com base no ID do usuário e nos dados da carteira fornecidos, retornando o resultado da operação de atualização.
 async function updateWalletData(
   userId: number,
   walletData: TWallet,

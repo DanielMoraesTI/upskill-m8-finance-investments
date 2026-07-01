@@ -417,7 +417,7 @@ export function TransactionCard({
         createPortal(
           <div
             ref={dropdownRef}
-            className="fixed z-[9999] min-w-40 rounded-lg border border-border/50 bg-popover shadow-lg py-1"
+            className="fixed z-9999 min-w-40 rounded-lg border border-border/50 bg-popover shadow-lg py-1"
             style={{ top: menuPos.top, right: menuPos.right }}
           >
             <button

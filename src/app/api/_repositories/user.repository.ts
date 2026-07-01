@@ -23,12 +23,12 @@ async function findByEmail(email: string): Promise<TUserModel | null> {
 
         const parsed = UserModelSchema.safeParse(user);
         if (!parsed.success) {
-            throw new Error("Dados de usuario invalidos no banco de dados");
+            throw new Error("Dados de usuário inválidos no banco de dados");
         }
 
         return parsed.data;
     } catch (error) {
-        console.error("Erro ao buscar usuario por email:", error);
+        console.error("Erro ao buscar usuário por email:", error);
         throw error;
     }
 }
@@ -58,7 +58,7 @@ async function insertNewUser(userData: Omit<TUserModel, "id">): Promise<TUserMod
 
         return user;
     } catch (error) {
-        console.error("Erro ao inserir novo usuario:", error);
+        console.error("Erro ao inserir novo usuário:", error);
         throw error;
     };
 }
@@ -70,7 +70,7 @@ async function deleteByEmail(email: string): Promise<void> {
     try {
         await db.query("DELETE FROM user WHERE email = ?", [email]);
     } catch (error) {
-        console.error("Erro ao excluir usuario por email:", error);
+        console.error("Erro ao excluir usuário por email:", error);
         throw error;
     }
 }

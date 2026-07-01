@@ -33,7 +33,7 @@ async function getConversationMessages(userId: number, conversationId: number): 
     const parsed = ConversationSchema.safeParse(conversation);
     if (!parsed.success) {
         console.log("Erro ao validar conversa:", parsed.error);
-        throw new Error("Dados de conversa invalidos");
+        throw new Error("Dados de conversa inválidos");
     }
     return parsed.data;
 }
@@ -51,7 +51,7 @@ async function getAllConversationSummary(userId: number): Promise<TConversationS
     const parsed = ConversationSummarySchema.safeParse(conversationSummary);
     if (!parsed.success) {
         console.log("Erro ao validar resumo da conversa:", parsed.error);
-        throw new Error("Dados de resumo da conversa invalidos");
+        throw new Error("Dados de resumo da conversa inválidos");
     }
     return parsed.data;
 }
@@ -90,7 +90,7 @@ async function createConversation(userId: number, prompt: string): Promise<TConv
     const parsed = ConversationSchema.safeParse(conversation);
     if (!parsed.success) {
         console.log("Erro ao validar conversa:", parsed.error);
-        throw new Error("Dados de conversa invalidos");
+        throw new Error("Dados de conversa inválidos");
     }
 
     return parsed.data;
@@ -113,7 +113,7 @@ async function createMessage(args: Omit<TMessage, "id" | "createdAt">): Promise<
     const parsed = MessageSchema.safeParse(message);
     if (!parsed.success) {
         console.log("Erro ao validar mensagem:", parsed.error);
-        throw new Error("Dados de mensagem invalidos");
+        throw new Error("Dados de mensagem inválidos");
     }
 
     await chatbotRepository.updateConversationTimestamp(args.conversationId);
@@ -127,7 +127,7 @@ async function handleFunctionCall(userId: number, fnName: ChatbotFunction, args:
             return await getInvestmentSummary(userId, args);
 
         default:
-            throw new Error(`FunÃ§Ã£o '${fnName}' nÃ£o implementada.`);
+            throw new Error(`Função '${fnName}' não implementada.`);
     }
 }
 

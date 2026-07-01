@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     } catch (error) {
         console.error("Erro em GET /api/portal/assets:", error);
-        return errorResponse("Erro ao processar a solicitaÃ§Ã£o", 500);
+        return errorResponse("Erro ao processar a solicitação", 500);
     }
 }
 

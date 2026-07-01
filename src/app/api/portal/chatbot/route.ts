@@ -22,13 +22,13 @@ const MODEL_NAME =
 const functionStepMap: Record<string, string> = {
   get_investment_summary: "Consultando resumo financeiro...",
 };
-// Esta função assá­ncrona processa as requisições POST para o endpoint "/api/portal/chatbot", interagindo com o modelo de inteligência artificial do Google Gemini para gerar respostas baseadas em prompts do usuário. Ela valida o ID do usuário autorizado, processa os eventos de resposta do modelo, incluindo chamadas de função, e retorna os resultados apropriados, tratando erros de rede e validação.
+// Esta função assí­ncrona processa as requisições POST para o endpoint "/api/portal/chatbot", interagindo com o modelo de inteligência artificial do Google Gemini para gerar respostas baseadas em prompts do usuário. Ela valida o ID do usuário autorizado, processa os eventos de resposta do modelo, incluindo chamadas de função, e retorna os resultados apropriados, tratando erros de rede e validação.
 export async function GET(req: NextRequest) {
   try {
     // validar o userID
     const authorizedUser = await userService.requireAuth(req);
     if (!authorizedUser) {
-      return errorResponse("NÃ£o autorizado", 401);
+      return errorResponse("Não autorizado", 401);
     }
 
     const { searchParams } = new URL(req.url);
@@ -267,10 +267,15 @@ export async function POST(req: NextRequest) {
           console.error("Erro de streaming do chatbot:", err);
           const error = err as ApiError;
           let errorMessage = "O serviÃ§o encontrou um problema.";
-          // Se o erro for um 503, indica que o modelo estÃ¡ com alta demanda, entÃ£o envia uma mensagem apropriada para o usuÃ¡rio.
+          // Se o erro for um 503, indica que o modelo está com alta demanda, então envia uma mensagem apropriada para o usuário.
           if (error?.status === 503) {
             errorMessage =
-              "O modelo estÃ¡ com alta demanda no momento. Por favor, tente novamente em alguns instantes.";
+              "O modelo está com alta demanda no momento. Por favor, tente novamente em alguns instantes.";
+          }
+          // Se o erro for um 429, indica que o usuário atingiu o limite de uso da IA, então envia uma mensagem apropriada para o usuário.
+          else if (error?.status === 429) {
+            errorMessage =
+              "Você atingiu o limite de uso da IA. Tente novamente mais tarde ou verifique seu plano.";
           }
 
           sendEvent({ done: true, type: "error", message: errorMessage });

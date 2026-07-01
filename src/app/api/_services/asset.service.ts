@@ -26,7 +26,7 @@ async function getAssetTypes(): Promise<TAssetTypeList | null> {
     const parsed = AssetTypeListSchema.safeParse(assetTypes);
     if (!parsed.success) {
       console.log("Erro ao validar tipos de ativos:", parsed.error);
-      throw new Error("Dados de tipo de ativo invalidos");
+      throw new Error("Dados de tipo de ativo inválidos");
     }
 
     return parsed.data;

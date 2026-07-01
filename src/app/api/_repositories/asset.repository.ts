@@ -74,7 +74,7 @@ async function updateAssetCurrentPrice(
     return result;
   } catch (error) {
     console.error("Erro em updateAssetCurrentPrice:", error);
-    throw new Error("Ocorreu um erro ao atualizar preco atual do ativo");
+    throw new Error("Ocorreu um erro ao atualizar preço atual do ativo");
   }
 }
 

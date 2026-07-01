@@ -50,8 +50,8 @@ async function getAllTransactions(userId: number): Promise<TTransactionList> {
 
     const parsed = TransactionListSchema.safeParse(transactionList);
     if (!parsed.success) {
-      console.log("Erro ao validar lista de transacoes:", parsed.error);
-      throw new Error("Dados de transacao invalidos");
+      console.log("Erro ao validar lista de transações:", parsed.error);
+      throw new Error("Dados de transação inválidos");
     }
 
     return parsed.data;
@@ -85,13 +85,13 @@ async function getTransactionById(
 
     const parsed = TransactionSchema.safeParse(transaction);
     if (!parsed.success) {
-      throw new Error("Dados de transacao invalidos");
+      throw new Error("Dados de transação inválidos");
     }
 
     return parsed.data;
   } catch (error) {
     console.error("Erro em getTransactionById:", error);
-    throw new Error("Ocorreu um erro ao buscar registro da transacao");
+    throw new Error("Ocorreu um erro ao buscar registro da transação");
   }
 }
 
@@ -116,8 +116,8 @@ async function getAllTransactionsWithArgs(
 
     const parsed = TransactionListSchema.safeParse(transactionList);
     if (!parsed.success) {
-      console.log("Erro ao validar lista de transacoes:", parsed.error);
-      throw new Error("Dados da lista de transacoes invalidos");
+      console.log("Erro ao validar lista de transações:", parsed.error);
+      throw new Error("Dados da lista de transacoes inválidos");
     }
 
     return parsed.data;
@@ -152,14 +152,14 @@ async function getAllTransactionsByAssetId(
 
     const parsed = TransactionListSchema.safeParse(transactionList);
     if (!parsed.success) {
-      console.log("Erro ao validar lista de transacoes:", parsed.error);
-      throw new Error("Dados da lista de transacoes invalidos");
+      console.log("Erro ao validar lista de transações:", parsed.error);
+      throw new Error("Dados da lista de transações inválidos");
     }
 
     return parsed.data;
   } catch (error) {
     console.error("Erro ao buscar transações por id do ativo:", error);
-    throw new Error("Ocorreu um erro ao buscar transacoes por id do ativo");
+    throw new Error("Ocorreu um erro ao buscar transações por id do ativo");
   }
 }
 
@@ -188,8 +188,8 @@ async function createTransaction(
 
     const parsed = TransactionSchema.safeParse(transaction);
     if (!parsed.success) {
-      console.log("Erro ao validar transacao:", parsed.error);
-      throw new Error("Dados de transacao invalidos");
+      console.log("Erro ao validar transação:", parsed.error);
+      throw new Error("Dados de transação inválidos");
     }
 
     return parsed.data;
@@ -217,13 +217,13 @@ async function updateTransaction(
 
     const updatedTransaction: TTransaction = {
       ...transactionData,
-      updated_at: getTodayLocalDate(), // Atualiza a data de atualizaÃ§Ã£o para o momento atual sem deslocamento de timezone
+      updated_at: getTodayLocalDate(), // Atualiza a data de atualizaçã£o para o momento atual sem deslocamento de timezone
     };
 
     const parsed = TransactionSchema.safeParse(updatedTransaction);
     if (!parsed.success) {
-      console.log("Erro ao validar transacao:", parsed.error);
-      throw new Error("Dados de transacao invalidos");
+      console.log("Erro ao validar transação:", parsed.error);
+      throw new Error("Dados de transacao inválidos");
     }
 
     return parsed.data;
