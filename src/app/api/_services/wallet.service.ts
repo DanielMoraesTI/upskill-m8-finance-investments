@@ -157,6 +157,23 @@ async function updateWalletIncome(
   }
 }
 
+// Atualiza somente o campo updated_at da carteira vinculada ao ativo.
+async function touchWalletUpdatedAtByAssetId(
+  userId: number,
+  assetId: number,
+): Promise<boolean> {
+  try {
+    const result = await walletRepository.touchWalletUpdatedAtByAssetId(
+      userId,
+      assetId,
+    );
+    return !!result;
+  } catch (error) {
+    console.error("Erro em touchWalletUpdatedAtByAssetId:", error);
+    throw new Error("Ocorreu um erro ao atualizar data da carteira");
+  }
+}
+
 async function recalculateWalletByAsset(
   userId: number,
   assetId: number,
@@ -197,6 +214,7 @@ const walletService = {
   getAllWallets,
   updateWalletData,
   updateWalletIncome,
+  touchWalletUpdatedAtByAssetId,
   ensureWalletByAsset,
   recalculateWalletByAsset,
 };

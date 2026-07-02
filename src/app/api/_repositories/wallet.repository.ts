@@ -112,11 +112,31 @@ async function updateWalletIncome(
   }
 }
 
+// Atualiza apenas o timestamp de atualização da carteira por ativo/usuário.
+async function touchWalletUpdatedAtByAssetId(
+  userId: number,
+  assetId: number,
+): Promise<ResultSetHeader> {
+  try {
+    const [result] = await db.query<ResultSetHeader>(
+      `UPDATE wallet
+       SET updated_at = CURRENT_TIMESTAMP
+       WHERE user_id = ? AND asset_id = ?`,
+      [userId, assetId],
+    );
+    return result;
+  } catch (error) {
+    console.error("Erro em touchWalletUpdatedAtByAssetId:", error);
+    throw new Error("Ocorreu um erro ao atualizar data da carteira");
+  }
+}
+
 const walletRepository = {
   findAllWallets,
   findWalletByAssetId,
   createWalletEntry,
   updateWalletData,
   updateWalletIncome,
+  touchWalletUpdatedAtByAssetId,
 };
 export default walletRepository;

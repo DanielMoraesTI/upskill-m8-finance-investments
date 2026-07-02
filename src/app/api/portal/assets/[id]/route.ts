@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import assetService from "@/app/api/_services/asset.service";
+import walletService from "@/app/api/_services/wallet.service";
 import { PatchCurrentPriceRequestSchema } from "@/schemas/assetSchema";
 import { errorResponse } from "@/app/api/_utils/serverUtils";
 import userService from "@/app/api/_services/user.service";
@@ -30,6 +31,9 @@ export async function PATCH(
       assetId,
       parsedBody.data.current_price,
     );
+
+    // Mantém o campo "Atualização" da carteira sincronizado ao editar preço atual.
+    await walletService.touchWalletUpdatedAtByAssetId(authorizedUser.id, assetId);
 
     return NextResponse.json(
       { message: "Preço atual do ativo atualizado com sucesso" },
