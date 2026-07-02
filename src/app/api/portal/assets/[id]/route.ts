@@ -33,7 +33,10 @@ export async function PATCH(
     );
 
     // Mantém o campo "Atualização" da carteira sincronizado ao editar preço atual.
-    await walletService.touchWalletUpdatedAtByAssetId(authorizedUser.id, assetId);
+    await walletService.touchWalletUpdatedAtByAssetId(
+      authorizedUser.id,
+      assetId,
+    );
 
     return NextResponse.json(
       { message: "Preço atual do ativo atualizado com sucesso" },
